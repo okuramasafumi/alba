@@ -1,4 +1,4 @@
-require "alba/version"
+require 'alba/version'
 
 module Alba
   class Error < StandardError; end

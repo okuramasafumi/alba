@@ -1,0 +1,15 @@
+---
+
+inherit_gem:
+  rubocop-sensible: 'config/rubocop.yml'
+
+require:
+  - rubocop-performance
+
+AllCops:
+  Exclude:
+    - 'Rakefile'
+    - 'alba.gemspec'
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
