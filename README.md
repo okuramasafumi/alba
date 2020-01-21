@@ -21,7 +21,7 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-# If you don't bundle 'oj', that's file
+# If you don't bundle 'oj', that's fine
 Alba.serialize({foo: 42}) # => '{"foo":42}'
 
 # bundle 'oj' in your Gemfile, then
