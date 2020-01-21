@@ -11,5 +11,11 @@ AllCops:
     - 'Rakefile'
     - 'alba.gemspec'
 
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+
+Metrics/MethodLength:
+  Max: 20
+
 Style/FrozenStringLiteralComment:
   Enabled: false
