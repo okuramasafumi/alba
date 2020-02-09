@@ -1,16 +1,17 @@
 require 'alba/version'
+require 'alba/resource'
 require 'json'
 
 # Core module
 module Alba
   class Error < StandardError; end
 
-  def self.backend=(backend)
-    @backend = backend&.to_sym
+  class << self
+    attr_reader :backend
   end
 
-  def self.backend
-    @backend
+  def self.backend=(backend)
+    @backend = backend&.to_sym
   end
 
   def self.serialize(object)
