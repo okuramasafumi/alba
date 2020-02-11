@@ -21,12 +21,36 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-# If you don't bundle 'oj', that's fine
-Alba.serialize({foo: 42}) # => '{"foo":42}'
+class User
+  attr_accessor :id, :name, :email, :created_at, :updated_at
+  def initialize(id, name, email)
+    @id = id
+    @name = name
+    @email = email
+    @created_at = Time.now
+    @updated_at = Time.now
+  end
+end
 
-# bundle 'oj' in your Gemfile, then
-Alba.backend = :oj
-Alba.serialize({foo: 42}) # => '{"foo":42}'
+class UserResource
+  include Alba::Resource
+
+  attributes :id, :name
+
+  attribute :name_with_email do |resource|
+    "#{resource.name}: #{resource.email}"
+  end
+end
+
+class SerializerWithKey
+  include Alba::Serializer
+
+  set key: :user
+end
+
+user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
+UserResource.new(user).serialize
+# => "{\"id\":1,\"name\":\"Masafumi OKURA\",\"name_with_email\":\"Masafumi OKURA: masafumi@example.com\"}"
 ```
 
 ## Development
