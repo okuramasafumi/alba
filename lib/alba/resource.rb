@@ -30,9 +30,9 @@ module Alba
                              @_serializer_class || Alba::Serializers::DefaultSerializer
                            end
         # opts = serializer.opts
-        serialiable_hash = @_attributes.map do |name, attribute|
-          [name, attribute.serialize(@_resource)]
-        end.to_h
+        serialiable_hash = @_attributes.transform_values do |attribute|
+          attribute.serialize(@_resource)
+        end
         serializer_class.new(serialiable_hash).serialize
       end
     end

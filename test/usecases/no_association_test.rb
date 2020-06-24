@@ -9,6 +9,7 @@ class NoAssociationTest < MiniTest::Test
 
   class User
     attr_accessor :id, :name, :email, :created_at, :updated_at
+
     def initialize(id, name, email)
       @id = id
       @name = name
