@@ -6,27 +6,32 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    ast (2.4.0)
-    jaro_winkler (1.5.4)
-    minitest (5.14.0)
-    parallel (1.19.1)
-    parser (2.7.0.2)
-      ast (~> 2.4.0)
+    ast (2.4.1)
+    minitest (5.14.1)
+    parallel (1.19.2)
+    parser (2.7.1.4)
+      ast (~> 2.4.1)
     rainbow (3.0.0)
     rake (13.0.1)
-    rubocop (0.79.0)
-      jaro_winkler (~> 1.5.1)
+    regexp_parser (1.7.1)
+    rexml (3.2.4)
+    rubocop (0.86.0)
       parallel (~> 1.10)
       parser (>= 2.7.0.1)
       rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.7)
+      rexml
+      rubocop-ast (>= 0.0.3, < 1.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 1.4.0, < 1.7)
+      unicode-display_width (>= 1.4.0, < 2.0)
+    rubocop-ast (0.0.3)
+      parser (>= 2.7.0.1)
     rubocop-performance (1.5.2)
       rubocop (>= 0.71.0)
     rubocop-sensible (0.3.0)
       rubocop (>= 0.60.0)
     ruby-progressbar (1.10.1)
-    unicode-display_width (1.6.1)
+    unicode-display_width (1.7.0)
 
 PLATFORMS
   ruby
