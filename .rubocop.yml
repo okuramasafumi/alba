@@ -10,6 +10,7 @@ AllCops:
   Exclude:
     - 'Rakefile'
     - 'alba.gemspec'
+  NewCops: enable
 
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
