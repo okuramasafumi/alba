@@ -29,11 +29,15 @@ module Alba
                            when nil
                              @_serializer_class || Alba::Serializers::DefaultSerializer
                            end
-        # opts = serializer.opts
-        serialiable_hash = @_attributes.transform_values do |attribute|
+        serializer_class.new(serializable_hash).serialize
+      end
+
+      private
+
+      def serializable_hash
+        @_attributes.transform_values do |attribute|
           attribute.serialize(@_resource)
         end
-        serializer_class.new(serialiable_hash).serialize
       end
     end
 
