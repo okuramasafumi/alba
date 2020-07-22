@@ -1,0 +1,60 @@
+# linter:
+# # https://help.sider.review/getting-started/custom-configuration
+
+#   # https://help.sider.review/tools/ruby/rubocop
+#   rubocop:
+#     gems:
+#       - "rubocop-rspec"
+#     config: "config/.rubocop.yml"
+#     safe: true
+
+#   # https://help.sider.review/tools/ruby/reek
+#   reek:
+#     gems:
+#       - name: "reek"
+#         version: "5.2.0"
+#     target:
+#       - lib/
+#       - test/
+#     config: config/.reek.yml
+
+#   # https://help.sider.review/tools/ruby/querly
+#   querly:
+#     gems:
+#       - "slim"
+
+#   # https://help.sider.review/tools/others/misspell
+#   misspell:
+#     exclude:
+#       - vendor
+#       - "**/*.min.js"
+#       - exclude_file.rb
+#     targets:
+#       - target_directory
+#       - another_target_directory/foo.rb
+#       - bar.rb
+#     locale: UK
+#     ignore: center,behavior
+
+#   # https://help.sider.review/tools/shellscript/shellcheck
+#   shellcheck:
+#     target: "src/**/*.{sh,bash}"
+#     include: "SC2104,SC2105"
+#     exclude: "SC1000,SC1118"
+#     enable: "all"
+#     shell: "bash"
+#     severity: "error"
+#     norc: true
+
+# # https://help.sider.review/getting-started/custom-configuration#ignore
+# ignore:
+#   - "*.pdf"
+#   - "*.mp4"
+#   - "images/**"
+
+# # https://help.sider.review/getting-started/custom-configuration#branchesexclude
+# branches:
+#   exclude:
+#     - master
+#     - development
+#     - /^release-.*$/
