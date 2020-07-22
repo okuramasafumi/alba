@@ -1,12 +1,12 @@
-# linter:
+linter:
 # # https://help.sider.review/getting-started/custom-configuration
 
 #   # https://help.sider.review/tools/ruby/rubocop
-#   rubocop:
-#     gems:
-#       - "rubocop-rspec"
-#     config: "config/.rubocop.yml"
-#     safe: true
+  rubocop:
+    gems:
+      - "rubocop-performance"
+      - "rubocop-sensible"
+    safe: false
 
 #   # https://help.sider.review/tools/ruby/reek
 #   reek:
