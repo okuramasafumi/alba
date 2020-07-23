@@ -72,4 +72,20 @@ class NoAssociationTest < MiniTest::Test
       UserResource.new(user).serialize(with: SerializerWithKey)
     )
   end
+
+  class UserResource2
+    include Alba::Resource
+
+    attribute :name_with_email do
+      "#{name}: #{email}"
+    end
+  end
+
+  def test_attribute_works_without_block_args
+    user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
+    assert_equal(
+      '{"user":{"name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
+      UserResource2.new(user).serialize(with: SerializerWithKey)
+    )
+  end
 end

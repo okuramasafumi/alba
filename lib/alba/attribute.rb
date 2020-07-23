@@ -12,7 +12,7 @@ module Alba
       when Symbol, String
         target.public_send(@method)
       when Proc
-        @method.call(target)
+        @method.arity.zero? ? target.instance_exec(&@method) : @method.call(target)
       end
     end
   end
