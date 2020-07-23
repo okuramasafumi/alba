@@ -22,7 +22,7 @@ module Alba
 
       def serialize(with: nil)
         serializer_class = case with
-                           when ->(obj) { obj.is_a?(Class) && obj.ancestors.include?(Alba::Serializer) }
+                           when ->(obj) { obj.is_a?(Class) && obj <= Alba::Serializer }
                              with
                            when Symbol
                              const_get(with.to_s.capitalize)
@@ -82,7 +82,7 @@ module Alba
       end
 
       def serializer(name)
-        @_serializer_class = name.ancestors.include?(Alba::Serializer) ? name : nil
+        @_serializer_class = name <= Alba::Serializer ? name : nil
       end
     end
   end
