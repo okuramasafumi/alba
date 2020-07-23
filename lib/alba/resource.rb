@@ -36,25 +36,29 @@ module Alba
         serializer_class.new(serializable_hash).serialize
       end
 
-      def to_hash
-        serializable_hash
+      def serializable_hash
+        attrs.merge(ones).merge(manies)
       end
+      alias to_hash serializable_hash
 
       private
 
-      def serializable_hash
-        attrs = @_attributes&.transform_values do |attribute|
+      def attrs
+        @_attributes&.transform_values do |attribute|
           attribute.serialize(@_resource)
         end || {}
-        ones = @_one&.transform_values do |one|
+      end
+
+      def ones
+        @_one&.transform_values do |one|
           one.to_hash(@_resource)
         end || {}
-        manies = @_many&.transform_values do |many|
+      end
+
+      def manies
+        @_many&.transform_values do |many|
           many.to_hash(@_resource)
         end || {}
-        attrs.update(ones)
-        attrs.update(manies)
-        attrs
       end
     end
 
