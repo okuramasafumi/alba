@@ -45,7 +45,7 @@ module Alba
 
       def attrs
         @_attributes&.transform_values do |attribute|
-          attribute.serialize(@_resource)
+          attribute.to_hash(@_resource)
         end || {}
       end
 

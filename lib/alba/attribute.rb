@@ -7,7 +7,7 @@ module Alba
       @method = method
     end
 
-    def serialize(target)
+    def to_hash(target)
       case @method
       when Symbol, String
         target.public_send(@method)
