@@ -9,7 +9,7 @@ module Alba
     end
 
     def to_hash(target)
-      objects = target.__send__(@name)
+      objects = target.public_send(@name)
       @resource ||= resource_class
       objects.map { |o| @resource.new(o).to_hash }
     end
