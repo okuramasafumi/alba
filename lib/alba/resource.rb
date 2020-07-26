@@ -7,7 +7,7 @@ require 'alba/serializers/default_serializer'
 module Alba
   # This module represents what should be serialized
   module Resource
-    DSLS = [:_attributes, :_one, :_many, :_serializer].freeze
+    DSLS = [:_attributes, :_serializer].freeze
     def self.included(base)
       base.class_eval do
         # Initialize
@@ -29,42 +29,24 @@ module Alba
 
       def serialize(with: nil)
         serializer = case with
+                     when nil
+                       @_serializer || Alba::Serializers::DefaultSerializer
                      when ->(obj) { obj.is_a?(Class) && obj <= Alba::Serializer }
                        with
                      when Symbol
                        const_get(with.to_s.capitalize)
                      when String
                        const_get(with)
-                     when nil
-                       @_serializer || Alba::Serializers::DefaultSerializer
                      end
         serializer.new(serializable_hash).serialize
       end
 
       def serializable_hash
-        attrs.merge(ones).merge(manies)
-      end
-      alias to_hash serializable_hash
-
-      private
-
-      def attrs
         @_attributes.transform_values do |attribute|
           attribute.to_hash(@_resource)
-        end || {}
+        end
       end
-
-      def ones
-        @_one.transform_values do |one|
-          one.to_hash(@_resource)
-        end || {}
-      end
-
-      def manies
-        @_many.transform_values do |many|
-          many.to_hash(@_resource)
-        end || {}
-      end
+      alias to_hash serializable_hash
     end
 
     # Class methods
@@ -86,11 +68,11 @@ module Alba
       end
 
       def one(name, resource: nil, &block)
-        @_one[name.to_sym] = One.new(name: name, resource: resource, &block)
+        @_attributes[name.to_sym] = One.new(name: name, resource: resource, &block)
       end
 
       def many(name, resource: nil, &block)
-        @_many[name.to_sym] = Many.new(name: name, resource: resource, &block)
+        @_attributes[name.to_sym] = Many.new(name: name, resource: resource, &block)
       end
 
       def serializer(name)
