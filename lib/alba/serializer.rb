@@ -25,7 +25,7 @@ module Alba
         when :oj
           begin
             require 'oj'
-            -> { Oj.dump(@_resource) }
+            -> { Oj.dump(@_resource, mode: :strict) }
           rescue LoadError
             fallback
           end
