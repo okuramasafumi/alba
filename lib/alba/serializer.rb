@@ -17,7 +17,10 @@ module Alba
       end
 
       def serialize
-        fallback = -> { @_resource.to_json }
+        fallback = lambda do
+          require 'json'
+          JSON.dump(@_resource)
+        end
         case Alba.backend
         when :oj
           begin

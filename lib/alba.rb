@@ -1,6 +1,7 @@
 require 'alba/version'
+require 'alba/serializers/default_serializer'
+require 'alba/serializer'
 require 'alba/resource'
-require 'json'
 
 # Core module
 module Alba

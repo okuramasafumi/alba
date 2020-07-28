@@ -1,3 +1,5 @@
+require 'alba/serializer'
+
 module Alba
   module Serializers
     # DefaultSerializer class is used when a user doesn't specify serializer opt.
