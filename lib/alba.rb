@@ -15,17 +15,6 @@ module Alba
   end
 
   def self.serialize(object)
-    fallback = ->(resource) { resource.to_json }
-    case backend
-    when :oj
-      begin
-        require 'oj'
-        ->(resource) { Oj.dump(resource) }
-      rescue LoadError
-        fallback
-      end
-    else
-      fallback
-    end.call(object)
+    Serializers::DefaultSerializer.new(object).serialize
   end
 end
