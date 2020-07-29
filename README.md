@@ -4,7 +4,7 @@
 
 # Alba
 
-`Alba` is a fast and flexible JSON serializer.
+`Alba` is a stupid, fast and easy to use JSON serializer.
 
 ## Installation
 
@@ -23,6 +23,8 @@ Or install it yourself as:
     $ gem install alba
 
 ## Usage
+
+### Simple serialization with key
 
 ```ruby
 class User
@@ -56,6 +58,64 @@ user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
 UserResource.new(user).serialize
 # => "{\"id\":1,\"name\":\"Masafumi OKURA\",\"name_with_email\":\"Masafumi OKURA: masafumi@example.com\"}"
 ```
+
+### Serialization with associations
+
+```ruby
+class User
+  attr_reader :id, :created_at, :updated_at
+  attr_accessor :articles
+
+  def initialize(id)
+    @id = id
+    @created_at = Time.now
+    @updated_at = Time.now
+    @articles = []
+  end
+end
+
+class Article
+  attr_accessor :user_id, :title, :body
+
+  def initialize(user_id, title, body)
+    @user_id = user_id
+    @title = title
+    @body = body
+  end
+end
+
+class ArticleResource
+  include Alba::Resource
+
+  attributes :title
+end
+
+class UserResource1
+  include Alba::Resource
+
+  attributes :id
+
+  many :articles, resource: ArticleResource
+end
+
+user = User.new(1)
+article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
+user.articles << article1
+article2 = Article.new(2, 'Super nice', 'Really nice!')
+user.articles << article2
+
+UserResource1.new(user).serialize
+# => '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}'
+```
+
+## Comparison
+
+Since Alba is intended to be stupid, there are many things Alba can't do while other gems can. However, from the same reason, it's extremely faster than alternatives.
+For a performance benchmark, see https://gist.github.com/okuramasafumi/4e375525bd3a28e4ca812d2a3b3e5829.
+
+## Why named "Alba"?
+
+The name "Alba" comes from "albatross", a kind of birds. In Japanese, this bird is called "Aho-dori", which means "stupid bird". I find it funny because in fact albatrosses fly really fast. I hope Alba looks stupid but in fact it does its job quick.
 
 ## Development
 
