@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    alba (0.4.0)
+    alba (0.5.0)
 
 GEM
   remote: https://rubygems.org/
