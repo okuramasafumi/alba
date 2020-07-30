@@ -108,6 +108,22 @@ UserResource1.new(user).serialize
 # => '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}'
 ```
 
+### Inline definition with `Alba.serialize`
+
+`Alba.serialize` method is a shortcut to define everything inline.
+
+```ruby
+Alba.serialize(user, with: proc { set key: :foo }) do
+  attributes :id
+  many :articles do
+    attributes :title, :body
+  end
+end
+# => '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}'
+```
+
+Although this might be useful sometimes, it's generally recommended to define a class for both Resource and Serializer.
+
 ## Comparison
 
 Since Alba is intended to be stupid, there are many things Alba can't do while other gems can. However, from the same reason, it's extremely faster than alternatives.
