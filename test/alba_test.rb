@@ -1,27 +1,67 @@
 require 'test_helper'
 
 class AlbaTest < Minitest::Test
-  def setup
-    Alba.backend = nil
+  class SerializerWithKey
+    include Alba::Serializer
+
+    set key: :foo
   end
 
-  def test_that_it_has_a_version_number
-    refute_nil ::Alba::VERSION
+  class User
+    attr_reader :id, :created_at, :updated_at
+    attr_accessor :articles
+
+    def initialize(id)
+      @id = id
+      @created_at = Time.now
+      @updated_at = Time.now
+      @articles = []
+    end
   end
 
-  def test_backend_returns_backend_if_set
-    Alba.backend = :oj
-    assert_equal :oj, Alba.backend
+  class Article
+    attr_accessor :user_id, :title, :body
+
+    def initialize(user_id, title, body)
+      @user_id = user_id
+      @title = title
+      @body = body
+    end
   end
 
-  def test_it_serializes_a_hash
-    hash = {foo: 42}
-    assert_equal '{"foo":42}', Alba.serialize(hash)
+  def test_it_serializes_object_with_block
+    user = User.new(1)
+    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
+    user.articles << article1
+    article2 = Article.new(2, 'Super nice', 'Really nice!')
+    user.articles << article2
+
+    assert_equal(
+      '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}',
+      Alba.serialize(user) do
+        attributes :id
+        many :articles do
+          attributes :title, :body
+        end
+      end
+    )
   end
 
-  def test_it_serializes_a_hash_with_oj_backend
-    hash = {foo: 42}
-    Alba.backend = :oj
-    assert_equal '{"foo":42}', Alba.serialize(hash)
+  def test_it_serializes_object_with_block_with_with_option
+    user = User.new(1)
+    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
+    user.articles << article1
+    article2 = Article.new(2, 'Super nice', 'Really nice!')
+    user.articles << article2
+
+    assert_equal(
+      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
+      Alba.serialize(user, with: SerializerWithKey) do
+        attributes :id
+        many :articles do
+          attributes :title, :body
+        end
+      end
+    )
   end
 end

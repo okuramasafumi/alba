@@ -2,6 +2,7 @@ require 'alba/version'
 require 'alba/serializers/default_serializer'
 require 'alba/serializer'
 require 'alba/resource'
+require 'alba/resources/default_resource'
 
 # Core module
 module Alba
@@ -9,13 +10,23 @@ module Alba
 
   class << self
     attr_reader :backend
-  end
 
-  def self.backend=(backend)
-    @backend = backend&.to_sym
-  end
+    def backend=(backend)
+      @backend = backend&.to_sym
+    end
 
-  def self.serialize(object)
-    Serializers::DefaultSerializer.new(object).serialize
+    def serialize(object, with: nil, &block)
+      raise ArgumentError, 'Block required' unless block
+
+      resource_class.class_eval(&block)
+      resource = resource_class.new(object)
+      resource.serialize(with: with)
+    end
+
+    private
+
+    def resource_class
+      ::Alba::Resources::DefaultResource.clone
+    end
   end
 end
