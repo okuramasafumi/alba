@@ -65,6 +65,23 @@ class AlbaTest < Minitest::Test
     )
   end
 
+  def test_it_serializes_object_with_block_with_invalid_with_option
+    user = User.new(1)
+    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
+    user.articles << article1
+    article2 = Article.new(2, 'Super nice', 'Really nice!')
+    user.articles << article2
+
+    assert_raises ArgumentError do
+      Alba.serialize(user, with: :invalid_with) do
+        attributes :id
+        many :articles do
+          attributes :title, :body
+        end
+      end
+    end
+  end
+
   def test_it_serializes_object_with_fully_inlined_definitions
     user = User.new(1)
     article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
