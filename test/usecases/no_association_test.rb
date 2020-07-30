@@ -88,4 +88,12 @@ class NoAssociationTest < MiniTest::Test
       UserResource2.new(user).serialize(with: SerializerWithKey)
     )
   end
+
+  def test_serialiaze_method_with_option_as_proc
+    user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
+    assert_equal(
+      '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
+      UserResource.new(user).serialize(with: proc { set key: :user })
+    )
+  end
 end

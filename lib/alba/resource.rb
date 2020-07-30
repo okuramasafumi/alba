@@ -33,10 +33,10 @@ module Alba
                        @_serializer || Alba::Serializers::DefaultSerializer
                      when ->(obj) { obj.is_a?(Class) && obj <= Alba::Serializer }
                        with
-                     when Symbol
-                       const_get(with.to_s.capitalize)
-                     when String
-                       const_get(with)
+                     when Proc
+                       inline_extended_serializer(with)
+                     else
+                       raise ArgumentError, 'Unexpected type for with, possible types are Class or Proc'
                      end
         serializer.new(serializable_hash).serialize
       end
@@ -47,6 +47,14 @@ module Alba
         end
       end
       alias to_hash serializable_hash
+
+      private
+
+      def inline_extended_serializer(with)
+        klass = ::Alba::Serializers::DefaultSerializer.clone
+        klass.class_eval(&with)
+        klass
+      end
     end
 
     # Class methods
