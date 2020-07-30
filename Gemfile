@@ -5,6 +5,7 @@ gemspec
 
 gem 'coveralls', require: false
 gem 'minitest', '~> 5.0'
+gem 'oj', '~> 3.0'
 gem 'rake', '~> 13.0'
 gem 'rubocop', '>= 0.79.0', require: false
 gem 'rubocop-performance', '~> 1.7.1', require: false
