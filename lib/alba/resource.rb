@@ -47,9 +47,16 @@ module Alba
       end
 
       def serializable_hash(with_key: true)
-        serializable_hash = @_attributes.transform_values do |attribute|
-          attribute.to_hash(@_resource)
+        get_attribute = lambda do |resource|
+          @_attributes.transform_values do |attribute|
+            attribute.to_hash(resource)
+          end
         end
+        serializable_hash = if collection?
+                              @_resource.map(&get_attribute)
+                            else
+                              get_attribute.call(@_resource)
+                            end
         with_key && @_key ? {@_key => serializable_hash} : serializable_hash
       end
       alias to_hash serializable_hash
@@ -64,6 +71,10 @@ module Alba
         klass = ::Alba::Serializers::DefaultSerializer.clone
         klass.class_eval(&with)
         klass
+      end
+
+      def collection?
+        @_resource.is_a?(Enumerable)
       end
     end
 
