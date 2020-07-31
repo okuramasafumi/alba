@@ -16,7 +16,7 @@ module Alba
               else
                 @_opts[:key]
               end
-        @hash = resource.serializable_hash
+        @hash = resource.serializable_hash(with_key: false)
         @hash = {key.to_sym => @hash} if key
       end
 

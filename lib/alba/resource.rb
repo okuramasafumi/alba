@@ -46,15 +46,16 @@ module Alba
         serializer.new(self).serialize
       end
 
-      def serializable_hash
-        @_attributes.transform_values do |attribute|
+      def serializable_hash(with_key: true)
+        serializable_hash = @_attributes.transform_values do |attribute|
           attribute.to_hash(@_resource)
         end
+        with_key && @_key ? {@_key => serializable_hash} : serializable_hash
       end
       alias to_hash serializable_hash
 
       def key
-        @_key || self.class.name.delete_suffix('Resource').downcase.gsub(/:{2}/, '_')
+        @_key || self.class.name.delete_suffix('Resource').downcase.gsub(/:{2}/, '_').to_sym
       end
 
       private
@@ -97,7 +98,7 @@ module Alba
       end
 
       def key(key)
-        @_key = key.to_s
+        @_key = key.to_sym
       end
     end
   end
