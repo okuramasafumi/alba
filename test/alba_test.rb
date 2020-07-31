@@ -30,6 +30,9 @@ class AlbaTest < Minitest::Test
   end
 
   def setup
+    Alba.backend = nil
+    Alba.default_serializer = nil
+
     @user = User.new(1)
     @article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
     @user.articles << @article1
@@ -90,6 +93,34 @@ class AlbaTest < Minitest::Test
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
       Alba.serialize(@user, with: proc { set key: :foo }) do
+        attributes :id
+        many :articles do
+          attributes :title, :body
+        end
+      end
+    )
+  end
+
+  def test_it_accepts_default_serializer_as_class
+    Alba.default_serializer = SerializerWithKey
+
+    assert_equal(
+      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
+      Alba.serialize(@user) do
+        attributes :id
+        many :articles do
+          attributes :title, :body
+        end
+      end
+    )
+  end
+
+  def test_it_accepts_default_serializer_as_proc
+    Alba.default_serializer = proc { set key: :user }
+
+    assert_equal(
+      '{"user":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
+      Alba.serialize(@user) do
         attributes :id
         many :articles do
           attributes :title, :body

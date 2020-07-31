@@ -10,6 +10,7 @@ module Alba
 
   class << self
     attr_reader :backend
+    attr_accessor :default_serializer
 
     def backend=(backend)
       @backend = backend&.to_sym
@@ -20,6 +21,7 @@ module Alba
 
       resource_class.class_eval(&block)
       resource = resource_class.new(object)
+      with ||= @default_serializer
       resource.serialize(with: with)
     end
 

@@ -34,6 +34,9 @@ class NoAssociationTest < MiniTest::Test
   end
 
   def setup
+    Alba.backend = nil
+    Alba.default_serializer = nil
+
     @user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
   end
 
@@ -52,6 +55,15 @@ class NoAssociationTest < MiniTest::Test
   end
 
   def test_it_returns_correct_json_with_with_option_in_serialize_method
+    assert_equal(
+      '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
+      UserResource.new(@user).serialize(with: SerializerWithKey)
+    )
+  end
+
+  def test_it_returns_correct_json_with_with_option_in_serialize_method_while_overwriting_default_serializer
+    Alba.default_serializer = proc { set key: :overwrite_me }
+
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
       UserResource.new(@user).serialize(with: SerializerWithKey)
