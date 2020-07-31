@@ -29,16 +29,18 @@ class AlbaTest < Minitest::Test
     end
   end
 
-  def test_it_serializes_object_with_block
-    user = User.new(1)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
+  def setup
+    @user = User.new(1)
+    @article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
+    @user.articles << @article1
+    @article2 = Article.new(2, 'Super nice', 'Really nice!')
+    @user.articles << @article2
+  end
 
+  def test_it_serializes_object_with_block
     assert_equal(
       '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}',
-      Alba.serialize(user) do
+      Alba.serialize(@user) do
         attributes :id
         many :articles do
           attributes :title, :body
@@ -48,15 +50,9 @@ class AlbaTest < Minitest::Test
   end
 
   def test_it_serializes_object_with_block_with_with_option
-    user = User.new(1)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
-
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
-      Alba.serialize(user, with: SerializerWithKey) do
+      Alba.serialize(@user, with: SerializerWithKey) do
         attributes :id
         many :articles do
           attributes :title, :body
@@ -66,14 +62,8 @@ class AlbaTest < Minitest::Test
   end
 
   def test_it_serializes_object_with_block_with_invalid_with_option
-    user = User.new(1)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
-
     assert_raises ArgumentError do
-      Alba.serialize(user, with: :invalid_with) do
+      Alba.serialize(@user, with: :invalid_with) do
         attributes :id
         many :articles do
           attributes :title, :body
@@ -83,15 +73,9 @@ class AlbaTest < Minitest::Test
   end
 
   def test_it_serializes_object_with_fully_inlined_definitions
-    user = User.new(1)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
-
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
-      Alba.serialize(user, with: proc { set key: :foo }) do
+      Alba.serialize(@user, with: proc { set key: :foo }) do
         attributes :id
         many :articles do
           attributes :title, :body
@@ -101,16 +85,11 @@ class AlbaTest < Minitest::Test
   end
 
   def test_it_serializes_object_with_fully_inlined_definitions_with_oj
-    user = User.new(1)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
     Alba.backend = :oj
 
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
-      Alba.serialize(user, with: proc { set key: :foo }) do
+      Alba.serialize(@user, with: proc { set key: :foo }) do
         attributes :id
         many :articles do
           attributes :title, :body

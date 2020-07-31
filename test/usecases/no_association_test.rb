@@ -33,43 +33,28 @@ class NoAssociationTest < MiniTest::Test
     serializer SerializerWithKey
   end
 
+  def setup
+    @user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
+  end
+
   def test_it_returns_correct_json_with_no_opt
-    user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
     assert_equal(
-      {
-        id: 1,
-        name: 'Masafumi OKURA',
-        name_with_email: 'Masafumi OKURA: masafumi@example.com'
-      }.to_json,
-      UserResource.new(user).serialize
+      '{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}',
+      UserResource.new(@user).serialize
     )
   end
 
   def test_it_returns_correct_json_with_serializer_opt
-    user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
     assert_equal(
-      {
-        user: {
-          id: 1,
-          name: 'Masafumi OKURA',
-          name_with_email: 'Masafumi OKURA: masafumi@example.com'
-        }
-      }.to_json,
-      UserResourceWithSerializerOpt.new(user).serialize
+      '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
+      UserResourceWithSerializerOpt.new(@user).serialize
     )
   end
 
   def test_it_returns_correct_json_with_with_option_in_serialize_method
-    user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
     assert_equal(
-      {
-        user: {
-          id: 1,
-          name: 'Masafumi OKURA',
-          name_with_email: 'Masafumi OKURA: masafumi@example.com'
-        }
-      }.to_json,
-      UserResource.new(user).serialize(with: SerializerWithKey)
+      '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
+      UserResource.new(@user).serialize(with: SerializerWithKey)
     )
   end
 
@@ -82,18 +67,16 @@ class NoAssociationTest < MiniTest::Test
   end
 
   def test_attribute_works_without_block_args
-    user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
     assert_equal(
       '{"user":{"name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource2.new(user).serialize(with: SerializerWithKey)
+      UserResource2.new(@user).serialize(with: SerializerWithKey)
     )
   end
 
   def test_serialiaze_method_with_option_as_proc
-    user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource.new(user).serialize(with: proc { set key: :user })
+      UserResource.new(@user).serialize(with: proc { set key: :user })
     )
   end
 end
