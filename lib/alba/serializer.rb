@@ -1,6 +1,5 @@
 module Alba
   # This module represents how a resource should be serialized.
-  #
   module Serializer
     def self.included(base)
       base.include InstanceMethods
@@ -10,22 +9,27 @@ module Alba
     # Instance methods
     module InstanceMethods
       def initialize(resource)
-        @_resource = resource
         @_opts = self.class._opts || {}
-        key = @_opts[:key]
-        @_resource = {key.to_sym => @_resource} if key
+        key = case @_opts[:key]
+              when true
+                resource.key
+              else
+                @_opts[:key]
+              end
+        @hash = resource.serializable_hash
+        @hash = {key.to_sym => @hash} if key
       end
 
       def serialize
         fallback = lambda do
           require 'json'
-          JSON.dump(@_resource)
+          JSON.dump(@hash)
         end
         case Alba.backend
         when :oj
           begin
             require 'oj'
-            -> { Oj.dump(@_resource, mode: :strict) }
+            -> { Oj.dump(@hash, mode: :strict) }
           rescue LoadError
             fallback
           end

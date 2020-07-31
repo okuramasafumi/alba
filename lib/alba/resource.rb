@@ -7,12 +7,17 @@ require 'alba/serializers/default_serializer'
 module Alba
   # This module represents what should be serialized
   module Resource
-    DSLS = [:_attributes, :_serializer].freeze
+    DSLS = [:_attributes, :_serializer, :_key].freeze
     def self.included(base)
       base.class_eval do
         # Initialize
         DSLS.each do |name|
-          initial = name == :_serializer ? nil : {}
+          initial = case name
+                    when :_attributes
+                      {}
+                    when :_serializer, :_name
+                      nil
+                    end
           instance_variable_set("@#{name}", initial) unless instance_variable_defined?("@#{name}")
         end
       end
@@ -38,7 +43,7 @@ module Alba
                      else
                        raise ArgumentError, 'Unexpected type for with, possible types are Class or Proc'
                      end
-        serializer.new(serializable_hash).serialize
+        serializer.new(self).serialize
       end
 
       def serializable_hash
@@ -47,6 +52,10 @@ module Alba
         end
       end
       alias to_hash serializable_hash
+
+      def key
+        @_key || self.class.name.delete_suffix('Resource').downcase.gsub(/:{2}/, '_')
+      end
 
       private
 
@@ -85,6 +94,10 @@ module Alba
 
       def serializer(name)
         @_serializer = name <= Alba::Serializer ? name : nil
+      end
+
+      def key(key)
+        @_key = key.to_s
       end
     end
   end
