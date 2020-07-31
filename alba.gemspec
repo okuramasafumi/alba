@@ -6,8 +6,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['OKURA Masafumi']
   spec.email         = ['masafumi.o1988@gmail.com']
 
-  spec.summary       = 'Fast and flexible JSON serializer'
-  spec.description   = 'Fast and flexible JSON serializer'
+  spec.summary       = 'Alba is a stupid, fast and easy to use JSON serializer.'
+  spec.description   = "Alba is designed to be a simple and fast alternative to existing JSON serializers. Its performance is better than almost all gems which do similar things. The internal is so simple that it's easy to hack and maintain."
   spec.homepage      = 'https://github.com/okuramasafumi/alba'
   spec.license       = 'MIT'
   spec.required_ruby_version = Gem::Requirement.new('>= 2.5.8')
