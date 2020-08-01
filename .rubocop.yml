@@ -19,10 +19,5 @@ Layout/SpaceInsideHashLiteralBraces:
 Metrics/MethodLength:
   Max: 20
 
-Naming/PredicateName:
-  AllowedMethods:
-    - 'has_one'
-    - 'has_many'
-
 Style/FrozenStringLiteralComment:
   Enabled: false
