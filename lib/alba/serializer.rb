@@ -47,6 +47,10 @@ module Alba
     module ClassMethods
       attr_reader :_opts, :_metadata
 
+      def inherited(subclass)
+        %w[_opts _metadata].each { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}")) }
+      end
+
       def set(key: false)
         @_opts ||= {}
         @_opts[:key] = key
