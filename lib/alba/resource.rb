@@ -82,10 +82,10 @@ module Alba
 
     # Class methods
     module ClassMethods
-      attr_accessor(*DSLS)
+      attr_reader(*DSLS)
 
       def inherited(subclass)
-        DSLS.each { |name| subclass.public_send("#{name}=", instance_variable_get("@#{name}")) }
+        DSLS.each { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}")) }
       end
 
       def attributes(*attrs)
