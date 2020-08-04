@@ -27,8 +27,10 @@ module Alba
 
     # Instance methods
     module InstanceMethods
-      def initialize(resource)
-        @_resource = resource
+      attr_reader :_object
+
+      def initialize(object)
+        @_object = object
         DSLS.each { |name| instance_variable_set("@#{name}", self.class.public_send(name)) }
       end
 
@@ -53,9 +55,9 @@ module Alba
           end
         end
         serializable_hash = if collection?
-                              @_resource.map(&get_attribute)
+                              @_object.map(&get_attribute)
                             else
-                              get_attribute.call(@_resource)
+                              get_attribute.call(@_object)
                             end
         with_key && @_key ? {@_key => serializable_hash} : serializable_hash
       end
@@ -74,7 +76,7 @@ module Alba
       end
 
       def collection?
-        @_resource.is_a?(Enumerable)
+        @_object.is_a?(Enumerable)
       end
     end
 
