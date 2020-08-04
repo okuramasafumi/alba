@@ -29,8 +29,9 @@ module Alba
     module InstanceMethods
       attr_reader :_object, :_key
 
-      def initialize(object)
+      def initialize(object, params: {})
         @_object = object
+        @params = params
         DSLS.each { |name| instance_variable_set("@#{name}", self.class.public_send(name)) }
       end
 
@@ -51,6 +52,9 @@ module Alba
       def serializable_hash
         get_attribute = lambda do |resource|
           @_attributes.transform_values do |attribute|
+            resource = resource.clone
+            params = @params # We NEED this line for the line below.
+            resource.define_singleton_method :params, -> { params }
             attribute.to_hash(resource)
           end
         end
