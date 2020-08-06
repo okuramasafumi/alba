@@ -127,7 +127,7 @@ Although this might be useful sometimes, it's generally recommended to define a 
 
 ## Comparison
 
-Since Alba is intended to be stupid, there are many things Alba can't do while other gems can. However, from the same reason, it's extremely faster than alternatives.
+Alba is faster than alternatives.
 For a performance benchmark, see https://gist.github.com/okuramasafumi/4e375525bd3a28e4ca812d2a3b3e5829.
 
 ## Why named "Alba"?
