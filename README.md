@@ -5,7 +5,7 @@
 
 # Alba
 
-`Alba` is a stupid, fast and easy to use JSON serializer.
+`Alba` is the fastest JSON serializer for Ruby.
 
 ## Installation
 
