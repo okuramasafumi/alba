@@ -4,6 +4,7 @@ linter:
 #   # https://help.sider.review/tools/ruby/rubocop
   rubocop:
     gems:
+      - "rubocop-minitest"
       - "rubocop-performance"
       - "rubocop-sensible"
     safe: false
