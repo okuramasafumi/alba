@@ -134,6 +134,18 @@ For a performance benchmark, see https://gist.github.com/okuramasafumi/4e375525b
 
 The name "Alba" comes from "albatross", a kind of birds. In Japanese, this bird is called "Aho-dori", which means "stupid bird". I find it funny because in fact albatrosses fly really fast. I hope Alba looks stupid but in fact it does its job quick.
 
+## Alba internals
+
+Alba has three component, `Serializer`, `Resource` and `Value` (`Value` is conceptual and not implemented directly).
+
+`Serializer` is a component responsible for rendering JSON output with `Resource`. `Serializer` can add more data to `Resource` such as `metadata`. Users can define one single `Serializer` and reuse it for all `Resource`s. The main interface is `#serialize`.
+
+`Resource` is a component responsible for defining how an object (or a collection of objects) is converted into JSON. The difference between `Serializer` and `Resource` is that while `Serializer` can add arbitrary data into JSON, `Resource` can get data only from the object under it. The main interface is `#serializable_hash`.
+
+`Value` is either `Attribute`, `One` or `Many`. They are responsible for fetching data from the object for `Resource`. The main interface is `#to_hash`.
+
+The main `Alba` module holds config values and one convenience method, `.serialize`.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
