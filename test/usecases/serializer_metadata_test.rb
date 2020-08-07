@@ -4,9 +4,7 @@ class SerializerMetadataTest < Minitest::Test
   class SerializerWithResourceCount
     include Alba::Serializer
 
-    metadata :user_count do |resources|
-      resources.count
-    end
+    metadata(:user_count, &:count)
   end
 
   class SerializerWithKeyAndResourceCount < SerializerWithResourceCount

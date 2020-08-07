@@ -16,6 +16,10 @@ AllCops:
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
+Metrics/ClassLength:
+  Exclude:
+    - 'test/alba_test.rb'
+
 Metrics/MethodLength:
   Max: 20
 
