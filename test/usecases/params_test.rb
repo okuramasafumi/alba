@@ -43,6 +43,7 @@ class ParamsTest < MiniTest::Test
   class UserResource
     include Alba::Resource
     serializer UserSerializer
+    enable_params!
 
     attributes :id, :name
 
@@ -70,11 +71,13 @@ class ParamsTest < MiniTest::Test
   class UserResource2
     include Alba::Resource
     serializer UserSerializer
+    # missing `enable_params!`, causing error
 
-    attributes :id
+    attributes :id, :name
 
-    one :profile, resource: ProfileResource
-    many :articles, resource: ArticleResource
+    attribute :logging_in do
+      id == params[:current_user_id]
+    end
   end
 
   def setup
@@ -102,11 +105,7 @@ class ParamsTest < MiniTest::Test
     )
   end
 
-  def test_params_works_in_one_and_many
-    skip
-    assert_equal(
-      '{"user":{"id":1,"name":"Masafumi OKURA","logging_in":true}}',
-      UserResource.new(@user, params: {current_user_id: 1}).serialize
-    )
+  def test_without_enable_params_it_raises_error
+    assert_raises(NameError) { UserResource2.new(@user, params: {current_user_id: 1}).serialize }
   end
 end

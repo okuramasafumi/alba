@@ -7,7 +7,7 @@ require 'alba/serializers/default_serializer'
 module Alba
   # This module represents what should be serialized
   module Resource
-    DSLS = [:_attributes, :_serializer, :_key].freeze
+    DSLS = [:_attributes, :_serializer, :_key, :_enable_params].freeze
     def self.included(base)
       base.class_eval do
         # Initialize
@@ -17,6 +17,8 @@ module Alba
                       {}
                     when :_serializer, :_name
                       nil
+                    when :_enable_params
+                      false
                     end
           instance_variable_set("@#{name}", initial) unless instance_variable_defined?("@#{name}")
         end
@@ -52,9 +54,11 @@ module Alba
       def serializable_hash
         get_attribute = lambda do |resource|
           @_attributes.transform_values do |attribute|
-            resource = resource.clone
-            params = @params # We NEED this line for the line below.
-            resource.define_singleton_method :params, -> { params }
+            if @_enable_params
+              resource = resource.clone
+              params = @params # We NEED this line for the line below.
+              resource.define_singleton_method :params, -> { params }
+            end
             attribute.to_hash(resource)
           end
         end
@@ -115,6 +119,10 @@ module Alba
 
       def key(key)
         @_key = key.to_sym
+      end
+
+      def enable_params!
+        @_enable_params = true
       end
     end
   end
