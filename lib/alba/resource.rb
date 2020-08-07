@@ -27,7 +27,7 @@ module Alba
 
     # Instance methods
     module InstanceMethods
-      attr_reader :_object
+      attr_reader :_object, :_key
 
       def initialize(object)
         @_object = object
@@ -48,18 +48,17 @@ module Alba
         serializer.new(self).serialize
       end
 
-      def serializable_hash(with_key: true)
+      def serializable_hash
         get_attribute = lambda do |resource|
           @_attributes.transform_values do |attribute|
             attribute.to_hash(resource)
           end
         end
-        serializable_hash = if collection?
-                              @_object.map(&get_attribute)
-                            else
-                              get_attribute.call(@_object)
-                            end
-        with_key && @_key ? {@_key => serializable_hash} : serializable_hash
+        if collection?
+          @_object.map(&get_attribute)
+        else
+          get_attribute.call(@_object)
+        end
       end
       alias to_hash serializable_hash
 

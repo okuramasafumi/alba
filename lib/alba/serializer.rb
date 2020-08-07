@@ -9,23 +9,32 @@ module Alba
     # Instance methods
     module InstanceMethods
       def initialize(resource)
-        @_opts = self.class._opts || {}
-        @_metadata = self.class._metadata || {}
-        @_metadata = @_metadata.transform_values { |block| block.call(resource._object) }
-        key = case @_opts[:key]
-              when true
-                resource.key
-              else
-                @_opts[:key]
-              end
-        @hash = resource.serializable_hash(with_key: false)
+        @resource = resource
+        @hash = resource.serializable_hash
         @hash = {key.to_sym => @hash} if key
         # @hash is either Hash or Array
-        @hash.is_a?(Hash) ? @hash.merge!(@_metadata.to_h) : @hash << @_metadata
+        @hash.is_a?(Hash) ? @hash.merge!(metadata.to_h) : @hash << metadata
       end
 
       def serialize
         Alba.encoder.call(@hash)
+      end
+
+      private
+
+      def key
+        opts = self.class._opts || {}
+        case opts[:key]
+        when true
+          @resource.key
+        else
+          opts[:key]
+        end
+      end
+
+      def metadata
+        metadata = self.class._metadata || {}
+        metadata.transform_values { |block| block.call(@resource._object) }
       end
     end
 
