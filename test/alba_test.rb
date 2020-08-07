@@ -87,6 +87,20 @@ class AlbaTest < Minitest::Test
     )
   end
 
+  def test_it_serializes_object_with_fully_inlined_definitions_with_json
+    Alba.backend = :json
+
+    assert_equal(
+      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
+      Alba.serialize(@user, with: proc { set key: :foo }) do
+        attributes :id
+        many :articles do
+          attributes :title, :body
+        end
+      end
+    )
+  end
+
   def test_it_serializes_object_with_fully_inlined_definitions_with_oj
     Alba.backend = :oj
 
@@ -99,6 +113,26 @@ class AlbaTest < Minitest::Test
         end
       end
     )
+  end
+
+  def test_it_serializes_object_with_fully_inlined_definitions_with_active_support
+    Alba.backend = :active_support
+
+    assert_equal(
+      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
+      Alba.serialize(@user, with: proc { set key: :foo }) do
+        attributes :id
+        many :articles do
+          attributes :title, :body
+        end
+      end
+    )
+  end
+
+  def test_it_raises_error_with_unsupported_backend
+    assert_raises(Alba::Error, 'Unsupported backend, not_supported') do
+      Alba.backend = :not_supported
+    end
   end
 
   def test_it_accepts_default_serializer_as_class

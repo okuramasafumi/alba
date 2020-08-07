@@ -9,11 +9,12 @@ module Alba
   class Error < StandardError; end
 
   class << self
-    attr_reader :backend
+    attr_reader :backend, :encoder
     attr_accessor :default_serializer
 
     def backend=(backend)
       @backend = backend&.to_sym
+      set_encoder
     end
 
     def serialize(object, with: nil, &block)
@@ -27,8 +28,40 @@ module Alba
 
     private
 
+    def set_encoder
+      @encoder = case @backend
+                 when :oj
+                   begin
+                     require 'oj'
+                     ->(hash) { Oj.dump(hash, mode: :strict) }
+                   rescue LoadError
+                     default_encoder
+                   end
+                 when :active_support
+                   begin
+                     require 'active_support/json'
+                     ->(hash) { ActiveSupport::JSON.encode(hash) }
+                   rescue LoadError
+                     default_encoder
+                   end
+                 when nil, :default, :json
+                   default_encoder
+                 else
+                   raise Alba::Error, "Unsupported backend, #{backend}"
+                 end
+    end
+
+    def default_encoder
+      lambda do |hash|
+        require 'json'
+        JSON.dump(hash)
+      end
+    end
+
     def resource_class
       ::Alba::Resources::DefaultResource.clone
     end
   end
+
+  @encoder = default_encoder
 end

@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in alba.gemspec
 gemspec
 
+gem 'activesupport', require: false
 gem 'coveralls', require: false
 gem 'minitest', '~> 5.0'
 gem 'oj', '~> 3.10'

@@ -25,21 +25,7 @@ module Alba
       end
 
       def serialize
-        fallback = lambda do
-          require 'json'
-          JSON.dump(@hash)
-        end
-        case Alba.backend
-        when :oj
-          begin
-            require 'oj'
-            -> { Oj.dump(@hash, mode: :strict) }
-          rescue LoadError
-            fallback
-          end
-        else
-          fallback
-        end.call
+        Alba.encoder.call(@hash)
       end
     end
 
