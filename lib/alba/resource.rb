@@ -26,10 +26,10 @@ module Alba
 
     # Instance methods
     module InstanceMethods
-      attr_reader :_object, :_key, :params
+      attr_reader :object, :_key, :params
 
       def initialize(object, params: {})
-        @_object = object
+        @object = object
         @params = params
         DSLS.each { |name| instance_variable_set("@#{name}", self.class.public_send(name)) }
       end
@@ -62,9 +62,9 @@ module Alba
           end
         end
         if collection?
-          @_object.map(&get_attribute)
+          @object.map(&get_attribute)
         else
-          get_attribute.call(@_object)
+          get_attribute.call(@object)
         end
       end
       alias to_hash serializable_hash
@@ -82,7 +82,7 @@ module Alba
       end
 
       def collection?
-        @_object.is_a?(Enumerable)
+        @object.is_a?(Enumerable)
       end
     end
 

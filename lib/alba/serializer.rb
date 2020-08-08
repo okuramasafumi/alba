@@ -34,7 +34,7 @@ module Alba
 
       def metadata
         metadata = self.class._metadata || {}
-        metadata.transform_values { |block| block.call(@resource._object) }
+        metadata.transform_values { |block| block.call(@resource.object) }
       end
     end
 
