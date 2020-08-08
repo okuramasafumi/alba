@@ -142,7 +142,7 @@ Alba has three component, `Serializer`, `Resource` and `Value` (`Value` is conce
 
 `Resource` is a component responsible for defining how an object (or a collection of objects) is converted into JSON. The difference between `Serializer` and `Resource` is that while `Serializer` can add arbitrary data into JSON, `Resource` can get data only from the object under it. The main interface is `#serializable_hash`.
 
-`Value` is either `Attribute`, `One` or `Many`. They are responsible for fetching data from the object for `Resource`. The main interface is `#to_hash`.
+`One` and `Many` are the special object fetching other resources and converting them into Hash.
 
 The main `Alba` module holds config values and one convenience method, `.serialize`.
 
