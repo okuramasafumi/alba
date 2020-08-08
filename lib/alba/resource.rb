@@ -8,6 +8,7 @@ module Alba
   module Resource
     DSLS = [:_attributes, :_serializer, :_key].freeze
     def self.included(base)
+      super
       base.class_eval do
         # Initialize
         DSLS.each do |name|
@@ -91,6 +92,7 @@ module Alba
       attr_reader(*DSLS)
 
       def inherited(subclass)
+        super
         DSLS.each { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}")) }
       end
 
