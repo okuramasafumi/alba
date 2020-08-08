@@ -46,8 +46,8 @@ class ParamsTest < MiniTest::Test
 
     attributes :id, :name
 
-    attribute :logging_in do
-      id == params[:current_user_id]
+    attribute :logging_in do |user|
+      user.id == params[:current_user_id]
     end
   end
 
@@ -62,8 +62,8 @@ class ParamsTest < MiniTest::Test
 
     attributes :email
 
-    attribute :full_name do
-      "#{first_name} #{last_name}"
+    attribute :full_name do |profile|
+      "#{profile.first_name} #{profile.last_name}"
     end
   end
 
@@ -103,10 +103,9 @@ class ParamsTest < MiniTest::Test
   end
 
   def test_params_works_in_one_and_many
-    skip
     assert_equal(
-      '{"user":{"id":1,"name":"Masafumi OKURA","logging_in":true}}',
-      UserResource.new(@user, params: {current_user_id: 1}).serialize
+      '{"user":{"id":1,"profile":{"email":"test@example.com","full_name":"Masafumi Okura"},"articles":[{"title":"Hello World!"}]}}',
+      UserResource2.new(@user, params: {current_user_id: 1}).serialize
     )
   end
 end

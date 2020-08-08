@@ -1,5 +1,4 @@
 require 'alba/serializer'
-require 'alba/attribute'
 require 'alba/one'
 require 'alba/many'
 require 'alba/serializers/default_serializer'
@@ -27,7 +26,7 @@ module Alba
 
     # Instance methods
     module InstanceMethods
-      attr_reader :_object, :_key
+      attr_reader :_object, :_key, :params
 
       def initialize(object, params: {})
         @_object = object
@@ -52,10 +51,14 @@ module Alba
       def serializable_hash
         get_attribute = lambda do |resource|
           @_attributes.transform_values do |attribute|
-            resource = resource.clone
-            params = @params # We NEED this line for the line below.
-            resource.define_singleton_method :params, -> { params }
-            attribute.to_hash(resource)
+            case attribute
+            when Symbol
+              resource.public_send attribute
+            when Proc
+              instance_exec(resource, &attribute)
+            when Alba::One, Alba::Many
+              attribute.to_hash(resource)
+            end
           end
         end
         if collection?
@@ -92,13 +95,13 @@ module Alba
       end
 
       def attributes(*attrs)
-        attrs.each { |attr_name| @_attributes[attr_name] = Attribute.new(name: attr_name, method: attr_name) }
+        attrs.each { |attr_name| @_attributes[attr_name] = attr_name }
       end
 
       def attribute(name, &block)
         raise ArgumentError, 'No block given in attribute method' unless block
 
-        @_attributes[name] = Attribute.new(name: name, method: block)
+        @_attributes[name] = block
       end
 
       def one(name, resource: nil, &block)

@@ -73,8 +73,8 @@ class NoAssociationTest < MiniTest::Test
   class UserResource2
     include Alba::Resource
 
-    attribute :name_with_email do
-      "#{name}: #{email}"
+    attribute :name_with_email do |user|
+      "#{user.name}: #{user.email}"
     end
   end
 

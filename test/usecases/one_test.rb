@@ -34,8 +34,8 @@ class OneTest < MiniTest::Test
 
     attributes :email
 
-    attribute :full_name do
-      "#{first_name} #{last_name}"
+    attribute :full_name do |profile|
+      "#{profile.first_name} #{profile.last_name}"
     end
   end
 
