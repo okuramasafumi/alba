@@ -2,6 +2,7 @@ module Alba
   # This module represents how a resource should be serialized.
   module Serializer
     def self.included(base)
+      super
       base.include InstanceMethods
       base.extend ClassMethods
     end
@@ -34,7 +35,7 @@ module Alba
 
       def metadata
         metadata = self.class._metadata || {}
-        metadata.transform_values { |block| block.call(@resource._object) }
+        metadata.transform_values { |block| block.call(@resource.object) }
       end
     end
 
@@ -43,6 +44,7 @@ module Alba
       attr_reader :_opts, :_metadata
 
       def inherited(subclass)
+        super
         %w[_opts _metadata].each { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}")) }
       end
 

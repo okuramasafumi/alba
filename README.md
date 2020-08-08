@@ -25,6 +25,24 @@ Or install it yourself as:
 
 ## Usage
 
+### Configuration
+
+Alba's configuration is fairly simple.
+
+#### Backend
+
+Backend is the actual part serializing an object into JSON. Alba supports these backends.
+
+* Oj, the fastest. Gem installation required.
+* active_support, mostly for Rails. Gem installation required.
+* default or json, with no external dependencies.
+
+You can set a backend like this:
+
+```ruby
+Alba.backend = :oj
+```
+
 ### Simple serialization with key
 
 ```ruby
@@ -130,6 +148,14 @@ Although this might be useful sometimes, it's generally recommended to define a 
 Alba is faster than alternatives.
 For a performance benchmark, see https://gist.github.com/okuramasafumi/4e375525bd3a28e4ca812d2a3b3e5829.
 
+## Rails
+
+When you use Alba in Rails, you can create an initializer file with the line below for compatibility with Rails JSON encoder.
+
+```ruby
+Alba.backend = :active_support
+```
+
 ## Why named "Alba"?
 
 The name "Alba" comes from "albatross", a kind of birds. In Japanese, this bird is called "Aho-dori", which means "stupid bird". I find it funny because in fact albatrosses fly really fast. I hope Alba looks stupid but in fact it does its job quick.
@@ -142,7 +168,7 @@ Alba has three component, `Serializer`, `Resource` and `Value` (`Value` is conce
 
 `Resource` is a component responsible for defining how an object (or a collection of objects) is converted into JSON. The difference between `Serializer` and `Resource` is that while `Serializer` can add arbitrary data into JSON, `Resource` can get data only from the object under it. The main interface is `#serializable_hash`.
 
-`Value` is either `Attribute`, `One` or `Many`. They are responsible for fetching data from the object for `Resource`. The main interface is `#to_hash`.
+`One` and `Many` are the special object fetching other resources and converting them into Hash.
 
 The main `Alba` module holds config values and one convenience method, `.serialize`.
 

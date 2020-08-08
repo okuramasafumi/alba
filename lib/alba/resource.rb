@@ -1,5 +1,4 @@
 require 'alba/serializer'
-require 'alba/attribute'
 require 'alba/one'
 require 'alba/many'
 require 'alba/serializers/default_serializer'
@@ -9,6 +8,7 @@ module Alba
   module Resource
     DSLS = [:_attributes, :_serializer, :_key].freeze
     def self.included(base)
+      super
       base.class_eval do
         # Initialize
         DSLS.each do |name|
@@ -27,10 +27,11 @@ module Alba
 
     # Instance methods
     module InstanceMethods
-      attr_reader :_object, :_key
+      attr_reader :object, :_key, :params
 
-      def initialize(object)
-        @_object = object
+      def initialize(object, params: {})
+        @object = object
+        @params = params
         DSLS.each { |name| instance_variable_set("@#{name}", self.class.public_send(name)) }
       end
 
@@ -51,13 +52,20 @@ module Alba
       def serializable_hash
         get_attribute = lambda do |resource|
           @_attributes.transform_values do |attribute|
-            attribute.to_hash(resource)
+            case attribute
+            when Symbol
+              resource.public_send attribute
+            when Proc
+              instance_exec(resource, &attribute)
+            when Alba::One, Alba::Many
+              attribute.to_hash(resource)
+            end
           end
         end
         if collection?
-          @_object.map(&get_attribute)
+          @object.map(&get_attribute)
         else
-          get_attribute.call(@_object)
+          get_attribute.call(@object)
         end
       end
       alias to_hash serializable_hash
@@ -75,7 +83,7 @@ module Alba
       end
 
       def collection?
-        @_object.is_a?(Enumerable)
+        @object.is_a?(Enumerable)
       end
     end
 
@@ -84,17 +92,18 @@ module Alba
       attr_reader(*DSLS)
 
       def inherited(subclass)
+        super
         DSLS.each { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}")) }
       end
 
       def attributes(*attrs)
-        attrs.each { |attr_name| @_attributes[attr_name] = Attribute.new(name: attr_name, method: attr_name) }
+        attrs.each { |attr_name| @_attributes[attr_name] = attr_name }
       end
 
       def attribute(name, &block)
         raise ArgumentError, 'No block given in attribute method' unless block
 
-        @_attributes[name] = Attribute.new(name: name, method: block)
+        @_attributes[name] = block
       end
 
       def one(name, resource: nil, &block)

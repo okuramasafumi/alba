@@ -14,7 +14,7 @@ class UserDefinedSerializableHashTest < MiniTest::Test
     include Alba::Resource
 
     def serializable_hash
-      grouped = @_object.group_by { |foo| foo.id.even? ? 'even' : 'odd' }
+      grouped = object.group_by { |foo| foo.id.even? ? 'even' : 'odd' }
       grouped.transform_values { |foos| foos.map { |foo| {name: foo.name} } }
     end
   end
