@@ -1,4 +1,4 @@
-require 'alba/association'
+require_relative 'association'
 
 module Alba
   # Representing one association

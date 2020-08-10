@@ -1,6 +1,6 @@
-require 'alba/version'
-require 'alba/serializer'
-require 'alba/resource'
+require_relative 'alba/version'
+require_relative 'alba/serializer'
+require_relative 'alba/resource'
 
 # Core module
 module Alba
