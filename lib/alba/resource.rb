@@ -44,7 +44,18 @@ module Alba
       end
 
       def serializable_hash
-        get_attribute = lambda do |resource|
+        collection? ? @object.map(&converter) : converter.call(@object)
+      end
+      alias to_hash serializable_hash
+
+      def key
+        @_key || self.class.name.delete_suffix('Resource').downcase.gsub(/:{2}/, '_').to_sym
+      end
+
+      private
+
+      def converter
+        lambda do |resource|
           @_attributes.transform_values do |attribute|
             case attribute
             when Symbol
@@ -56,19 +67,7 @@ module Alba
             end
           end
         end
-        if collection?
-          @object.map(&get_attribute)
-        else
-          get_attribute.call(@object)
-        end
       end
-      alias to_hash serializable_hash
-
-      def key
-        @_key || self.class.name.delete_suffix('Resource').downcase.gsub(/:{2}/, '_').to_sym
-      end
-
-      private
 
       def inline_extended_serializer(with)
         klass = ::Alba::Serializers::DefaultSerializer.clone
