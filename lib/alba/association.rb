@@ -16,9 +16,9 @@ module Alba
     private
 
     def resource_class
-      klass = Class.new
-      klass.include(::Alba::Resource)
-      klass.class_exec(&@block)
+      klass = ::Alba::Resources::DefaultResource.dup
+      klass.reset
+      klass.class_eval(&@block)
       klass
     end
   end
