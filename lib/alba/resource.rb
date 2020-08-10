@@ -114,6 +114,13 @@ module Alba
       def key(key)
         @_key = key.to_sym
       end
+
+      # Use this DSL in child class to ignore certain attributes
+      def ignoring(*attributes)
+        attributes.each do |attr_name|
+          @_attributes.delete(attr_name)
+        end
+      end
     end
   end
 end

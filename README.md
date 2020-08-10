@@ -143,6 +143,36 @@ end
 
 Although this might be useful sometimes, it's generally recommended to define a class for both Resource and Serializer.
 
+### Inheritance and Ignorance
+
+You can `exclude` or `ignore` certain attributes using `ignoring`.
+
+```ruby
+class Foo
+  attr_accessor :id, :name, :body
+
+  def initialize(id, name, body)
+    @id = id
+    @name = name
+    @body = body
+  end
+end
+
+class GenericFooResource
+  include Alba::Resource
+
+  attributes :id, :name, :body
+end
+
+class RestrictedFooResouce < GenericFooResource
+  ignoring :id, :body
+end
+
+RestrictedFooResouce.new(foo).serialize
+# => '{"name":"my foo"}'
+end
+```
+
 ## Comparison
 
 Alba is faster than alternatives.
