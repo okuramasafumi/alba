@@ -6,19 +6,13 @@ require 'alba/serializers/default_serializer'
 module Alba
   # This module represents what should be serialized
   module Resource
-    DSLS = [:_attributes, :_serializer, :_key].freeze
+    DSLS = {_attributes: {}, _serializer: nil, _key: nil}.freeze
     def self.included(base)
       super
       base.class_eval do
         # Initialize
-        DSLS.each do |name|
-          initial = case name
-                    when :_attributes
-                      {}
-                    when :_serializer, :_name
-                      nil
-                    end
-          instance_variable_set("@#{name}", initial) unless instance_variable_defined?("@#{name}")
+        DSLS.each do |name, initial|
+          instance_variable_set("@#{name}", initial.dup) unless instance_variable_defined?("@#{name}")
         end
       end
       base.include InstanceMethods
@@ -32,7 +26,7 @@ module Alba
       def initialize(object, params: {})
         @object = object
         @params = params
-        DSLS.each { |name| instance_variable_set("@#{name}", self.class.public_send(name)) }
+        DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.public_send(name)) }
       end
 
       def serialize(with: nil)
@@ -89,11 +83,11 @@ module Alba
 
     # Class methods
     module ClassMethods
-      attr_reader(*DSLS)
+      attr_reader(*DSLS.keys)
 
       def inherited(subclass)
         super
-        DSLS.each { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}")) }
+        DSLS.each_key { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}")) }
       end
 
       def attributes(*attrs)
