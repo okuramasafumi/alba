@@ -6,7 +6,7 @@ gemspec
 gem 'activesupport', require: false
 gem 'coveralls', require: false
 gem 'minitest', '~> 5.0'
-gem 'oj', '~> 3.10'
+gem 'oj', '~> 3.10', platforms: :ruby
 gem 'rake', '~> 13.0'
 gem 'rubocop', '>= 0.79.0', require: false
 gem 'rubocop-minitest', '~> 0.10.1', require: false
