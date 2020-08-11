@@ -86,7 +86,7 @@ module Alba
 
       def inherited(subclass)
         super
-        DSLS.each_key { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}")) }
+        DSLS.each_key { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}").clone) }
       end
 
       def attributes(*attrs)
