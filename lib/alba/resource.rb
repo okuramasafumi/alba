@@ -90,13 +90,13 @@ module Alba
       end
 
       def attributes(*attrs)
-        attrs.each { |attr_name| @_attributes[attr_name] = attr_name }
+        attrs.each { |attr_name| @_attributes[attr_name.to_sym] = attr_name.to_sym }
       end
 
       def attribute(name, &block)
         raise ArgumentError, 'No block given in attribute method' unless block
 
-        @_attributes[name] = block
+        @_attributes[name.to_sym] = block
       end
 
       def one(name, resource: nil, &block)
