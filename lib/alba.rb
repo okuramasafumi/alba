@@ -31,24 +31,28 @@ module Alba
     def set_encoder
       @encoder = case @backend
                  when :oj
-                   begin
-                     require 'oj'
-                     ->(hash) { Oj.dump(hash, mode: :strict) }
-                   rescue LoadError
-                     default_encoder
-                   end
+                   try_oj
                  when :active_support
-                   begin
-                     require 'active_support/json'
-                     ->(hash) { ActiveSupport::JSON.encode(hash) }
-                   rescue LoadError
-                     default_encoder
-                   end
+                   try_active_support
                  when nil, :default, :json
                    default_encoder
                  else
                    raise Alba::Error, "Unsupported backend, #{backend}"
                  end
+    end
+
+    def try_oj
+      require 'oj'
+      ->(hash) { Oj.dump(hash, mode: :strict) }
+    rescue LoadError
+      default_encoder
+    end
+
+    def try_active_support
+      require 'active_support/json'
+      ->(hash) { ActiveSupport::JSON.encode(hash) }
+    rescue LoadError
+      default_encoder
     end
 
     def default_encoder

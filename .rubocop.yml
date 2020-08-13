@@ -24,7 +24,7 @@ Metrics/ClassLength:
     - 'test/alba_test.rb'
 
 Metrics/MethodLength:
-  Max: 20
+  Max: 15
 
 Style/FrozenStringLiteralComment:
   Enabled: false
