@@ -13,6 +13,9 @@ AllCops:
     - 'alba.gemspec'
   NewCops: enable
 
+Layout/ClassStructure:
+  Enabled: true
+
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
