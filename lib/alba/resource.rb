@@ -118,7 +118,7 @@ module Alba
       # Use this DSL in child class to ignore certain attributes
       def ignoring(*attributes)
         attributes.each do |attr_name|
-          @_attributes.delete(attr_name)
+          @_attributes.delete(attr_name.to_sym)
         end
       end
     end
