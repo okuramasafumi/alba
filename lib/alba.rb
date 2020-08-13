@@ -7,6 +7,7 @@ require 'alba/resources/default_resource'
 # Core module
 module Alba
   class Error < StandardError; end
+  class UnsupportedBackend < Error; end
 
   class << self
     attr_reader :backend, :encoder
@@ -37,7 +38,7 @@ module Alba
                  when nil, :default, :json
                    default_encoder
                  else
-                   raise Alba::Error, "Unsupported backend, #{backend}"
+                   raise Alba::UnsupportedBackend, "Unsupported backend, #{backend}"
                  end
     end
 

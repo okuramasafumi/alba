@@ -130,7 +130,7 @@ class AlbaTest < Minitest::Test
   end
 
   def test_it_raises_error_with_unsupported_backend
-    assert_raises(Alba::Error, 'Unsupported backend, not_supported') do
+    assert_raises(Alba::UnsupportedBackend, 'Unsupported backend, not_supported') do
       Alba.backend = :not_supported
     end
   end
