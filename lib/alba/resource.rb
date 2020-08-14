@@ -64,6 +64,8 @@ module Alba
               instance_exec(resource, &attribute)
             when Alba::One, Alba::Many
               attribute.to_hash(resource)
+            else
+              raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
             end
           end
         end
