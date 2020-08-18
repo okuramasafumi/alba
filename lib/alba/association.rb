@@ -4,8 +4,8 @@ module Alba
   class Association
     def initialize(name:, resource: nil, &block)
       @name = name
-      @resource = resource
       @block = block
+      @resource = resource || resource_class
       raise ArgumentError, 'resource or block is required' if @resource.nil? && @block.nil?
     end
 
