@@ -12,12 +12,23 @@ AllCops:
     - 'Rakefile'
     - 'alba.gemspec'
   NewCops: enable
+  EnabledByDefault: true
+
+# Oneline comment is not valid so until it gets valid, we disable it
+Bundler/GemComment:
+  Enabled: false
 
 Layout/ClassStructure:
   Enabled: true
 
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
+
+Layout/MultilineAssignmentLayout:
+  EnforcedStyle: same_line
+
+Lint/ConstantResolution:
+  Enabled: false
 
 Metrics/ClassLength:
   Exclude:
@@ -26,5 +37,20 @@ Metrics/ClassLength:
 Metrics/MethodLength:
   Max: 15
 
+Style/ConstantVisibility:
+  Enabled: false
+
+Style/Copyright:
+  Enabled: false
+
+Style/DocumentationMethod:
+  Enabled: false
+
 Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/InlineComment:
+  Enabled: false
+
+Style/MethodCallWithArgsParentheses:
   Enabled: false
