@@ -101,12 +101,12 @@ module Alba
         @_attributes[name.to_sym] = block
       end
 
-      def one(name, resource: nil, &block)
-        @_attributes[name.to_sym] = One.new(name: name, resource: resource, &block)
+      def one(name, resource: nil, key: nil, &block)
+        @_attributes[key&.to_sym || name.to_sym] = One.new(name: name, resource: resource, &block)
       end
 
-      def many(name, resource: nil, &block)
-        @_attributes[name.to_sym] = Many.new(name: name, resource: resource, &block)
+      def many(name, resource: nil, key: nil, &block)
+        @_attributes[key&.to_sym || name.to_sym] = Many.new(name: name, resource: resource, &block)
       end
 
       def serializer(name)
