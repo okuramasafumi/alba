@@ -5,6 +5,7 @@ module Alba
   class One < Association
     def to_hash(target)
       object = target.public_send(@name)
+      object = @condition.call(object) if @condition
       @resource.new(object).to_hash
     end
   end

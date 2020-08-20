@@ -20,10 +20,10 @@ class ManyTest < MiniTest::Test
   end
 
   class Article
-    attr_accessor :user_id, :title, :body
+    attr_accessor :id, :title, :body
 
-    def initialize(user_id, title, body)
-      @user_id = user_id
+    def initialize(id, title, body)
+      @id = id
       @title = title
       @body = body
     end
@@ -94,6 +94,28 @@ class ManyTest < MiniTest::Test
     assert_equal(
       '{"id":1,"posts":[{"title":"Hello World!"},{"title":"Super nice"}]}',
       UserResource3.new(user).serialize
+    )
+  end
+
+  class UserResource4
+    include Alba::Resource
+
+    attributes :id
+
+    many :articles,
+         ->(articles) { articles.select { |a| a.id.even? } },
+         resource: ArticleResource
+  end
+
+  def test_it_returns_correct_json_with_given_condition
+    user = User.new(1)
+    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
+    user.articles << article1
+    article2 = Article.new(2, 'Super nice', 'Really nice!')
+    user.articles << article2
+    assert_equal(
+      '{"id":1,"articles":[{"title":"Super nice"}]}',
+      UserResource4.new(user).serialize
     )
   end
 end
