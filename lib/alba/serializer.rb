@@ -25,12 +25,7 @@ module Alba
 
       def key
         opts = self.class._opts || {}
-        case opts[:key]
-        when true
-          @resource.key
-        else
-          opts[:key]
-        end
+        opts[:key] == true ? @resource.key : opts[:key]
       end
 
       def metadata
