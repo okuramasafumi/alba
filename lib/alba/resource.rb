@@ -63,7 +63,7 @@ module Alba
             when Proc
               instance_exec(resource, &attribute)
             when Alba::One, Alba::Many
-              attribute.to_hash(resource)
+              attribute.to_hash(resource, params: params)
             else
               raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
             end

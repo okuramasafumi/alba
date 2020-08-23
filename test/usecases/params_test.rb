@@ -63,7 +63,11 @@ class ParamsTest < MiniTest::Test
     attributes :email
 
     attribute :full_name do |profile|
-      "#{profile.first_name} #{profile.last_name}"
+      if params[:profile_full_name_with_comma]
+        "#{profile.first_name}, #{profile.last_name}"
+      else
+        "#{profile.first_name} #{profile.last_name}"
+      end
     end
   end
 
@@ -104,8 +108,8 @@ class ParamsTest < MiniTest::Test
 
   def test_params_works_in_one_and_many
     assert_equal(
-      '{"user":{"id":1,"profile":{"email":"test@example.com","full_name":"Masafumi Okura"},"articles":[{"title":"Hello World!"}]}}',
-      UserResource2.new(@user, params: {current_user_id: 1}).serialize
+      '{"user":{"id":1,"profile":{"email":"test@example.com","full_name":"Masafumi, Okura"},"articles":[{"title":"Hello World!"}]}}',
+      UserResource2.new(@user, params: {profile_full_name_with_comma: true}).serialize
     )
   end
 end
