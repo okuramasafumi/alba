@@ -6,3 +6,4 @@ rvm:
   - 2.6.6
   - 2.7.1
   - truffleruby
+before_install: gem install bundler -v 2.1.4
