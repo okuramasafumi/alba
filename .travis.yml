@@ -7,4 +7,3 @@ rvm:
   - 2.7.1
   - jruby-9.2.13.0
   - truffleruby
-before_install: gem install bundler -v 2.1.4
