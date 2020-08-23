@@ -39,6 +39,10 @@ Or install it yourself as:
 
     $ gem install alba
 
+## Supported Ruby versions
+
+Alba supports CRuby 2.5.8 and higher, latest JRuby and latest TruffleRuby.
+
 ## Usage
 
 ### Configuration
