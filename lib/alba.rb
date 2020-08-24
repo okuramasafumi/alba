@@ -64,7 +64,10 @@ module Alba
     end
 
     def resource_class
-      ::Alba::Resources::DefaultResource.clone
+      @resource_class ||= begin
+                             klass = Class.new
+                             klass.include(Alba::Resource)
+                           end
     end
   end
 
