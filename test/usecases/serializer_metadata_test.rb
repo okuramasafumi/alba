@@ -11,6 +11,12 @@ class SerializerMetadataTest < Minitest::Test
     set key: :users
   end
 
+  class SerializerWithMoreMetadata < SerializerWithKeyAndResourceCount
+    metadata :words do
+      %w[foo bar]
+    end
+  end
+
   class User
     attr_reader :id, :created_at, :updated_at
     attr_accessor :articles
@@ -67,6 +73,13 @@ class SerializerMetadataTest < Minitest::Test
     assert_equal(
       '{"users":[{"id":1,"articles":[{"title":"Hello World!"}]},{"id":2,"articles":[{"title":"Super nice"}]}],"user_count":2}',
       UserResource.new([@user1, @user2]).serialize(with: SerializerWithKeyAndResourceCount)
+    )
+  end
+
+  def test_serializer_with_multiple_inheritance_works
+    assert_equal(
+      '{"users":[{"id":1,"articles":[{"title":"Hello World!"}]},{"id":2,"articles":[{"title":"Super nice"}]}],"user_count":2,"words":["foo","bar"]}',
+      UserResource.new([@user1, @user2]).serialize(with: SerializerWithMoreMetadata)
     )
   end
 end

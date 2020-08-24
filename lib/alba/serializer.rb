@@ -3,6 +3,10 @@ module Alba
   module Serializer
     def self.included(base)
       super
+      base.class_eval do
+        @_opts = {} unless instance_variable_defined?('@_opts')
+        @_metadata = {} unless instance_variable_defined?('@_metadata')
+      end
       base.include InstanceMethods
       base.extend ClassMethods
     end
@@ -24,12 +28,12 @@ module Alba
       private
 
       def key
-        opts = self.class._opts || {}
+        opts = self.class._opts
         opts[:key] == true ? @resource.key : opts[:key]
       end
 
       def metadata
-        metadata = self.class._metadata || {}
+        metadata = self.class._metadata
         metadata.transform_values { |block| block.call(@resource.object) }
       end
     end
@@ -40,16 +44,14 @@ module Alba
 
       def inherited(subclass)
         super
-        %w[_opts _metadata].each { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}")) }
+        %w[_opts _metadata].each { |name| subclass.instance_variable_set("@#{name}", public_send(name).clone) }
       end
 
       def set(key: false)
-        @_opts ||= {}
         @_opts[:key] = key
       end
 
       def metadata(name, &block)
-        @_metadata ||= {}
         @_metadata[name] = block
       end
     end

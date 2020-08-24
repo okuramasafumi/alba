@@ -32,7 +32,7 @@ module Alba
       def serialize(with: nil)
         serializer = case with
                      when nil
-                       @_serializer || Alba::Serializers::DefaultSerializer
+                       @_serializer || empty_serializer
                      when ->(obj) { obj.is_a?(Class) && obj <= Alba::Serializer }
                        with
                      when Proc
@@ -71,8 +71,14 @@ module Alba
         end
       end
 
+      def empty_serializer
+        klass = Class.new
+        klass.include Alba::Serializer
+        klass
+      end
+
       def inline_extended_serializer(with)
-        klass = ::Alba::Serializers::DefaultSerializer.clone
+        klass = empty_serializer
         klass.class_eval(&with)
         klass
       end
