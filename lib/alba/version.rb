@@ -1,3 +1,3 @@
 module Alba
-  VERSION = '0.10.1'.freeze
+  VERSION = '0.10.2'.freeze
 end
