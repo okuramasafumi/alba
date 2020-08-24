@@ -1,7 +1,6 @@
 require 'alba/serializer'
 require 'alba/one'
 require 'alba/many'
-require 'alba/serializers/default_serializer'
 
 module Alba
   # This module represents what should be serialized

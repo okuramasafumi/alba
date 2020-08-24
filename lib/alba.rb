@@ -1,8 +1,6 @@
 require 'alba/version'
-require 'alba/serializers/default_serializer'
 require 'alba/serializer'
 require 'alba/resource'
-require 'alba/resources/default_resource'
 
 # Core module
 module Alba
