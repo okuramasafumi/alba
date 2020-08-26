@@ -20,10 +20,10 @@ class ParamsTest < MiniTest::Test
   end
 
   class Article
-    attr_accessor :user_id, :title, :body
+    attr_accessor :id, :title, :body
 
-    def initialize(user_id, title, body)
-      @user_id = user_id
+    def initialize(id, title, body)
+      @id = id
       @title = title
       @body = body
     end
@@ -78,7 +78,9 @@ class ParamsTest < MiniTest::Test
     attributes :id
 
     one :profile, resource: ProfileResource
-    many :articles, resource: ArticleResource
+    many :articles,
+         proc { |articles, params| articles.select { |a| params[:article_ids].include?(a.id) } },
+         resource: ArticleResource
   end
 
   def setup
@@ -108,8 +110,8 @@ class ParamsTest < MiniTest::Test
 
   def test_params_works_in_one_and_many
     assert_equal(
-      '{"user":{"id":1,"profile":{"email":"test@example.com","full_name":"Masafumi, Okura"},"articles":[{"title":"Hello World!"}]}}',
-      UserResource2.new(@user, params: {profile_full_name_with_comma: true}).serialize
+      '{"user":{"id":1,"profile":{"email":"test@example.com","full_name":"Masafumi, Okura"},"articles":[]}}',
+      UserResource2.new(@user, params: {profile_full_name_with_comma: true, article_ids: [2]}).serialize
     )
   end
 end

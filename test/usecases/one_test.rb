@@ -101,8 +101,8 @@ class OneTest < MiniTest::Test
     attributes :id
 
     one :profile,
-        lambda { |profile|
-          profile.email.upcase!
+        proc { |profile, params|
+          profile.email.sub!('@', params[:replace_atmark_with]) if params[:replace_atmark_with]
           profile
         },
         resource: ProfileResource
@@ -113,8 +113,8 @@ class OneTest < MiniTest::Test
     profile = Profile.new(1, 'test@example.com', 'Masafumi', 'Okura')
     user.profile = profile
     assert_equal(
-      '{"id":1,"profile":{"email":"TEST@EXAMPLE.COM","full_name":"Masafumi Okura"}}',
-      UserResource4.new(user).serialize
+      '{"id":1,"profile":{"email":"test_at_example.com","full_name":"Masafumi Okura"}}',
+      UserResource4.new(user, params: {replace_atmark_with: '_at_'}).serialize
     )
   end
 end

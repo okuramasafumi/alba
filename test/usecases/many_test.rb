@@ -103,7 +103,7 @@ class ManyTest < MiniTest::Test
     attributes :id
 
     many :articles,
-         ->(articles) { articles.select { |a| a.id.even? } },
+         proc { |articles| articles.select { |a| a.id.even? } },
          resource: ArticleResource
   end
 

@@ -5,7 +5,7 @@ module Alba
   class One < Association
     def to_hash(target, params: {})
       object = target.public_send(@name)
-      object = @condition.call(object) if @condition
+      object = @condition.call(object, params) if @condition
       @resource.new(object, params: params).to_hash
     end
   end
