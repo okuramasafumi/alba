@@ -2,6 +2,8 @@
 [![Build Status](https://travis-ci.com/okuramasafumi/alba.svg?branch=master)](https://travis-ci.com/okuramasafumi/alba)
 [![Coverage Status](https://coveralls.io/repos/github/okuramasafumi/alba/badge.svg?branch=master)](https://coveralls.io/github/okuramasafumi/alba?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/fdab4cc0de0b9addcfe8/maintainability)](https://codeclimate.com/github/okuramasafumi/alba/maintainability)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/okuramasafumi/alba)
+![GitHub](https://img.shields.io/github/license/okuramasafumi/alba)
 
 # Alba
 
