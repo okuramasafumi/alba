@@ -43,6 +43,25 @@ Or install it yourself as:
 
 Alba supports CRuby 2.5.7 and higher and latest TruffleRuby.
 
+## Features
+
+* Resource-based serialization
+* Arbitrary attribute definition
+* One and many association with the ability to define them inline
+* Adding condition and filter to association
+* Parameters can be injected and used in attributes and associations
+* Setting root key separately in Serializer
+* Adding metadata
+* Selectable backend
+
+## Anti features
+
+* Sorting keys
+* Class level support of parameters
+* Supporting all existing JSON encoder/decoder
+* Cache
+* And many others
+
 ## Usage
 
 ### Configuration
