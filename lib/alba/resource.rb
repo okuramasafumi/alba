@@ -1,6 +1,6 @@
-require 'alba/serializer'
-require 'alba/one'
-require 'alba/many'
+require_relative 'serializer'
+require_relative 'one'
+require_relative 'many'
 
 module Alba
   # This module represents what should be serialized
