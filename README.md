@@ -7,19 +7,19 @@
 
 `Alba` is the fastest JSON serializer for Ruby.
 
-# Why yet another JSON serializer?
+## Why yet another JSON serializer?
 
 We know that there are several other JSON serializers for Ruby around, but none of them made us satisfied.
 
 Alba has some advantages over other JSON serializers which we've wanted to have.
 
-## Easy to understand
+### Easy to understand
 
 DSL is great. It makes the coding experience natural and intuitive. However, remembering lots of DSL requires us a lot of effort. Unfortunately, most of the existing libraries have implemented their features via DSL and it's not easy to understand how they behave entirely. Alba's core DSL are only four (`attributes`, `attribute`, `one` and `many`) so it's easy to understand how to use.
 
 Alba is also understandable internally. The codebase is much smaller than the alternatives. In fact, it's less than 300 lines of code. Look at the code on [GitHub](https://github.com/okuramasafumi/alba/tree/master/lib) and you'll be surprised how simple it is!
 
-## Performance
+### Performance
 
 Alba is faster than most of the alternatives. We have a [benchmark](https://gist.github.com/okuramasafumi/4e375525bd3a28e4ca812d2a3b3e5829).
 
