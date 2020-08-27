@@ -129,7 +129,7 @@ class ArticleResource
   attributes :title
 end
 
-class UserResource1
+class UserResource
   include Alba::Resource
 
   attributes :id
@@ -143,7 +143,7 @@ user.articles << article1
 article2 = Article.new(2, 'Super nice', 'Really nice!')
 user.articles << article2
 
-UserResource1.new(user).serialize
+UserResource.new(user).serialize
 # => '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}'
 ```
 
