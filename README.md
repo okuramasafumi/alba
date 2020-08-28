@@ -62,6 +62,7 @@ Alba supports CRuby 2.5.7 and higher and latest TruffleRuby.
 * Class level support of parameters
 * Supporting all existing JSON encoder/decoder
 * Cache
+* [JSON:API](https://jsonapi.org) support
 * And many others
 
 ## Usage
