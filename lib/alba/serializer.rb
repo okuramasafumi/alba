@@ -1,6 +1,10 @@
 module Alba
   # This module represents how a resource should be serialized.
   module Serializer
+    # @!parse include InstanceMethods
+    # @!parse extend ClassMethods
+
+    # @private
     def self.included(base)
       super
       base.class_eval do
@@ -13,6 +17,7 @@ module Alba
 
     # Instance methods
     module InstanceMethods
+      # @param resource [Alba::Resource]
       def initialize(resource)
         @resource = resource
         @hash = resource.serializable_hash
@@ -21,6 +26,9 @@ module Alba
         @hash.is_a?(Hash) ? @hash.merge!(metadata.to_h) : @hash << metadata
       end
 
+      # Use real encoder to actually serialize to JSON
+      #
+      # @return [String] JSON string
       def serialize
         Alba.encoder.call(@hash)
       end
@@ -42,17 +50,25 @@ module Alba
     module ClassMethods
       attr_reader :_opts, :_metadata
 
+      # @private
       def inherited(subclass)
         super
         %w[_opts _metadata].each { |name| subclass.instance_variable_set("@#{name}", public_send(name).clone) }
       end
 
+      # Set options, currently key only
+      #
+      # @param key [Boolean, Symbol]
       def set(key: false)
         @_opts[:key] = key
       end
 
+      # Set metadata
+      #
+      # @param name [String, Symbol] key for the metadata
+      # @param block [Block] the content of the metadata
       def metadata(name, &block)
-        @_metadata[name] = block
+        @_metadata[name.to_sym] = block
       end
     end
   end
