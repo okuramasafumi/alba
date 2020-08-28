@@ -4,18 +4,33 @@ require_relative 'alba/resource'
 
 # Core module
 module Alba
+  # Base class for Errors
   class Error < StandardError; end
+  # Error class for backend which is not supported
   class UnsupportedBackend < Error; end
 
   class << self
     attr_reader :backend, :encoder
     attr_accessor :default_serializer
 
+    # Set the backend, which actually serializes object into JSON
+    #
+    # @param backend [#to_sym, nil] the name of the backend
+    #   Possible values are `oj`, `active_support`, `default`, `json` and nil
+    # @return [Proc] the proc to encode object into JSON
+    # @raise [Alba::UnsupportedBackend] if backend is not supported
     def backend=(backend)
       @backend = backend&.to_sym
       set_encoder
     end
 
+    # Serialize the object with inline definitions
+    #
+    # @param object [Object] the object to be serialized
+    # @param with [nil, Proc, Alba::Serializer] selializer
+    # @param block [Block] resource block
+    # @return [String] serialized JSON string
+    # @raise [ArgumentError] if block is absent or `with` argument's type is wrong
     def serialize(object, with: nil, &block)
       raise ArgumentError, 'Block required' unless block
 
