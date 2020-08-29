@@ -18,9 +18,6 @@ AllCops:
 Bundler/GemComment:
   Enabled: false
 
-Layout/ClassStructure:
-  Enabled: true
-
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
@@ -38,12 +35,10 @@ Metrics/MethodLength:
   Max: 15
 
 Style/ConstantVisibility:
-  Enabled: false
+  Exclude:
+    - 'lib/alba/version.rb'
 
 Style/Copyright:
-  Enabled: false
-
-Style/DocumentationMethod:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
