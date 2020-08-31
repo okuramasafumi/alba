@@ -55,6 +55,7 @@ Alba supports CRuby 2.5.7 and higher and latest TruffleRuby.
 * Setting root key separately in Serializer
 * Adding metadata
 * Selectable backend
+* No runtime dependencies
 
 ## Anti features
 
@@ -63,6 +64,7 @@ Alba supports CRuby 2.5.7 and higher and latest TruffleRuby.
 * Supporting all existing JSON encoder/decoder
 * Cache
 * [JSON:API](https://jsonapi.org) support
+* Association name inflection
 * And many others
 
 ## Usage
