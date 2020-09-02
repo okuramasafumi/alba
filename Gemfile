@@ -5,7 +5,7 @@ gemspec
 
 gem 'activesupport', require: false # For backend
 gem 'coveralls', require: false # For test coverage
-gem 'minitest', '~> 5.0' # For test
+gem 'minitest', '~> 5.14' # For test
 gem 'oj', '~> 3.10', platform: :ruby, require: false # For backend
 gem 'rake', '~> 13.0' # For test and automation
 gem 'rubocop', '>= 0.79.0', require: false # For lint
