@@ -83,6 +83,16 @@ class ParamsTest < MiniTest::Test
          resource: ArticleResource
   end
 
+  class UserResource3 < UserResource2
+    cond = lambda do |articles, params|
+        params[:foo] = true
+        params[:foo] ? [] : articles
+      end
+    many :articles,
+      cond,
+      resource: ArticleResource
+  end
+
   def setup
     Alba.backend = nil
     Alba.default_serializer = nil
@@ -113,5 +123,9 @@ class ParamsTest < MiniTest::Test
       '{"user":{"id":1,"profile":{"email":"test@example.com","full_name":"Masafumi, Okura"},"articles":[]}}',
       UserResource2.new(@user, params: {profile_full_name_with_comma: true, article_ids: [2]}).serialize
     )
+  end
+
+  def test_params_cannot_be_modified
+    assert_raises(FrozenError) { UserResource3.new(@user).serialize }
   end
 end

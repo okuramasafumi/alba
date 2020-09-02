@@ -31,7 +31,7 @@ module Alba
       # @param params [Hash] user-given Hash for arbitrary data
       def initialize(object, params: {})
         @object = object
-        @params = params
+        @params = params.freeze
         DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.public_send(name)) }
       end
 
