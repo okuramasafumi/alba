@@ -45,6 +45,10 @@ Or install it yourself as:
 
 Alba supports CRuby 2.5.7 and higher and latest TruffleRuby.
 
+## Documentation
+
+You can find the documentation on [RubyDoc](https://rubydoc.info/gems/alba).
+
 ## Features
 
 * Resource-based serialization
