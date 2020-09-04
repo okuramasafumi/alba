@@ -46,8 +46,8 @@ GEM
       parser (>= 2.7.1.4)
     rubocop-minitest (0.10.1)
       rubocop (>= 0.87)
-    rubocop-performance (1.7.1)
-      rubocop (>= 0.82.0)
+    rubocop-performance (1.8.0)
+      rubocop (>= 0.87.0)
     rubocop-sensible (0.3.0)
       rubocop (>= 0.60.0)
     ruby-progressbar (1.10.1)
@@ -81,7 +81,7 @@ DEPENDENCIES
   rake (~> 13.0)
   rubocop (>= 0.79.0)
   rubocop-minitest (~> 0.10.1)
-  rubocop-performance (~> 1.7.1)
+  rubocop-performance (~> 1.8.0)
   rubocop-sensible (~> 0.3.0)
   yard
 
