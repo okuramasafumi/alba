@@ -85,12 +85,12 @@ class ParamsTest < MiniTest::Test
 
   class UserResource3 < UserResource2
     cond = lambda do |articles, params|
-        params[:foo] = true
-        params[:foo] ? [] : articles
-      end
+      params[:foo] = true
+      params[:foo] ? [] : articles
+    end
     many :articles,
-      cond,
-      resource: ArticleResource
+         cond,
+         resource: ArticleResource
   end
 
   def setup
