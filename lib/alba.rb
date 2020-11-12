@@ -78,9 +78,9 @@ module Alba
 
     def resource_class
       @resource_class ||= begin
-                             klass = Class.new
-                             klass.include(Alba::Resource)
-                           end
+        klass = Class.new
+        klass.include(Alba::Resource)
+      end
     end
   end
 
