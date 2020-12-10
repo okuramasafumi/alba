@@ -7,6 +7,7 @@ linter:
       - "rubocop-minitest"
       - "rubocop-performance"
       - "rubocop-sensible"
+      - "rubocop-rake"
     safe: false
 
 #   # https://help.sider.review/tools/ruby/reek
