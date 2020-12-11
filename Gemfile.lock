@@ -6,12 +6,12 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (6.0.3.4)
+    activesupport (6.1.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-      i18n (>= 0.7, < 2)
-      minitest (~> 5.1)
-      tzinfo (~> 1.1)
-      zeitwerk (~> 2.2, >= 2.2.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
+      zeitwerk (~> 2.3)
     ast (2.4.1)
     concurrent-ruby (1.1.7)
     coveralls (0.8.23)
@@ -63,14 +63,13 @@ GEM
     term-ansicolor (1.7.1)
       tins (~> 1.0)
     thor (1.0.1)
-    thread_safe (0.3.6)
     tins (1.25.0)
       sync
-    tzinfo (1.2.7)
-      thread_safe (~> 0.1)
+    tzinfo (2.0.3)
+      concurrent-ruby (~> 1.0)
     unicode-display_width (1.7.0)
     yard (0.9.25)
-    zeitwerk (2.4.0)
+    zeitwerk (2.4.2)
 
 PLATFORMS
   ruby
