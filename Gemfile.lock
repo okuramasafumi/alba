@@ -24,7 +24,7 @@ GEM
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     json (2.3.1)
-    minitest (5.14.2)
+    minitest (5.14.3)
     oj (3.10.18)
     parallel (1.20.1)
     parser (3.0.0.0)
