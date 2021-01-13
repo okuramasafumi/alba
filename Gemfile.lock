@@ -25,7 +25,7 @@ GEM
       concurrent-ruby (~> 1.0)
     json (2.3.1)
     minitest (5.14.3)
-    oj (3.10.18)
+    oj (3.11.0)
     parallel (1.20.1)
     parser (3.0.0.0)
       ast (~> 2.4.1)
@@ -79,7 +79,7 @@ DEPENDENCIES
   alba!
   coveralls
   minitest (~> 5.14)
-  oj (~> 3.10)
+  oj (~> 3.11)
   rake (~> 13.0)
   rubocop (>= 0.79.0)
   rubocop-minitest (~> 0.10.3)
