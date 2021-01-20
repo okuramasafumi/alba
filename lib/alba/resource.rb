@@ -141,6 +141,7 @@ module Alba
       def one(name, condition = nil, resource: nil, key: nil, &block)
         @_attributes[key&.to_sym || name.to_sym] = One.new(name: name, condition: condition, resource: resource, &block)
       end
+      alias has_one one
 
       # Set Many association
       #
@@ -153,6 +154,7 @@ module Alba
       def many(name, condition = nil, resource: nil, key: nil, &block)
         @_attributes[key&.to_sym || name.to_sym] = Many.new(name: name, condition: condition, resource: resource, &block)
       end
+      alias has_many many
 
       # Set serializer for the resource
       #
