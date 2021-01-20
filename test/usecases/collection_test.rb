@@ -52,4 +52,11 @@ class CollectionTest < Minitest::Test
       UserResource.new([@user1, @user2]).serialize(with: proc { set key: :users })
     )
   end
+
+  def test_array_no_with_arg
+    assert_equal(
+      '[{"id":1,"articles":[{"title":"Hello World!"}]},{"id":2,"articles":[{"title":"Super nice"}]}]',
+      UserResource.new([@user1, @user2]).serialize
+    )
+  end
 end
