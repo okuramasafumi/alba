@@ -22,10 +22,10 @@ module Alba
         @resource = resource
         @hash = resource.serializable_hash
         @hash = {key.to_sym => @hash} if key
+        return if metadata.empty?
+
         # @hash is either Hash or Array
-        unless metadata.empty?
-          @hash.is_a?(Hash) ? @hash.merge!(metadata.to_h) : @hash << metadata
-        end
+        @hash.is_a?(Hash) ? @hash.merge!(metadata.to_h) : @hash << metadata
       end
 
       # Use real encoder to actually serialize to JSON
