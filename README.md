@@ -59,6 +59,7 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/gems/alba).
 * Setting root key separately in Serializer
 * Adding metadata
 * Selectable backend
+* Key transformation
 * No runtime dependencies
 
 ## Anti features
