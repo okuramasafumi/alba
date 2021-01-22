@@ -7,7 +7,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _serializer: nil, _key: nil}.freeze
+    DSLS = {_attributes: {}, _serializer: nil, _key: nil, _transform_keys: nil}.freeze
     private_constant :DSLS
 
     # @private
@@ -68,20 +68,34 @@ module Alba
 
       private
 
+      # rubocop:disable Style/MethodCalledOnDoEndBlock
       def converter
         lambda do |resource|
-          @_attributes.transform_values do |attribute|
-            case attribute
-            when Symbol
-              resource.public_send attribute
-            when Proc
-              instance_exec(resource, &attribute)
-            when Alba::One, Alba::Many
-              attribute.to_hash(resource, params: params)
-            else
-              raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
-            end
-          end
+          @_attributes.map do |key, attribute|
+            [transform_key(key), fetch_attribute(resource, attribute)]
+          end.to_h
+        end
+      end
+      # rubocop:enable Style/MethodCalledOnDoEndBlock
+
+      # Override this method to supply custom key transform method
+      def transform_key(key)
+        return key unless @_transform_keys
+
+        require_relative 'key_transformer'
+        KeyTransformer.transform(key, @_transform_keys)
+      end
+
+      def fetch_attribute(resource, attribute)
+        case attribute
+        when Symbol
+          resource.public_send attribute
+        when Proc
+          instance_exec(resource, &attribute)
+        when Alba::One, Alba::Many
+          attribute.to_hash(resource, params: params)
+        else
+          raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
         end
       end
 
@@ -178,6 +192,13 @@ module Alba
         attributes.each do |attr_name|
           @_attributes.delete(attr_name.to_sym)
         end
+      end
+
+      # Transform keys as specified type
+      #
+      # @params type [String, Symbol]
+      def transform_keys(type)
+        @_transform_keys = type.to_sym
       end
     end
   end

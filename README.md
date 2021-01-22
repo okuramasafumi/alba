@@ -221,6 +221,38 @@ RestrictedFooResouce.new(foo).serialize
 end
 ```
 
+### Attribute key transformation
+
+** Note: You need to install `active_support` gem to use `transform_keys` DSL.
+
+With `active_support` installed, you can transform attribute keys.
+
+```ruby
+class User
+  attr_reader :id, :first_name, :last_name
+
+  def initialize(id, first_name, last_name)
+    @id = id
+    @first_name = first_name
+    @last_name = last_name
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  attributes :id, :first_name, :last_name
+
+  transform_keys :lower_camel
+end
+
+user = User.new(1, 'Masafumi', 'Okura')
+UserResourceCamel.new(user).serialize
+# => '{"id":1,"firstName":"Masafumi","lastName":"Okura"}'
+```
+
+Supported transformation types are :camel, :lower_camel and :dash.
+
 ## Comparison
 
 Alba is faster than alternatives.
