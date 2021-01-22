@@ -42,6 +42,10 @@ Style/ConstantVisibility:
 Style/Copyright:
   Enabled: false
 
+# I know what I do :)
+Style/DisableCopsWithinSourceCodeDirective:
+  Enabled: false
+
 Style/FrozenStringLiteralComment:
   Enabled: false
 
