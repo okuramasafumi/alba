@@ -24,7 +24,7 @@ module Alba
       when :dash
         ActiveSupport::Inflector.dasherize(key)
       else
-        raise ::Alba::Error, "Unknown transform_type: #{transform_type}. Supported transform_type are :camel and :dash."
+        raise ::Alba::Error, "Unknown transform_type: #{transform_type}. Supported transform_type are :camel, :lower_camel and :dash."
       end
     end
   end
