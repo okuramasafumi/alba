@@ -12,6 +12,7 @@ AllCops:
   Exclude:
     - 'Rakefile'
     - 'alba.gemspec'
+    - 'benchmark/**/*.rb'
   NewCops: enable
   EnabledByDefault: true
 
