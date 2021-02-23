@@ -23,7 +23,7 @@ Alba is also understandable internally. The codebase is much smaller than the al
 
 ### Performance
 
-Alba is faster than most of the alternatives. We have a [benchmark](https://gist.github.com/okuramasafumi/4e375525bd3a28e4ca812d2a3b3e5829).
+Alba is faster than most of the alternatives. We have a [benchmark](https://github.com/okuramasafumi/alba/tree/master/benchmark).
 
 ## Installation
 
@@ -47,7 +47,7 @@ Alba supports CRuby 2.5.7 and higher and latest TruffleRuby.
 
 ## Documentation
 
-You can find the documentation on [RubyDoc](https://rubydoc.info/gems/alba).
+You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramasafumi/alba).
 
 ## Features
 
