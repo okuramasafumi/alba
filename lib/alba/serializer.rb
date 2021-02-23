@@ -7,10 +7,8 @@ module Alba
     # @private
     def self.included(base)
       super
-      base.class_eval do
-        @_opts = {} unless instance_variable_defined?('@_opts')
-        @_metadata = {} unless instance_variable_defined?('@_metadata')
-      end
+      base.instance_variable_set('@_opts', {}) unless base.instance_variable_defined?('@_opts')
+      base.instance_variable_set('@_metadata', {}) unless base.instance_variable_defined?('@_metadata')
       base.include InstanceMethods
       base.extend ClassMethods
     end
