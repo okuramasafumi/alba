@@ -19,7 +19,7 @@ Alba has some advantages over other JSON serializers which we've wanted to have.
 
 DSL is great. It makes the coding experience natural and intuitive. However, remembering lots of DSL requires us a lot of effort. Unfortunately, most of the existing libraries have implemented their features via DSL and it's not easy to understand how they behave entirely. Alba's core DSL are only four (`attributes`, `attribute`, `one` and `many`) so it's easy to understand how to use.
 
-Alba is also understandable internally. The codebase is much smaller than the alternatives. In fact, it's less than 300 lines of code. Look at the code on [GitHub](https://github.com/okuramasafumi/alba/tree/master/lib) and you'll be surprised how simple it is!
+Alba is also understandable internally. The codebase is much smaller than the alternatives. In fact, it's about 330 lines of code. Look at the code on [GitHub](https://github.com/okuramasafumi/alba/tree/master/lib) and you'll be surprised how simple it is!
 
 ### Performance
 
