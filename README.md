@@ -61,13 +61,13 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Selectable backend
 * Key transformation
 * No runtime dependencies
+* Cache (ActiveSupport::Cache is supported)
 
 ## Anti features
 
 * Sorting keys
 * Class level support of parameters
 * Supporting all existing JSON encoder/decoder
-* Cache
 * [JSON:API](https://jsonapi.org) support
 * Association name inflection
 * And many others
@@ -253,6 +253,27 @@ UserResourceCamel.new(user).serialize
 ```
 
 Supported transformation types are :camel, :lower_camel and :dash.
+
+### Cache
+
+**Note** that caching feature is exmerimental.
+
+Given ActiveSupport is installed, you can turn on cache with the code below:
+
+```ruby
+# Use memory cache store
+Alba.cache_store = :memory
+# or use Redis cache store
+Alba.cache_store = :redis
+# you can also reset cache store
+Alba.cache_store = nil
+```
+
+Alba is fast enough without cache, but with cache it gets much faster.
+
+Use cache only when you require lightning fast speed.
+
+Note that cache feature depends on `updated_at` attribute on serialized object. If it's absent Alba simply ignores cache.
 
 ## Comparison
 
