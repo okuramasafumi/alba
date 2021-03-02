@@ -45,6 +45,13 @@ class CacheTest < MiniTest::Test
     refute_equal before_update_result, after_update_result
   end
 
+  def test_without_cache
+    Alba.without_cache do
+      assert_equal Alba::NullCacheStore, Alba.cache.class
+    end
+    assert_equal ActiveSupport::Cache::MemoryStore, Alba.cache.class
+  end
+
   def teardown
     Alba.cache_store = nil
   end

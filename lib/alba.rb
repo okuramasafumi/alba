@@ -12,7 +12,7 @@ module Alba
   class UnsupportedBackend < Error; end
 
   class << self
-    attr_reader :backend, :encoder, :cache
+    attr_reader :backend, :encoder, :cache, :cache_store
     attr_accessor :default_serializer
 
     # Set the backend, which actually serializes object into JSON
@@ -31,6 +31,7 @@ module Alba
     # @params [Symbol] cache_store
     # @raise [Alba::Error] if active_support is not installed or given cache_store is not supported
     def cache_store=(cache_store = nil)
+      @cache_store = cache_store
       @cache = NullCacheStore.new and return if cache_store.nil?
 
       begin
@@ -39,11 +40,9 @@ module Alba
         raise ::Alba::Error, 'To set cache_store, you must bundle `active_support` gem.'
       end
 
-      cache_store_class = case cache_store
-                          when :memory
-                            ActiveSupport::Cache::MemoryStore
-                          when :redis
-                            ActiveSupport::Cache::RedisStore
+      cache_store_class = case cache_store.to_sym
+                          when :memory then ActiveSupport::Cache::MemoryStore
+                          when :redis then ActiveSupport::Cache::RedisStore
                           else
                             raise ::Alba::Error, "Unsupported cache_store: #{cache_store}. :memory and :redis are supported."
                           end
@@ -64,6 +63,19 @@ module Alba
       resource = resource_class.new(object)
       with ||= @default_serializer
       resource.serialize(with: with)
+    end
+
+    # Low level API to disable cache temporarily.
+    #
+    # @params [Block]
+    def without_cache(&block)
+      original_cache_store = Alba.cache_store
+      raise ArgumentError, 'Block is required' unless block
+
+      Alba.cache_store = nil
+      yield
+    ensure
+      Alba.cache_store = original_cache_store
     end
 
     private
