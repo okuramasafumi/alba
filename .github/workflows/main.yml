@@ -8,7 +8,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        ruby: [2.5, 2.6, 2.7, 3.0, head, jruby, truffleruby]
+        ruby: [2.5, 2.6, 2.7, 3.0, head, truffleruby]
+        exclude:
+          - os: windows-latest
+            ruby: truffleruby
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
