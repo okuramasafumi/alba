@@ -45,6 +45,29 @@ class CacheTest < MiniTest::Test
     refute_equal before_update_result, after_update_result
   end
 
+  def test_it_works_correctly_with_collection_add
+    users = []
+    user = User.new(1, 'Test', 'test@example.org')
+    users << user
+    before_update_result = UserResource.new(users).serialize
+    user2 = User.new(2, 'Test2', 'test2@example.org')
+    users << user2
+    after_update_result = UserResource.new(users).serialize
+    refute_equal before_update_result, after_update_result
+  end
+
+  def test_it_works_correctly_with_collection_remove
+    users = []
+    user = User.new(1, 'Test', 'test@example.org')
+    user2 = User.new(2, 'Test2', 'test2@example.org')
+    users << user
+    users << user2
+    before_update_result = UserResource.new(users).serialize
+    users.delete_at(0)
+    after_update_result = UserResource.new(users).serialize
+    refute_equal before_update_result, after_update_result
+  end
+
   def test_without_cache
     Alba.without_cache do
       assert_equal Alba::NullCacheStore, Alba.cache.class
