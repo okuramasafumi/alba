@@ -101,18 +101,21 @@ class AlbaTest < Minitest::Test
     )
   end
 
-  def test_it_serializes_object_with_fully_inlined_definitions_with_oj
-    Alba.backend = :oj
+  # oj doesn't work on Windows
+  unless ENV['OS'] == 'Windows_NT'
+    def test_it_serializes_object_with_fully_inlined_definitions_with_oj
+      Alba.backend = :oj
 
-    assert_equal(
-      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
-      Alba.serialize(@user, with: proc { set key: :foo }) do
-        attributes :id
-        many :articles do
-          attributes :title, :body
+      assert_equal(
+        '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
+        Alba.serialize(@user, with: proc { set key: :foo }) do
+          attributes :id
+          many :articles do
+            attributes :title, :body
+          end
         end
-      end
-    )
+      )
+    end
   end
 
   def test_it_serializes_object_with_fully_inlined_definitions_with_active_support
