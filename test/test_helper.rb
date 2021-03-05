@@ -3,6 +3,8 @@ Coveralls.wear!
 
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'alba'
-require 'oj' # For backend swapping
+unless ENV['OS'] == 'Windows_NT'
+  require 'oj' # For backend swapping
+end
 
 require 'minitest/autorun'
