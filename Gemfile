@@ -10,7 +10,7 @@ gem 'oj', '~> 3.11', platform: :ruby, require: false # For backend
 gem 'rake', '~> 13.0' # For test and automation
 gem 'rubocop', '>= 0.79.0', require: false # For lint
 gem 'rubocop-minitest', '~> 0.10.3', require: false # For lint
-gem 'rubocop-performance', '~> 1.10.1', require: false # For lint
+gem 'rubocop-performance', '~> 1.10.2', require: false # For lint
 gem 'rubocop-rake', '>= 0.5.1', require: false # For lint
 gem 'rubocop-sensible', '~> 0.3.0', require: false # For lint
 gem 'yard', require: false
