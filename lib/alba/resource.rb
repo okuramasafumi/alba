@@ -57,7 +57,16 @@ module Alba
       #
       # @return [Hash]
       def serializable_hash
-        collection? ? @object.map(&converter) : converter.call(@object)
+        cache = Alba.cache
+        cache_key = if cache.is_a?(NullCacheStore)
+                      nil
+                    else
+                      @object.respond_to?(:cache_key_with_version) ? @object.cache_key_with_version : nil
+                    end
+        cache = NullCacheStore.new if cache_key.nil?
+        cache.fetch(cache_key) do
+          collection? ? @object.map(&converter) : converter.call(@object)
+        end
       end
       alias to_hash serializable_hash
 

@@ -118,4 +118,22 @@ class ManyTest < MiniTest::Test
       UserResource4.new(user).serialize
     )
   end
+
+  def test_it_returns_json_with_null_when_articles_do_not_exist_with_resource_option
+    user = User.new(1)
+    user.articles = nil
+    assert_equal(
+      '{"id":1,"articles":null}',
+      UserResource1.new(user).serialize
+    )
+  end
+
+  def test_it_returns_json_with_null_when_articles_do_not_exist_with_block
+    user = User.new(1)
+    user.articles = nil
+    assert_equal(
+      '{"id":1,"articles":null}',
+      UserResource2.new(user).serialize
+    )
+  end
 end

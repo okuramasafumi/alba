@@ -11,6 +11,8 @@ module Alba
     def to_hash(target, params: {})
       object = target.public_send(@name)
       object = @condition.call(object, params) if @condition
+      return if object.nil?
+
       @resource.new(object, params: params).to_hash
     end
   end
