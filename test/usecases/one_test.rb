@@ -117,4 +117,20 @@ class OneTest < MiniTest::Test
       UserResource4.new(user, params: {replace_atmark_with: '_at_'}).serialize
     )
   end
+
+  def test_it_returns_json_with_null_when_profile_does_not_exist_with_resource_option
+    user = User.new(1)
+    assert_equal(
+      '{"id":1,"profile":null}',
+      UserResource1.new(user).serialize
+    )
+  end
+
+  def test_it_returns_json_with_null_when_profile_does_not_exist_with_block
+    user = User.new(1)
+    assert_equal(
+      '{"id":1,"profile":null}',
+      UserResource2.new(user).serialize
+    )
+  end
 end
