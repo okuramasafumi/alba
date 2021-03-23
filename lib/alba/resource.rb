@@ -196,7 +196,7 @@ module Alba
 
       # Transform keys as specified type
       #
-      # @params type [String, Symbol]
+      # @param type [String, Symbol]
       def transform_keys(type)
         @_transform_keys = type.to_sym
       end
