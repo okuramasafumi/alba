@@ -254,6 +254,44 @@ UserResourceCamel.new(user).serialize
 
 Supported transformation types are :camel, :lower_camel and :dash.
 
+### Filtering attributes
+
+You can filter attributes by overriding `Alba::Resource#converter` method, but it's a bit tricky.
+
+```ruby
+class User
+  attr_accessor :id, :name, :email, :created_at, :updated_at
+
+  def initialize(id, name, email)
+    @id = id
+    @name = name
+    @email = email
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  attributes :id, :name, :email
+
+  private
+
+  # Here using `Proc#>>` method to compose a proc from `super`
+  def converter
+    super >> proc { |hash| hash.compact }
+  end
+end
+
+user = User.new(1, nil, nil)
+UserResource.new(user).serialize # => '{"id":1}'
+
+
+```
+
+The key part is the use of `Proc#>>` since `Alba::Resource#converter` returns a `Proc` which contains the basic logic and it's impossible to change its behavior by just overriding the method.
+
+It's not recommended to swap the whole conversion logic. It's recommended to always call `super` when you override `converter`.
+
 ## Comparison
 
 Alba is faster than alternatives.
