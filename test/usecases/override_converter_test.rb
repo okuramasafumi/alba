@@ -13,29 +13,33 @@ class OverrideConverterTest < MiniTest::Test
     end
   end
 
-  class UserResource
-    include Alba::Resource
+  # rubocop:disable Style/MissingElse
+  if RUBY_VERSION >= '2.6'
+    class UserResource
+      include Alba::Resource
 
-    attributes :id, :name, :email
+      attributes :id, :name, :email
 
-    private
+      private
 
-    def converter
-      super >> proc { |hash| hash.compact }
+      def converter
+        super >> proc { |hash| hash.compact }
+      end
+    end
+
+    def setup
+      Alba.backend = nil
+      Alba.default_serializer = nil
+
+      @user = User.new(1, nil, nil)
+    end
+
+    def test_it_filters_nil_attributes_with_overriding_converter
+      assert_equal(
+        '{"id":1}',
+        UserResource.new(@user).serialize
+      )
     end
   end
-
-  def setup
-    Alba.backend = nil
-    Alba.default_serializer = nil
-
-    @user = User.new(1, nil, nil)
-  end
-
-  def test_it_filters_nil_attributes_with_overriding_converter
-    assert_equal(
-      '{"id":1}',
-      UserResource.new(@user).serialize
-    )
-  end
+  # rubocop:enable Style/MissingElse
 end
