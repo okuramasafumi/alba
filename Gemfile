@@ -13,4 +13,5 @@ gem 'rubocop-minitest', '~> 0.11.0', require: false # For lint
 gem 'rubocop-performance', '~> 1.10.1', require: false # For lint
 gem 'rubocop-rake', '>= 0.5.1', require: false # For lint
 gem 'rubocop-sensible', '~> 0.3.0', require: false # For lint
+gem 'ruby-prof', require: false # For performance profiling
 gem 'yard', require: false
