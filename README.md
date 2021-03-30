@@ -19,7 +19,7 @@ Alba has some advantages over other JSON serializers which we've wanted to have.
 
 DSL is great. It makes the coding experience natural and intuitive. However, remembering lots of DSL requires us a lot of effort. Unfortunately, most of the existing libraries have implemented their features via DSL and it's not easy to understand how they behave entirely. Alba's core DSL are only four (`attributes`, `attribute`, `one` and `many`) so it's easy to understand how to use.
 
-Alba is also understandable internally. The codebase is much smaller than the alternatives. In fact, it's about 330 lines of code. Look at the code on [GitHub](https://github.com/okuramasafumi/alba/tree/master/lib) and you'll be surprised how simple it is!
+Alba is also understandable internally. The codebase is much smaller than the alternatives. In fact, it's about 250 lines of code. Look at the code on [GitHub](https://github.com/okuramasafumi/alba/tree/master/lib) and you'll be surprised how simple it is!
 
 ### Performance
 
@@ -56,7 +56,6 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * One and many association with the ability to define them inline
 * Adding condition and filter to association
 * Parameters can be injected and used in attributes and associations
-* Setting root key separately in Serializer
 * Adding metadata
 * Selectable backend
 * Key transformation
@@ -109,17 +108,13 @@ end
 class UserResource
   include Alba::Resource
 
+  key :user
+
   attributes :id, :name
 
   attribute :name_with_email do |resource|
     "#{resource.name}: #{resource.email}"
   end
-end
-
-class SerializerWithKey
-  include Alba::Serializer
-
-  set key: :user
 end
 
 user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
@@ -181,7 +176,7 @@ UserResource.new(user).serialize
 `Alba.serialize` method is a shortcut to define everything inline.
 
 ```ruby
-Alba.serialize(user, with: proc { set key: :foo }) do
+Alba.serialize(user, key: :foo) do
   attributes :id
   many :articles do
     attributes :title, :body
@@ -190,7 +185,7 @@ end
 # => '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}'
 ```
 
-Although this might be useful sometimes, it's generally recommended to define a class for both Resource and Serializer.
+Although this might be useful sometimes, it's generally recommended to define a class for Resource.
 
 ### Inheritance and Ignorance
 
@@ -308,18 +303,6 @@ Alba.backend = :active_support
 ## Why named "Alba"?
 
 The name "Alba" comes from "albatross", a kind of birds. In Japanese, this bird is called "Aho-dori", which means "stupid bird". I find it funny because in fact albatrosses fly really fast. I hope Alba looks stupid but in fact it does its job quick.
-
-## Alba internals
-
-Alba has three component, `Serializer`, `Resource` and `Value` (`Value` is conceptual and not implemented directly).
-
-`Serializer` is a component responsible for rendering JSON output with `Resource`. `Serializer` can add more data to `Resource` such as `metadata`. Users can define one single `Serializer` and reuse it for all `Resource`s. The main interface is `#serialize`.
-
-`Resource` is a component responsible for defining how an object (or a collection of objects) is converted into JSON. The difference between `Serializer` and `Resource` is that while `Serializer` can add arbitrary data into JSON, `Resource` can get data only from the object under it. The main interface is `#serializable_hash`.
-
-`One` and `Many` are the special object fetching other resources and converting them into Hash.
-
-The main `Alba` module holds config values and one convenience method, `.serialize`.
 
 ## Development
 
