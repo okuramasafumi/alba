@@ -26,7 +26,7 @@ class UserDefinedSerializableHashTest < MiniTest::Test
     foo4 = Foo.new(4, 'name4')
     assert_equal(
       '{"foos":{"odd":[{"name":"name1"},{"name":"name3"}],"even":[{"name":"name2"},{"name":"name4"}]}}',
-      FooResource.new([foo1, foo2, foo3, foo4]).serialize(with: proc { set key: :foos })
+      FooResource.new([foo1, foo2, foo3, foo4]).serialize(key: :foos)
     )
   end
 end

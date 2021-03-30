@@ -29,7 +29,6 @@ class OverrideConverterTest < MiniTest::Test
 
     def setup
       Alba.backend = nil
-      Alba.default_serializer = nil
 
       @user = User.new(1, nil, nil)
     end

@@ -1,12 +1,6 @@
 require_relative '../test_helper'
 
 class ManyTest < MiniTest::Test
-  class SerializerWithKey
-    include Alba::Serializer
-
-    set key: :foo
-  end
-
   class User
     attr_reader :id, :created_at, :updated_at
     attr_accessor :articles

@@ -1,5 +1,4 @@
 require_relative 'alba/version'
-require_relative 'alba/serializer'
 require_relative 'alba/resource'
 
 # Core module
@@ -12,7 +11,6 @@ module Alba
 
   class << self
     attr_reader :backend, :encoder
-    attr_accessor :default_serializer
 
     # Set the backend, which actually serializes object into JSON
     #
@@ -28,17 +26,16 @@ module Alba
     # Serialize the object with inline definitions
     #
     # @param object [Object] the object to be serialized
-    # @param with [nil, Proc, Alba::Serializer] selializer
+    # @param key [Symbol]
     # @param block [Block] resource block
     # @return [String] serialized JSON string
     # @raise [ArgumentError] if block is absent or `with` argument's type is wrong
-    def serialize(object, with: nil, &block)
+    def serialize(object, key: nil, &block)
       raise ArgumentError, 'Block required' unless block
 
       resource_class.class_eval(&block)
       resource = resource_class.new(object)
-      with ||= @default_serializer
-      resource.serialize(with: with)
+      resource.serialize(key: key)
     end
 
     private

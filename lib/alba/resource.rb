@@ -1,4 +1,3 @@
-require_relative 'serializer'
 require_relative 'one'
 require_relative 'many'
 
@@ -25,7 +24,7 @@ module Alba
 
     # Instance methods
     module InstanceMethods
-      attr_reader :object, :_key, :params
+      attr_reader :object, :params
 
       # @param object [Object] the object to be serialized
       # @param params [Hash] user-given Hash for arbitrary data
@@ -37,20 +36,18 @@ module Alba
 
       # Get serializer with `with` argument and serialize self with it
       #
-      # @param with [nil, Proc, Alba::Serializer] selializer
+      # @param key [Symbol]
       # @return [String] serialized JSON string
-      def serialize(with: nil)
-        serializer = case with
-                     when nil
-                       @_serializer || empty_serializer
-                     when ->(obj) { obj.is_a?(Class) && obj <= Alba::Serializer }
-                       with
-                     when Proc
-                       inline_extended_serializer(with)
-                     else
-                       raise ArgumentError, 'Unexpected type for with, possible types are Class or Proc'
-                     end
-        serializer.new(self).serialize
+      def serialize(key: nil)
+        key = if key.nil? && @_key
+                @_key
+              elsif key == true
+                @_key || self.class.name.delete_suffix('Resource').downcase.gsub(/:{2}/, '_').to_sym
+              else
+                key
+              end
+        hash = key ? {key.to_sym => serializable_hash} : serializable_hash
+        Alba.encoder.call(hash)
       end
 
       # A Hash for serialization
@@ -61,12 +58,12 @@ module Alba
       end
       alias to_hash serializable_hash
 
+      private
+
       # @return [Symbol]
-      def key
+      def _key
         @_key || self.class.name.delete_suffix('Resource').downcase.gsub(/:{2}/, '_').to_sym
       end
-
-      private
 
       # rubocop:disable Style/MethodCalledOnDoEndBlock
       def converter

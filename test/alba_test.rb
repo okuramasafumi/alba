@@ -1,12 +1,6 @@
 require 'test_helper'
 
 class AlbaTest < Minitest::Test
-  class SerializerWithKey
-    include Alba::Serializer
-
-    set key: :foo
-  end
-
   class User
     attr_reader :id, :created_at, :updated_at
     attr_accessor :articles
@@ -31,7 +25,6 @@ class AlbaTest < Minitest::Test
 
   def setup
     Alba.backend = nil
-    Alba.default_serializer = nil
 
     @user = User.new(1)
     @article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
@@ -55,7 +48,7 @@ class AlbaTest < Minitest::Test
   def test_it_serializes_object_with_block_with_with_option
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
-      Alba.serialize(@user, with: SerializerWithKey) do
+      Alba.serialize(@user, key: :foo) do
         attributes :id
         many :articles do
           attributes :title, :body
@@ -64,21 +57,10 @@ class AlbaTest < Minitest::Test
     )
   end
 
-  def test_it_serializes_object_with_block_with_invalid_with_option
-    assert_raises ArgumentError do
-      Alba.serialize(@user, with: :invalid_with) do
-        attributes :id
-        many :articles do
-          attributes :title, :body
-        end
-      end
-    end
-  end
-
   def test_it_serializes_object_with_fully_inlined_definitions
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
-      Alba.serialize(@user, with: proc { set key: :foo }) do
+      Alba.serialize(@user, key: :foo) do
         attributes :id
         many :articles do
           attributes :title, :body
@@ -92,7 +74,7 @@ class AlbaTest < Minitest::Test
 
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
-      Alba.serialize(@user, with: proc { set key: :foo }) do
+      Alba.serialize(@user, key: :foo) do
         attributes :id
         many :articles do
           attributes :title, :body
@@ -108,7 +90,7 @@ class AlbaTest < Minitest::Test
 
       assert_equal(
         '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
-        Alba.serialize(@user, with: proc { set key: :foo }) do
+        Alba.serialize(@user, key: :foo) do
           attributes :id
           many :articles do
             attributes :title, :body
@@ -123,7 +105,7 @@ class AlbaTest < Minitest::Test
 
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
-      Alba.serialize(@user, with: proc { set key: :foo }) do
+      Alba.serialize(@user, key: :foo) do
         attributes :id
         many :articles do
           attributes :title, :body
@@ -136,33 +118,5 @@ class AlbaTest < Minitest::Test
     assert_raises(Alba::UnsupportedBackend, 'Unsupported backend, not_supported') do
       Alba.backend = :not_supported
     end
-  end
-
-  def test_it_accepts_default_serializer_as_class
-    Alba.default_serializer = SerializerWithKey
-
-    assert_equal(
-      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
-      Alba.serialize(@user) do
-        attributes :id
-        many :articles do
-          attributes :title, :body
-        end
-      end
-    )
-  end
-
-  def test_it_accepts_default_serializer_as_proc
-    Alba.default_serializer = proc { set key: :user }
-
-    assert_equal(
-      '{"user":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
-      Alba.serialize(@user) do
-        attributes :id
-        many :articles do
-          attributes :title, :body
-        end
-      end
-    )
   end
 end

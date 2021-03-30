@@ -1,12 +1,6 @@
 require_relative '../test_helper'
 
 class NoAssociationTest < MiniTest::Test
-  class SerializerWithKey
-    include Alba::Serializer
-
-    set key: :user
-  end
-
   class User
     attr_accessor :id, :name, :email, :created_at, :updated_at
 
@@ -29,13 +23,12 @@ class NoAssociationTest < MiniTest::Test
     end
   end
 
-  class UserResourceWithSerializerOpt < UserResource
-    serializer SerializerWithKey
+  class UserResourceWithKeyOnly < UserResource
+    key :user
   end
 
   def setup
     Alba.backend = nil
-    Alba.default_serializer = nil
 
     @user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
   end
@@ -50,23 +43,21 @@ class NoAssociationTest < MiniTest::Test
   def test_it_returns_correct_json_with_serializer_opt
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResourceWithSerializerOpt.new(@user).serialize
+      UserResourceWithKeyOnly.new(@user).serialize
     )
   end
 
   def test_it_returns_correct_json_with_with_option_in_serialize_method
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource.new(@user).serialize(with: SerializerWithKey)
+      UserResource.new(@user).serialize(key: :user)
     )
   end
 
   def test_it_returns_correct_json_with_with_option_in_serialize_method_while_overwriting_default_serializer
-    Alba.default_serializer = proc { set key: :overwrite_me }
-
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource.new(@user).serialize(with: SerializerWithKey)
+      UserResource.new(@user).serialize(key: :user)
     )
   end
 
@@ -81,21 +72,21 @@ class NoAssociationTest < MiniTest::Test
   def test_attribute_works_without_block_args
     assert_equal(
       '{"user":{"name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource2.new(@user).serialize(with: SerializerWithKey)
+      UserResource2.new(@user).serialize(key: :user)
     )
   end
 
   def test_serialiaze_method_with_option_as_proc
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource.new(@user).serialize(with: proc { set key: :user })
+      UserResource.new(@user).serialize(key: :user)
     )
   end
 
-  def test_serialiaze_method_with_option_as_proc_and_key_is_true
+  def test_serialiaze_method_with_option_and_key_is_true
     assert_equal(
       '{"noassociationtest_user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource.new(@user).serialize(with: proc { set key: true })
+      UserResource.new(@user).serialize(key: true)
     )
   end
 
@@ -108,7 +99,7 @@ class NoAssociationTest < MiniTest::Test
   def test_serializer_key_overwrites_resource_key
     assert_equal(
       '{"user":{"id":1}}',
-      UserResourceWithKey.new(@user).serialize(with: SerializerWithKey)
+      UserResourceWithKey.new(@user).serialize(key: :user)
     )
   end
 end
