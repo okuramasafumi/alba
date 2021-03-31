@@ -21,11 +21,6 @@ class ResourceTest < MiniTest::Test
     many :bars, resource: BarResource
   end
 
-  def test_name_option
-    assert_equal :foo, FooResource.new(Foo.new).key
-    assert_equal :resourcetest_bar, BarResource.new(Foo.new).key
-  end
-
   def test_serializable_hash
     foo = Foo.new
     foo.id = 1

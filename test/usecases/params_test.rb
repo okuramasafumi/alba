@@ -1,11 +1,6 @@
 require_relative '../test_helper'
 
 class ParamsTest < MiniTest::Test
-  class UserSerializer
-    include Alba::Serializer
-    set key: :user
-  end
-
   class User
     attr_accessor :id, :name, :email, :created_at, :updated_at, :profile, :articles
 
@@ -42,7 +37,7 @@ class ParamsTest < MiniTest::Test
 
   class UserResource
     include Alba::Resource
-    serializer UserSerializer
+    key :user
 
     attributes :id, :name
 
@@ -73,7 +68,7 @@ class ParamsTest < MiniTest::Test
 
   class UserResource2
     include Alba::Resource
-    serializer UserSerializer
+    key :user
 
     attributes :id
 
@@ -95,7 +90,6 @@ class ParamsTest < MiniTest::Test
 
   def setup
     Alba.backend = nil
-    Alba.default_serializer = nil
 
     @user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
     profile = Profile.new(1, 'test@example.com', 'Masafumi', 'Okura')
