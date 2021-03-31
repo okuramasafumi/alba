@@ -85,7 +85,7 @@ class NoAssociationTest < MiniTest::Test
 
   def test_serialiaze_method_with_option_and_key_is_true
     assert_equal(
-      '{"noassociationtest_user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
+      '{"true":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
       UserResource.new(@user).serialize(key: true)
     )
   end

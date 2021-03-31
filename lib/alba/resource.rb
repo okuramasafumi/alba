@@ -39,14 +39,8 @@ module Alba
       # @param key [Symbol]
       # @return [String] serialized JSON string
       def serialize(key: nil)
-        key = if key.nil? && @_key
-                @_key
-              elsif key == true
-                @_key || self.class.name.delete_suffix('Resource').downcase.gsub(/:{2}/, '_').to_sym
-              else
-                key
-              end
-        hash = key ? {key.to_sym => serializable_hash} : serializable_hash
+        key = key.nil? ? _key : key
+        hash = key && key != '' ? {key.to_s => serializable_hash} : serializable_hash
         Alba.encoder.call(hash)
       end
 
@@ -60,9 +54,15 @@ module Alba
 
       private
 
-      # @return [Symbol]
+      # @return [String]
       def _key
-        @_key || self.class.name.delete_suffix('Resource').downcase.gsub(/:{2}/, '_').to_sym
+        if @_key == true && Alba.with_inference
+          demodulized = ActiveSupport::Inflector.demodulize(self.class.name)
+          meth = collection? ? :tableize : :singularize
+          ActiveSupport::Inflector.public_send(meth, demodulized.delete_suffix('Resource').downcase)
+        else
+          @_key.to_s
+        end
       end
 
       # rubocop:disable Style/MethodCalledOnDoEndBlock
@@ -178,7 +178,13 @@ module Alba
       #
       # @param key [String, Symbol]
       def key(key)
-        @_key = key.to_sym
+        @_key = key.respond_to?(:to_sym) ? key.to_sym : key
+      end
+
+      # Set key to true
+      #
+      def key!
+        @_key = true
       end
 
       # Delete attributes

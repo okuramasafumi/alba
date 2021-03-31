@@ -59,6 +59,7 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Adding metadata
 * Selectable backend
 * Key transformation
+* Root key inference
 * No runtime dependencies
 
 ## Anti features
@@ -279,13 +280,32 @@ end
 
 user = User.new(1, nil, nil)
 UserResource.new(user).serialize # => '{"id":1}'
-
-
 ```
 
 The key part is the use of `Proc#>>` since `Alba::Resource#converter` returns a `Proc` which contains the basic logic and it's impossible to change its behavior by just overriding the method.
 
 It's not recommended to swap the whole conversion logic. It's recommended to always call `super` when you override `converter`.
+
+### Root key inference
+
+After `Alba.with_inference!` called, Alba tries to infer root key from its class name.
+
+```ruby
+class UserResource
+  include Alba::Resource
+
+  key!
+
+  attributes :id
+end
+
+UserResource.new(user).serialize # => Sets "user" key
+UserResource.new([user]).serialize # => Sets "users" key
+```
+
+This resource automatically sets its root key to either "users" or "user", depending on the given object is collection or not.
+
+Note that to enable this feature you must install `ActiveSupport` gem.
 
 ## Comparison
 
