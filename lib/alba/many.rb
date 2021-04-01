@@ -13,6 +13,7 @@ module Alba
       objects = @condition.call(objects, params) if @condition
       return if objects.nil?
 
+      @resource = constantize(@resource)
       objects.map { |o| @resource.new(o, params: params).to_hash }
     end
   end

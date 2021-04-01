@@ -13,6 +13,7 @@ module Alba
       object = @condition.call(object, params) if @condition
       return if object.nil?
 
+      @resource = constantize(@resource)
       @resource.new(object, params: params).to_hash
     end
   end

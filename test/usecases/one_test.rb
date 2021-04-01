@@ -127,4 +127,22 @@ class OneTest < MiniTest::Test
       UserResource2.new(user).serialize
     )
   end
+
+  class UserResource5
+    include Alba::Resource
+
+    attributes :id
+
+    one :profile, resource: 'OneTest::ProfileResource'
+  end
+
+  def test_it_returns_correct_json_with_resource_option_string
+    user = User.new(1)
+    profile = Profile.new(1, 'test@example.com', 'Masafumi', 'Okura')
+    user.profile = profile
+    assert_equal(
+      '{"id":1,"profile":{"email":"test@example.com","full_name":"Masafumi Okura"}}',
+      UserResource5.new(user).serialize
+    )
+  end
 end

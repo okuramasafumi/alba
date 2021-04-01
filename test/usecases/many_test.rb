@@ -130,4 +130,24 @@ class ManyTest < MiniTest::Test
       UserResource2.new(user).serialize
     )
   end
+
+  class UserResource5
+    include Alba::Resource
+
+    attributes :id
+
+    many :articles, resource: 'ManyTest::ArticleResource'
+  end
+
+  def test_it_returns_correct_json_with_resource_option_string
+    user = User.new(1)
+    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
+    user.articles << article1
+    article2 = Article.new(2, 'Super nice', 'Really nice!')
+    user.articles << article2
+    assert_equal(
+      '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}',
+      UserResource5.new(user).serialize
+    )
+  end
 end

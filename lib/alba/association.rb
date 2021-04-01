@@ -30,6 +30,15 @@ module Alba
 
     private
 
+    def constantize(resource)
+      case resource # rubocop:disable Style/MissingElse
+      when Class
+        resource
+      when Symbol, String
+        Object.const_get(resource)
+      end
+    end
+
     def resource_class
       klass = Class.new
       klass.include(Alba::Resource)
