@@ -288,10 +288,10 @@ It's not recommended to swap the whole conversion logic. It's recommended to alw
 
 ### Inference
 
-After `Alba.with_inference!` called, Alba tries to infer root key and association resource name.
+After `Alba.enable_inference!` called, Alba tries to infer root key and association resource name.
 
 ```ruby
-Alba.with_inference!
+Alba.enable_inference!
 
 class User
   attr_reader :id

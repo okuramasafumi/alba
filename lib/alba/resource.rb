@@ -56,7 +56,7 @@ module Alba
 
       # @return [String]
       def _key
-        if @_key == true && Alba.with_inference
+        if @_key == true && Alba.inferring
           demodulized = ActiveSupport::Inflector.demodulize(self.class.name)
           meth = collection? ? :tableize : :singularize
           ActiveSupport::Inflector.public_send(meth, demodulized.delete_suffix('Resource').downcase)

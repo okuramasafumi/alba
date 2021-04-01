@@ -37,7 +37,7 @@ class WithInferenceTest < Minitest::Test
   end
 
   class UserInferringResource
-    Alba.with_inference! # Need this here instead of initializer
+    Alba.enable_inference! # Need this here instead of initializer
     include Alba::Resource
 
     attributes :id
@@ -46,13 +46,13 @@ class WithInferenceTest < Minitest::Test
   end
 
   def setup
-    Alba.with_inference!
+    Alba.enable_inference!
     @user = User.new(1)
     @user.articles << Article.new(1, 'The title')
   end
 
   def teardown
-    Alba.without_inference!
+    Alba.disable_inference!
   end
 
   def test_it_infers_resource_name

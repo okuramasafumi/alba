@@ -10,7 +10,7 @@ module Alba
   class UnsupportedBackend < Error; end
 
   class << self
-    attr_reader :backend, :encoder, :with_inference
+    attr_reader :backend, :encoder, :inferring
 
     # Set the backend, which actually serializes object into JSON
     #
@@ -39,18 +39,18 @@ module Alba
     end
 
     # Enable inference for key and resource name
-    def with_inference!
+    def enable_inference!
       begin
         require 'active_support/inflector'
       rescue LoadError
-        raise ::Alba::Error, 'To use with_inference, please install `ActiveSupport` gem.'
+        raise ::Alba::Error, 'To enable inference, please install `ActiveSupport` gem.'
       end
-      @with_inference = true
+      @inferring = true
     end
 
     # Disable inference for key and resource name
-    def without_inference!
-      @with_inference = false
+    def disable_inference!
+      @inferring = false
     end
 
     private
