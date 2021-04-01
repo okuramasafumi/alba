@@ -2,24 +2,21 @@ require_relative '../test_helper'
 
 class WithInferenceTest < Minitest::Test
   class User
-    attr_reader :id, :created_at, :updated_at
+    attr_reader :id
     attr_accessor :articles
 
     def initialize(id)
       @id = id
-      @created_at = Time.now
-      @updated_at = Time.now
       @articles = []
     end
   end
 
   class Article
-    attr_accessor :id, :title, :body
+    attr_accessor :id, :title
 
-    def initialize(id, title, body)
+    def initialize(id, title)
       @id = id
       @title = title
-      @body = body
     end
   end
 
@@ -39,22 +36,31 @@ class WithInferenceTest < Minitest::Test
     many :articles, resource: ArticleResource
   end
 
+  class UserInferringResource
+    Alba.with_inference! # Need this here instead of initializer
+    include Alba::Resource
+
+    attributes :id
+
+    many :articles
+  end
+
   def setup
     Alba.with_inference!
     @user = User.new(1)
-    @user.articles << Article.new(1, 'The title', 'The body')
+    @user.articles << Article.new(1, 'The title')
   end
 
   def teardown
     Alba.without_inference!
   end
 
-  #   def test_it_infers_resource_name
-  #     assert_equal(
-  #       '{"id":1,"articles":[{"title":"The title"}]}',
-  #       UserResource.new(@user).serialize
-  #     )
-  #   end
+  def test_it_infers_resource_name
+    assert_equal(
+      '{"id":1,"articles":[{"title":"The title"}]}',
+      UserInferringResource.new(@user).serialize
+    )
+  end
 
   def test_it_infers_key_with_key_bang
     assert_equal(

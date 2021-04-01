@@ -286,24 +286,58 @@ The key part is the use of `Proc#>>` since `Alba::Resource#converter` returns a 
 
 It's not recommended to swap the whole conversion logic. It's recommended to always call `super` when you override `converter`.
 
-### Root key inference
+### Inference
 
-After `Alba.with_inference!` called, Alba tries to infer root key from its class name.
+After `Alba.with_inference!` called, Alba tries to infer root key and association resource name.
 
 ```ruby
+Alba.with_inference!
+
+class User
+  attr_reader :id
+  attr_accessor :articles
+
+  def initialize(id)
+    @id = id
+    @articles = []
+  end
+end
+
+class Article
+  attr_accessor :id, :title
+
+  def initialize(id, title)
+    @id = id
+    @title = title
+  end
+end
+
+class ArticleResource
+  include Alba::Resource
+
+  attributes :title
+end
+
 class UserResource
   include Alba::Resource
 
   key!
 
   attributes :id
+
+  many :articles
 end
 
-UserResource.new(user).serialize # => Sets "user" key
-UserResource.new([user]).serialize # => Sets "users" key
+user = User.new(1)
+user.articles << Article.new(1, 'The title')
+
+UserResource.new(user).serialize # => '{"user":{"id":1,"articles":[{"title":"The title"}]}}'
+UserResource.new([user]).serialize # => '{"users":[{"id":1,"articles":[{"title":"The title"}]}]}'
 ```
 
 This resource automatically sets its root key to either "users" or "user", depending on the given object is collection or not.
+
+Also, you don't have to specify which resource class to use with `many`. Alba infers it from association name.
 
 Note that to enable this feature you must install `ActiveSupport` gem.
 

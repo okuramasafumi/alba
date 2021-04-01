@@ -150,7 +150,8 @@ module Alba
       # @param block [Block]
       # @see Alba::One#initialize
       def one(name, condition = nil, resource: nil, key: nil, &block)
-        @_attributes[key&.to_sym || name.to_sym] = One.new(name: name, condition: condition, resource: resource, &block)
+        nesting = self.name&.rpartition('::')&.first
+        @_attributes[key&.to_sym || name.to_sym] = One.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
       end
       alias has_one one
 
@@ -163,7 +164,8 @@ module Alba
       # @param block [Block]
       # @see Alba::Many#initialize
       def many(name, condition = nil, resource: nil, key: nil, &block)
-        @_attributes[key&.to_sym || name.to_sym] = Many.new(name: name, condition: condition, resource: resource, &block)
+        nesting = self.name&.rpartition('::')&.first
+        @_attributes[key&.to_sym || name.to_sym] = Many.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
       end
       alias has_many many
 
