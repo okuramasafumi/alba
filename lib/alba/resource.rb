@@ -6,7 +6,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _serializer: nil, _key: nil, _transform_keys: nil}.freeze
+    DSLS = {_attributes: {}, _key: nil, _transform_keys: nil}.freeze
     private_constant :DSLS
 
     # @private
@@ -34,7 +34,7 @@ module Alba
         DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.public_send(name)) }
       end
 
-      # Get serializer with `with` argument and serialize self with it
+      # Serialize object into JSON string
       #
       # @param key [Symbol]
       # @return [String] serialized JSON string
@@ -94,18 +94,6 @@ module Alba
         else
           raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
         end
-      end
-
-      def empty_serializer
-        klass = Class.new
-        klass.include Alba::Serializer
-        klass
-      end
-
-      def inline_extended_serializer(with)
-        klass = empty_serializer
-        klass.class_eval(&with)
-        klass
       end
 
       def collection?
@@ -168,13 +156,6 @@ module Alba
         @_attributes[key&.to_sym || name.to_sym] = Many.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
       end
       alias has_many many
-
-      # Set serializer for the resource
-      #
-      # @param name [Alba::Serializer]
-      def serializer(name)
-        @_serializer = name <= Alba::Serializer ? name : nil
-      end
 
       # Set key
       #
