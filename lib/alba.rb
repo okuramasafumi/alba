@@ -10,7 +10,7 @@ module Alba
   class UnsupportedBackend < Error; end
 
   class << self
-    attr_reader :backend, :encoder, :inferring
+    attr_reader :backend, :encoder, :inferring, :_on_error
 
     # Set the backend, which actually serializes object into JSON
     #
@@ -51,6 +51,18 @@ module Alba
     # Disable inference for key and resource name
     def disable_inference!
       @inferring = false
+    end
+
+    # Set error handler
+    #
+    # @param [Symbol] handler
+    # @param [Block]
+    def on_error(handler = nil, &block)
+      raise ArgumentError, 'You cannot specify error handler with both Symbol and block' if handler && block
+      raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
+
+      p block if block
+      @_on_error = handler || block
     end
 
     private
@@ -98,4 +110,5 @@ module Alba
   end
 
   @encoder = default_encoder
+  @_on_error = :raise
 end

@@ -6,7 +6,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _transform_keys: nil}.freeze
+    DSLS = {_attributes: {}, _key: nil, _transform_keys: nil, _on_error: nil}.freeze
     private_constant :DSLS
 
     # @private
@@ -65,15 +65,35 @@ module Alba
         end
       end
 
-      # rubocop:disable Style/MethodCalledOnDoEndBlock
       def converter
         lambda do |resource|
-          @_attributes.map do |key, attribute|
-            [transform_key(key), fetch_attribute(resource, attribute)]
-          end.to_h
+          arrays = @_attributes.map do |key, attribute|
+            key = transform_key(key)
+            [key, fetch_attribute(resource, attribute)]
+          rescue ::Alba::Error, FrozenError
+            raise
+          rescue StandardError => e
+            handle_error(e, resource, key, attribute)
+          end
+          arrays.reject(&:empty?).to_h
         end
       end
-      # rubocop:enable Style/MethodCalledOnDoEndBlock
+
+      def handle_error(error, resource, key, attribute)
+        on_error = @_on_error || Alba._on_error
+        case on_error
+        when :raise, nil
+          raise
+        when :nullify
+          [key, nil]
+        when :ignore
+          []
+        when Proc
+          on_error.call(error, resource, key, attribute, self.class)
+        else
+          raise ::Alba::Error, "Unknown on_error: #{on_error.inspect}"
+        end
+      end
 
       # Override this method to supply custom key transform method
       def transform_key(key)
@@ -185,6 +205,17 @@ module Alba
       # @param type [String, Symbol]
       def transform_keys(type)
         @_transform_keys = type.to_sym
+      end
+
+      # Set error handler
+      #
+      # @param [Symbol] handler
+      # @param [Block]
+      def on_error(handler = nil, &block)
+        raise ArgumentError, 'You cannot specify error handler with both Symbol and block' if handler && block
+        raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
+
+        @_on_error = handler || block
       end
     end
   end
