@@ -15,6 +15,7 @@ AllCops:
     - 'benchmark/**/*.rb'
   NewCops: enable
   EnabledByDefault: true
+  TargetRubyVersion: 2.5
 
 # Oneline comment is not valid so until it gets valid, we disable it
 Bundler/GemComment:
