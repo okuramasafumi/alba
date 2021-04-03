@@ -60,6 +60,7 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Selectable backend
 * Key transformation
 * Root key inference
+* Error handling
 * No runtime dependencies
 
 ## Anti features
@@ -340,6 +341,59 @@ This resource automatically sets its root key to either "users" or "user", depen
 Also, you don't have to specify which resource class to use with `many`. Alba infers it from association name.
 
 Note that to enable this feature you must install `ActiveSupport` gem.
+
+### Error handling
+
+You can set error handler globally or per resource using `on_error`.
+
+```ruby
+class User
+  attr_accessor :id, :name
+
+  def initialize(id, name, email)
+    @id = id
+    @name = name
+    @email = email
+  end
+
+  def email
+    raise RuntimeError, 'Error!'
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  attributes :id, :name, :email
+
+  on_error :ignore
+end
+
+user = User.new(1, 'Test', 'email@example.com')
+UserResource.new(user).serialize # => '{"id":1,"name":"Test"}'
+```
+
+This way you can exclude an entry when fetching an attribute gives an exception.
+
+There are four possible arguments `on_error` method accepts.
+
+* `:raise` re-raises an error. This is the default behavior.
+* `:ignore` ignores the entry with the error.
+* `:nullify` sets the attribute with the error to `nil`.
+* Block gives you more control over what to be returned.
+
+The block receives five arguments, `error`, `object`, `key`, `attribute` and `resource class` and must return a two-element array. Below is an example.
+
+```ruby
+# Global error handling
+Alba.on_error do |error, object, key, attribute, resource_class|
+  if resource_class == MyResource
+    ['error_fallback', object.error_fallback]
+  else
+    [key, error.message]
+  end
+end
+```
 
 ## Comparison
 
