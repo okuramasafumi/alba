@@ -37,6 +37,11 @@ Metrics/ClassLength:
 Metrics/MethodLength:
   Max: 15
 
+# Resource class includes DSLs, which tend to accept long list of parameters
+Metrics/ParameterLists:
+  Exclude:
+    - 'lib/alba/resource.rb'
+
 Style/ConstantVisibility:
   Exclude:
     - 'lib/alba/version.rb'
