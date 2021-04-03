@@ -69,13 +69,32 @@ module Alba
         lambda do |resource|
           arrays = @_attributes.map do |key, attribute|
             key = transform_key(key)
-            [key, fetch_attribute(resource, attribute)]
+            if attribute.is_a?(Array) # Conditional
+              conditional_attribute(resource, key, attribute)
+            else
+              [key, fetch_attribute(resource, attribute)]
+            end
           rescue ::Alba::Error, FrozenError
             raise
           rescue StandardError => e
             handle_error(e, resource, key, attribute)
           end
           arrays.reject(&:empty?).to_h
+        end
+      end
+
+      def conditional_attribute(resource, key, attribute)
+        fetched_attribute = fetch_attribute(resource, attribute.first)
+        condition = attribute.last
+        object = if attribute.first.is_a?(Alba::Association)
+                   attribute.first.object
+                 else
+                   fetched_attribute
+                 end
+        if condition.respond_to?(:call) && condition.call(resource, object)
+          [key, fetched_attribute]
+        else
+          []
         end
       end
 
@@ -134,19 +153,24 @@ module Alba
       # Set multiple attributes at once
       #
       # @param attrs [Array<String, Symbol>]
-      def attributes(*attrs)
-        attrs.each { |attr_name| @_attributes[attr_name.to_sym] = attr_name.to_sym }
+      # @param options [Hash] option hash including `if` that is a  condition to render these attributes
+      def attributes(*attrs, **options)
+        attrs.each do |attr_name|
+          attr = options[:if] ? [attr_name.to_sym, options[:if]] : attr_name.to_sym
+          @_attributes[attr_name.to_sym] = attr
+        end
       end
 
       # Set an attribute with the given block
       #
       # @param name [String, Symbol] key name
+      # @param options [Hash] option hash including `if` that is a  condition to render
       # @param block [Block] the block called during serialization
       # @raise [ArgumentError] if block is absent
-      def attribute(name, &block)
+      def attribute(name, **options, &block)
         raise ArgumentError, 'No block given in attribute method' unless block
 
-        @_attributes[name.to_sym] = block
+        @_attributes[name.to_sym] = options[:if] ? [block, options[:if]] : block
       end
 
       # Set One association
@@ -155,11 +179,13 @@ module Alba
       # @param condition [Proc]
       # @param resource [Class<Alba::Resource>]
       # @param key [String, Symbol] used as key when given
+      # @param options [Hash] option hash including `if` that is a  condition to render
       # @param block [Block]
       # @see Alba::One#initialize
-      def one(name, condition = nil, resource: nil, key: nil, &block)
+      def one(name, condition = nil, resource: nil, key: nil, **options, &block)
         nesting = self.name&.rpartition('::')&.first
-        @_attributes[key&.to_sym || name.to_sym] = One.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
+        one = One.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
+        @_attributes[key&.to_sym || name.to_sym] = options[:if] ? [one, options[:if]] : one
       end
       alias has_one one
 
@@ -169,11 +195,13 @@ module Alba
       # @param condition [Proc]
       # @param resource [Class<Alba::Resource>]
       # @param key [String, Symbol] used as key when given
+      # @param options [Hash] option hash including `if` that is a  condition to render
       # @param block [Block]
       # @see Alba::Many#initialize
-      def many(name, condition = nil, resource: nil, key: nil, &block)
+      def many(name, condition = nil, resource: nil, key: nil, **options, &block)
         nesting = self.name&.rpartition('::')&.first
-        @_attributes[key&.to_sym || name.to_sym] = Many.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
+        many = Many.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
+        @_attributes[key&.to_sym || name.to_sym] = options[:if] ? [many, options[:if]] : many
       end
       alias has_many many
 

@@ -2,6 +2,8 @@ module Alba
   # Base class for `One` and `Many`
   # Child class should implement `to_hash` method
   class Association
+    attr_reader :object
+
     # @param name [Symbol] name of the method to fetch association
     # @param condition [Proc] a proc filtering data
     # @param resource [Class<Alba::Resource>] a resource class for the association

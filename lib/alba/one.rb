@@ -9,9 +9,9 @@ module Alba
     # @param params [Hash] user-given Hash for arbitrary data
     # @return [Hash]
     def to_hash(target, params: {})
-      object = target.public_send(@name)
-      object = @condition.call(object, params) if @condition
-      return if object.nil?
+      @object = target.public_send(@name)
+      @object = @condition.call(object, params) if @condition
+      return if @object.nil?
 
       @resource = constantize(@resource)
       @resource.new(object, params: params).to_hash
