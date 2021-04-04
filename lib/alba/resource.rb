@@ -66,39 +66,39 @@ module Alba
       end
 
       def converter
-        lambda do |resource|
+        lambda do |object|
           arrays = @_attributes.map do |key, attribute|
             key = transform_key(key)
             if attribute.is_a?(Array) # Conditional
-              conditional_attribute(resource, key, attribute)
+              conditional_attribute(object, key, attribute)
             else
-              [key, fetch_attribute(resource, attribute)]
+              [key, fetch_attribute(object, attribute)]
             end
           rescue ::Alba::Error, FrozenError
             raise
           rescue StandardError => e
-            handle_error(e, resource, key, attribute)
+            handle_error(e, object, key, attribute)
           end
           arrays.reject(&:empty?).to_h
         end
       end
 
-      def conditional_attribute(resource, key, attribute)
-        fetched_attribute = fetch_attribute(resource, attribute.first)
+      def conditional_attribute(object, key, attribute)
+        fetched_attribute = fetch_attribute(object, attribute.first)
         condition = attribute.last
-        object = if attribute.first.is_a?(Alba::Association)
-                   attribute.first.object
-                 else
-                   fetched_attribute
-                 end
-        if condition.respond_to?(:call) && condition.call(resource, object)
+        attr = if attribute.first.is_a?(Alba::Association)
+                 attribute.first.object
+               else
+                 fetched_attribute
+               end
+        if condition.respond_to?(:call) && condition.call(object, attr)
           [key, fetched_attribute]
         else
           []
         end
       end
 
-      def handle_error(error, resource, key, attribute)
+      def handle_error(error, object, key, attribute)
         on_error = @_on_error || Alba._on_error
         case on_error
         when :raise, nil
@@ -108,7 +108,7 @@ module Alba
         when :ignore
           []
         when Proc
-          on_error.call(error, resource, key, attribute, self.class)
+          on_error.call(error, object, key, attribute, self.class)
         else
           raise ::Alba::Error, "Unknown on_error: #{on_error.inspect}"
         end
@@ -122,14 +122,14 @@ module Alba
         KeyTransformer.transform(key, @_transform_keys)
       end
 
-      def fetch_attribute(resource, attribute)
+      def fetch_attribute(object, attribute)
         case attribute
         when Symbol
-          resource.public_send attribute
+          object.public_send attribute
         when Proc
-          instance_exec(resource, &attribute)
+          instance_exec(object, &attribute)
         when Alba::One, Alba::Many
-          attribute.to_hash(resource, params: params)
+          attribute.to_hash(object, params: params)
         else
           raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
         end
