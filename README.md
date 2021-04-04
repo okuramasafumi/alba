@@ -287,6 +287,33 @@ The key part is the use of `Proc#>>` since `Alba::Resource#converter` returns a 
 
 It's not recommended to swap the whole conversion logic. It's recommended to always call `super` when you override `converter`.
 
+### Conditional attributes
+
+Filtering attributes with overriding `convert` works well for simple cases. However, It's cumbersome when we want to filter various attributes based on different conditions for keys.
+
+In these cases, conditional attributes works well. We can pass `if` option to `attributes`, `attribute`, `one` and `many`. Below is an example for the same effect as [filtering attributes section](#filtering-attributes).
+
+```ruby
+class User
+  attr_accessor :id, :name, :email, :created_at, :updated_at
+
+  def initialize(id, name, email)
+    @id = id
+    @name = name
+    @email = email
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  attributes :id, :name, :email, if: proc { |user, attribute| !attribute.nil? }
+end
+
+user = User.new(1, nil, nil)
+UserResource.new(user).serialize # => '{"id":1}'
+```
+
 ### Inference
 
 After `Alba.enable_inference!` called, Alba tries to infer root key and association resource name.
