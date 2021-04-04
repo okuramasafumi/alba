@@ -19,8 +19,6 @@ Alba has some advantages over other JSON serializers which we've wanted to have.
 
 DSL is great. It makes the coding experience natural and intuitive. However, remembering lots of DSL requires us a lot of effort. Unfortunately, most of the existing libraries have implemented their features via DSL and it's not easy to understand how they behave entirely. Alba's core DSL are only four (`attributes`, `attribute`, `one` and `many`) so it's easy to understand how to use.
 
-Alba is also understandable internally. The codebase is much smaller than the alternatives. In fact, it's about 250 lines of code. Look at the code on [GitHub](https://github.com/okuramasafumi/alba/tree/master/lib) and you'll be surprised how simple it is!
-
 ### Performance
 
 Alba is faster than most of the alternatives. We have a [benchmark](https://github.com/okuramasafumi/alba/tree/master/benchmark).
@@ -56,11 +54,12 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * One and many association with the ability to define them inline
 * Adding condition and filter to association
 * Parameters can be injected and used in attributes and associations
-* Adding metadata
+* Conditional attributes and associations
 * Selectable backend
 * Key transformation
 * Root key inference
 * Error handling
+* Resource name inflection based on association name
 * No runtime dependencies
 
 ## Anti features
@@ -70,7 +69,6 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Supporting all existing JSON encoder/decoder
 * Cache
 * [JSON:API](https://jsonapi.org) support
-* Association name inflection
 * And many others
 
 ## Usage
@@ -79,7 +77,7 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 
 Alba's configuration is fairly simple.
 
-#### Backend
+#### Backend configuration
 
 Backend is the actual part serializing an object into JSON. Alba supports these backends.
 
@@ -92,6 +90,26 @@ You can set a backend like this:
 ```ruby
 Alba.backend = :oj
 ```
+
+#### Inference configuration
+
+You can enable inference feature using `enable_inference!` method.
+
+```ruby
+Alba.enable_inference!
+```
+
+You must install `ActiveSupport` to enable inference.
+
+#### Error handling configuration
+
+You can configure error handling with `on_error` method.
+
+```ruby
+Alba.on_error :ignore
+```
+
+For the details, see [Error handling section](#error-handling)
 
 ### Simple serialization with key
 
