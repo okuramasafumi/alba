@@ -70,6 +70,10 @@ class ConditionalAttributesTest < MiniTest::Test
     attributes :full_name, if: proc { |user| user.respond_to?(:full_name) }
   end
 
+  class UserResource7 < UserResource
+    attributes :name, if: proc { |_user| print 'foo' or true }
+  end
+
   def setup
     @user = User.new(1, 'Masafumi OKURA')
     profile = Profile.new(1, 'test@example.com')
@@ -133,5 +137,9 @@ class ConditionalAttributesTest < MiniTest::Test
       '{"id":1}',
       UserResource6.new(@user).serialize
     )
+  end
+
+  def test_conditional_attribute_with_if_with_one_parameter_yields_only_once
+    assert_output('foo') { UserResource7.new(@user).serialize }
   end
 end
