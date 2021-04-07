@@ -11,7 +11,7 @@
 
 ## Why?
 
-Because it's fast, flexible and maintainable!
+Because it's fast, flexible and well-maintained!
 
 ### Fast
 
@@ -21,9 +21,9 @@ Alba is faster than most of the alternatives. We have a [benchmark](https://gith
 
 Alba provides a small set of DSL to define your serialization logic. It also provides methods you can override to alter and filter serialized hash so that you have full control over the result.
 
-### Maintainable
+### Maintained
 
-Alba is well maintained and adds features quickly. [Coverage Status](https://coveralls.io/github/okuramasafumi/alba?branch=master) and [CodeClimate Maintainability](https://codeclimate.com/github/okuramasafumi/alba/maintainability) show the code base is quite healthy.
+Alba is well-maintained and adds features quickly. [Coverage Status](https://coveralls.io/github/okuramasafumi/alba?branch=master) and [CodeClimate Maintainability](https://codeclimate.com/github/okuramasafumi/alba/maintainability) show the code base is quite healthy.
 
 ## Installation
 
