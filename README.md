@@ -442,6 +442,10 @@ Alba.on_error do |error, object, key, attribute, resource_class|
 end
 ```
 
+### Caching
+
+Currently, Alba doesn't support caching, primarily due to the behavior of `ActiveRecord::Relation`'s cache. See [the issue](https://github.com/rails/rails/issues/41784).
+
 ## Comparison
 
 Alba is faster than alternatives.
