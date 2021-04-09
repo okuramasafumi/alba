@@ -9,7 +9,7 @@
 
 `Alba` is the fastest JSON serializer for Ruby.
 
-## Why?
+## Why Alba?
 
 Because it's fast, flexible and well-maintained!
 
