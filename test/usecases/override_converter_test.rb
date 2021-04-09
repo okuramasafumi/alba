@@ -13,7 +13,6 @@ class OverrideConverterTest < MiniTest::Test
     end
   end
 
-  # rubocop:disable Style/MissingElse
   if RUBY_VERSION >= '2.6'
     class UserResource
       include Alba::Resource
@@ -40,5 +39,4 @@ class OverrideConverterTest < MiniTest::Test
       )
     end
   end
-  # rubocop:enable Style/MissingElse
 end

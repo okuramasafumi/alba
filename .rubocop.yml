@@ -61,3 +61,7 @@ Style/InlineComment:
 
 Style/MethodCallWithArgsParentheses:
   Enabled: false
+
+# There are so many cases we just want `if` expression!
+Style/MissingElse:
+  EnforcedStyle: case
