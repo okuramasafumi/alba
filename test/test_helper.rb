@@ -3,7 +3,7 @@ Coveralls.wear!
 
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'alba'
-unless ENV['OS'] == 'Windows_NT'
+if ENV['OS'] != 'Windows_NT' && RUBY_PLATFORM !~ /java/
   require 'oj' # For backend swapping
 end
 
