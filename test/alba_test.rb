@@ -84,7 +84,7 @@ class AlbaTest < Minitest::Test
   end
 
   # oj doesn't work on Windows or JRuby
-  if ENV['OS'] != 'Windows_NT' || RUBY_PLATFORM !~ /java/
+  if ENV['OS'] != 'Windows_NT' && RUBY_PLATFORM !~ /java/
     def test_it_serializes_object_with_fully_inlined_definitions_with_oj
       Alba.backend = :oj
 
