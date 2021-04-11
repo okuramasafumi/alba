@@ -463,6 +463,13 @@ Alba.backend = :active_support
 
 The name "Alba" comes from "albatross", a kind of birds. In Japanese, this bird is called "Aho-dori", which means "stupid bird". I find it funny because in fact albatrosses fly really fast. I hope Alba looks stupid but in fact it does its job quick.
 
+## Pioneers
+
+There are great pioneers in Ruby's ecosystem which does basically the same thing as Alba does. To name a few:
+
+* [ActiveModelSerializers](https://github.com/rails-api/active_model_serializers) a.k.a AMS, the most famous implementation of JSON serializer for Ruby
+* [Blueprinter](https://github.com/procore/blueprinter) shares some concepts with Alba
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
