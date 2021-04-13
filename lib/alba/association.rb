@@ -25,11 +25,6 @@ module Alba
       end
     end
 
-    # @abstract
-    def to_hash
-      :not_implemented
-    end
-
     private
 
     def constantize(resource)
