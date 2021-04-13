@@ -4,7 +4,6 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'activesupport', require: false # For backend
-gem 'coveralls', require: false # For test coverage
 gem 'minitest', '~> 5.14' # For test
 gem 'rake', '~> 13.0' # For test and automation
 gem 'rubocop', '>= 0.79.0', require: false # For lint
@@ -12,6 +11,7 @@ gem 'rubocop-minitest', '~> 0.11.0', require: false # For lint
 gem 'rubocop-performance', '~> 1.10.1', require: false # For lint
 gem 'rubocop-rake', '>= 0.5.1', require: false # For lint
 gem 'rubocop-sensible', '~> 0.3.0', require: false # For lint
+gem 'simplecov', '~> 0.21.0', require: false # For test coverage
 gem 'yard', require: false
 
 platforms :ruby do
