@@ -12,6 +12,7 @@ gem 'rubocop-performance', '~> 1.10.1', require: false # For lint
 gem 'rubocop-rake', '>= 0.5.1', require: false # For lint
 gem 'rubocop-sensible', '~> 0.3.0', require: false # For lint
 gem 'simplecov', '~> 0.21.0', require: false # For test coverage
+gem 'simplecov-cobertura', require: false # For test coverage
 gem 'yard', require: false
 
 platforms :ruby do
