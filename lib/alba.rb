@@ -61,7 +61,6 @@ module Alba
       raise ArgumentError, 'You cannot specify error handler with both Symbol and block' if handler && block
       raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
 
-      p block if block
       @_on_error = handler || block
     end
 
