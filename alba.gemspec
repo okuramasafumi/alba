@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.description   = "Alba is designed to be a simple, easy to use and fast alternative to existing JSON serializers. Its performance is better than almost all gems which do similar things. The internal is so simple that it's easy to hack and maintain."
   spec.homepage      = 'https://github.com/okuramasafumi/alba'
   spec.license       = 'MIT'
-  spec.required_ruby_version = Gem::Requirement.new('>= 2.5.7')
+  spec.required_ruby_version = Gem::Requirement.new('>= 2.5.0')
 
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = 'https://github.com/okuramasafumi/alba'
