@@ -9,6 +9,14 @@
 
 `Alba` is the fastest JSON serializer for Ruby, JRuby an TruffleRuby.
 
+## Discussions
+
+Alba uses [GitHub Discussions](https://github.com/okuramasafumi/alba/discussions) to openly discuss the project.
+
+If you've already used Alba, please consider posting your thoughts and feelings on [Feedback](https://github.com/okuramasafumi/alba/discussions/categories/feedback). The fact that you enjoy using Alba gives me energy to keep developing Alba!
+
+If you have feature requests or interesting ideas, join us with [Ideas](https://github.com/okuramasafumi/alba/discussions/categories/ideas). Let's make Alba even better, together!
+
 ## Why Alba?
 
 Because it's fast, flexible and well-maintained!
