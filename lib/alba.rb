@@ -33,8 +33,10 @@ module Alba
     def serialize(object, key: nil, &block)
       raise ArgumentError, 'Block required' unless block
 
-      resource_class.class_eval(&block)
-      resource = resource_class.new(object)
+      klass = Class.new
+      klass.include(Alba::Resource)
+      klass.class_eval(&block)
+      resource = klass.new(object)
       resource.serialize(key: key)
     end
 
@@ -61,7 +63,6 @@ module Alba
       raise ArgumentError, 'You cannot specify error handler with both Symbol and block' if handler && block
       raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
 
-      p block if block
       @_on_error = handler || block
     end
 
@@ -84,6 +85,7 @@ module Alba
       require 'oj'
       ->(hash) { Oj.dump(hash, mode: :strict) }
     rescue LoadError
+      Kernel.warn '`Oj` is not installed, falling back to default JSON encoder.'
       default_encoder
     end
 
@@ -91,6 +93,7 @@ module Alba
       require 'active_support/json'
       ->(hash) { ActiveSupport::JSON.encode(hash) }
     rescue LoadError
+      Kernel.warn '`ActiveSupport` is not installed, falling back to default JSON encoder.'
       default_encoder
     end
 
@@ -98,13 +101,6 @@ module Alba
       lambda do |hash|
         require 'json'
         JSON.dump(hash)
-      end
-    end
-
-    def resource_class
-      @resource_class ||= begin
-        klass = Class.new
-        klass.include(Alba::Resource)
       end
     end
   end

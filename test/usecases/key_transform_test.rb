@@ -25,6 +25,14 @@ class KeyTransformTest < Minitest::Test
     transform_keys :lower_camel
   end
 
+  class UserResourceDash < UserResource
+    transform_keys :dash
+  end
+
+  class UserResourceUnknown < UserResource
+    transform_keys :unknown
+  end
+
   def setup
     @user = User.new(1, 'Masafumi', 'Okura')
   end
@@ -41,5 +49,16 @@ class KeyTransformTest < Minitest::Test
       '{"id":1,"firstName":"Masafumi","lastName":"Okura"}',
       UserResourceLowerCamel.new(@user).serialize
     )
+  end
+
+  def test_transform_key_to_dash
+    assert_equal(
+      '{"id":1,"first-name":"Masafumi","last-name":"Okura"}',
+      UserResourceDash.new(@user).serialize
+    )
+  end
+
+  def test_transform_key_to_unknown
+    assert_raises(Alba::Error) { UserResourceUnknown.new(@user).serialize }
   end
 end

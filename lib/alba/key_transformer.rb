@@ -16,6 +16,7 @@ module Alba
     # @return [String] transformed key
     # @raise [Alba::Error] when transform_type is not supported
     def transform(key, transform_type)
+      key = key.to_s
       case transform_type
       when :camel
         ActiveSupport::Inflector.camelize(key)

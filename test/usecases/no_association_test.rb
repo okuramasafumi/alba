@@ -102,4 +102,15 @@ class NoAssociationTest < MiniTest::Test
       UserResourceWithKey.new(@user).serialize(key: :user)
     )
   end
+
+  def test_it_raises_argument_error_with_attribute_without_block
+    resource = <<~RUBY
+      class InvalidResource
+        include Alba::Resource
+
+        attribute :without_block
+      end
+    RUBY
+    assert_raises(ArgumentError) { eval(resource) }
+  end
 end

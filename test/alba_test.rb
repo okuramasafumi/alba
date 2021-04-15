@@ -3,13 +3,22 @@ require 'test_helper'
 class AlbaTest < Minitest::Test
   class User
     attr_reader :id, :created_at, :updated_at
-    attr_accessor :articles
+    attr_accessor :profile, :articles
 
     def initialize(id)
       @id = id
       @created_at = Time.now
       @updated_at = Time.now
       @articles = []
+    end
+  end
+
+  class Profile
+    attr_reader :user_id, :email
+
+    def initialize(user_id, email)
+      @user_id = user_id
+      @email = email
     end
   end
 
@@ -27,15 +36,15 @@ class AlbaTest < Minitest::Test
     Alba.backend = nil
 
     @user = User.new(1)
+    profile = Profile.new(1, 'test@example.com')
+    @user.profile = profile
     @article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
     @user.articles << @article1
-    @article2 = Article.new(2, 'Super nice', 'Really nice!')
-    @user.articles << @article2
   end
 
   def test_it_serializes_object_with_block
     assert_equal(
-      '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}',
+      '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}',
       Alba.serialize(@user) do
         attributes :id
         many :articles do
@@ -47,7 +56,7 @@ class AlbaTest < Minitest::Test
 
   def test_it_serializes_object_with_block_with_with_option
     assert_equal(
-      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
+      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
       Alba.serialize(@user, key: :foo) do
         attributes :id
         many :articles do
@@ -59,9 +68,12 @@ class AlbaTest < Minitest::Test
 
   def test_it_serializes_object_with_fully_inlined_definitions
     assert_equal(
-      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
+      '{"foo":{"id":1,"profile":{"email":"test@example.com"},"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
       Alba.serialize(@user, key: :foo) do
         attributes :id
+        one :profile do
+          attributes :email
+        end
         many :articles do
           attributes :title, :body
         end
@@ -73,7 +85,7 @@ class AlbaTest < Minitest::Test
     Alba.backend = :json
 
     assert_equal(
-      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
+      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
       Alba.serialize(@user, key: :foo) do
         attributes :id
         many :articles do
@@ -89,7 +101,7 @@ class AlbaTest < Minitest::Test
       Alba.backend = :oj
 
       assert_equal(
-        '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
+        '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
         Alba.serialize(@user, key: :foo) do
           attributes :id
           many :articles do
@@ -104,7 +116,7 @@ class AlbaTest < Minitest::Test
     Alba.backend = :active_support
 
     assert_equal(
-      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}',
+      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
       Alba.serialize(@user, key: :foo) do
         attributes :id
         many :articles do

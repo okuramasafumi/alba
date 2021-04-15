@@ -52,6 +52,10 @@ class OnErrorTest < MiniTest::Test
     on_error :ignore
   end
 
+  class UserResource6 < UserResource
+    on_error :invalid
+  end
+
   def setup
     Alba.on_error :raise
     @user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
@@ -95,5 +99,37 @@ class OnErrorTest < MiniTest::Test
       '{"user":{"id":1,"name":"Masafumi OKURA"}}',
       UserResource5.new(@user).serialize
     )
+  end
+
+  def test_on_error_invalid
+    assert_raises Alba::Error do
+      UserResource6.new(@user).serialize
+    end
+  end
+
+  def test_on_error_both_handler_and_block_provided
+    resource = <<~RUBY
+      class UserResource7 < UserResource
+        on_error :both do |error|
+          p error
+        end
+      end
+    RUBY
+
+    assert_raises ArgumentError do
+      eval(resource)
+    end
+  end
+
+  def test_on_error_without_handler_and_block
+    resource = <<~RUBY
+      class UserResource8 < UserResource
+        on_error
+      end
+    RUBY
+
+    assert_raises ArgumentError do
+      eval(resource)
+    end
   end
 end

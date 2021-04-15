@@ -9,12 +9,15 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         ruby: [2.5, 2.6, 2.7, 3.0, head, jruby, truffleruby]
+        gemfile: [all, without_active_support, without_oj]
         exclude:
           - os: windows-latest
             ruby: jruby
           - os: windows-latest
             ruby: truffleruby
     runs-on: ${{ matrix.os }}
+    env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
+      BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
     steps:
     - uses: actions/checkout@v2
     - name: Set up Ruby
