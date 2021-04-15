@@ -33,8 +33,10 @@ module Alba
     def serialize(object, key: nil, &block)
       raise ArgumentError, 'Block required' unless block
 
-      resource_class.class_eval(&block)
-      resource = resource_class.new(object)
+      klass = Class.new
+      klass.include(Alba::Resource)
+      klass.class_eval(&block)
+      resource = klass.new(object)
       resource.serialize(key: key)
     end
 
@@ -99,13 +101,6 @@ module Alba
       lambda do |hash|
         require 'json'
         JSON.dump(hash)
-      end
-    end
-
-    def resource_class
-      @resource_class ||= begin
-        klass = Class.new
-        klass.include(Alba::Resource)
       end
     end
   end
