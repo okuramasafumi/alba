@@ -145,4 +145,18 @@ class OneTest < MiniTest::Test
       UserResource5.new(user).serialize
     )
   end
+
+  def test_it_raises_error_when_no_resource_or_block_given_without_inference
+    Alba.disable_inference!
+    resource = <<~RUBY
+      class UserResource6
+        include Alba::Resource
+
+        attributes :id
+
+        one :profile
+      end
+    RUBY
+    assert_raises(ArgumentError) { eval(resource) }
+  end
 end
