@@ -14,9 +14,11 @@ gemfile(true) do
   gem "active_model_serializers"
   gem "blueprinter"
   gem "representable"
+  gem "primalize"
   gem "alba", path: '../'
   gem "oj"
   gem "multi_json"
+  gem "benchmark-ips"
 end
 
 require "active_record"
@@ -83,6 +85,25 @@ class AlbaPostResource
   attributes :id, :body
   many :comments, resource: AlbaCommentResource
   attribute :commenter_names do |post|
+    post.commenters.pluck(:name)
+  end
+end
+
+class PrimalizeCommentResource < Primalize::Single
+  attributes id: integer, body: string
+end
+
+class PrimalizePostResource < Primalize::Single
+  alias post object
+
+  attributes(
+    id: integer,
+    body: string,
+    comments: array(primalize(PrimalizeCommentResource)),
+    commenter_names: array(string),
+  )
+
+  def commenter_names
     post.commenters.pluck(:name)
   end
 end
@@ -183,7 +204,10 @@ alba_inline = Proc.new do
     end
   end
 end
-[alba, jbuilder, ams, rails, blueprinter, representable, alba_inline].each {|x| puts x.call }
+primalize = proc do
+  PrimalizePostResource.new(post).to_json
+end
+[alba, jbuilder, ams, rails, blueprinter, representable, alba_inline, primalize].each {|x| puts x.call }
 
 require 'benchmark'
 time = 1000
@@ -195,4 +219,19 @@ Benchmark.bmbm do |x|
   x.report(:blueprinter) { time.times(&blueprinter) }
   x.report(:representable) { time.times(&representable) }
   x.report(:alba_inline) { time.times(&alba_inline) }
+  x.report(:primalize) { time.times(&primalize) }
+end
+
+require 'benchmark/ips'
+Benchmark.ips do |x|
+  x.report(:alba, &alba)
+  x.report(:jbuilder, &jbuilder)
+  x.report(:ams, &ams)
+  x.report(:rails, &rails)
+  x.report(:blueprinter, &blueprinter)
+  x.report(:representable, &representable)
+  x.report(:alba_inline, &alba_inline)
+  x.report(:primalize, &primalize)
+
+  x.compare!
 end
