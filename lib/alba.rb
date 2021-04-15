@@ -83,6 +83,7 @@ module Alba
       require 'oj'
       ->(hash) { Oj.dump(hash, mode: :strict) }
     rescue LoadError
+      Kernel.warn '`Oj` is not installed, falling back to default JSON encoder.'
       default_encoder
     end
 
@@ -90,6 +91,7 @@ module Alba
       require 'active_support/json'
       ->(hash) { ActiveSupport::JSON.encode(hash) }
     rescue LoadError
+      Kernel.warn '`ActiveSupport` is not installed, falling back to default JSON encoder.'
       default_encoder
     end
 
