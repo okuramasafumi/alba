@@ -83,4 +83,16 @@ class WithInferenceTest < Minitest::Test
       UserResource.new(@user).serialize(key: :foo)
     )
   end
+
+  def test_inline_definition_works_with_inference
+    assert_equal(
+      '{"id":1,"articles":[{"title":"The title"}]}',
+      Alba.serialize(@user) do
+        attributes :id
+        many :articles do
+          attributes :title
+        end
+      end
+    )
+  end
 end
