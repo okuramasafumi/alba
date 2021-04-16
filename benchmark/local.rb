@@ -17,6 +17,7 @@ gemfile(true) do
   gem "alba", path: '../'
   gem "oj"
   gem "multi_json"
+  gem "benchmark-ips"
   gem "jsonapi-serializer"
 end
 
@@ -27,7 +28,7 @@ require "oj"
 Oj.optimize_rails
 
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
-# ActiveRecord::Base.logger = Logger.new(STDOUT)
+# ActiveRecord::Base.logger = Logger.new($stdout)
 
 ActiveRecord::Schema.define do
   create_table :posts, force: true do |t|
@@ -257,4 +258,19 @@ Benchmark.bmbm do |x|
   x.report(:alba_inline) { time.times(&alba_inline) }
   x.report(:jsonapi) { time.times(&jsonapi) }
   x.report(:jsonapi_same_format) { time.times(&jsonapi_same_format) }
+end
+
+require 'benchmark/ips'
+Benchmark.ips do |x|
+  x.report(:alba, &alba)
+  x.report(:jbuilder, &jbuilder)
+  x.report(:ams, &ams)
+  x.report(:rails, &rails)
+  x.report(:blueprinter, &blueprinter)
+  x.report(:representable, &representable)
+  x.report(:alba_inline, &alba_inline)
+  x.report(:jsonapi, &jsonapi)
+  x.report(:jsonapi_same_format, &jsonapi_same_format)
+
+  x.compare!
 end
