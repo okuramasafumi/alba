@@ -1,6 +1,11 @@
 require_relative '../test_helper'
 
 class DependenciesTest < MiniTest::Test
+  def teardown
+    Alba.disable_inference!
+    Alba.backend = nil
+  end
+
   if ENV['BUNDLE_GEMFILE'] == File.expand_path('gemfiles/without_active_support.gemfile')
     def test_load_error_for_inference
       assert_raises(Alba::Error) { Alba.enable_inference! }
