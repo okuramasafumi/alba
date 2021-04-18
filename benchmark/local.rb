@@ -1,32 +1,37 @@
 # Benchmark script to run varieties of JSON serializers
 # Fetch Alba from local, otherwise fetch latest from RubyGems
 
+# --- Bundle dependencies ---
+
 require "bundler/inline"
 
 gemfile(true) do
   source "https://rubygems.org"
-
   git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-  gem "activerecord", "6.1.3"
-  gem "sqlite3"
-  gem "jbuilder"
   gem "active_model_serializers"
-  gem "blueprinter"
-  gem "representable"
+  gem "activerecord", "6.1.3"
   gem "alba", path: '../'
-  gem "oj"
+  gem "benchmark-ips"
+  gem "blueprinter"
+  gem "jbuilder"
+  gem "jsonapi-serializer" # successor of fast_jsonapi
   gem "multi_json"
+  gem "oj"
+  gem "representable"
+  gem "sqlite3"
 end
 
+# --- Test data model setup ---
+
 require "active_record"
-require "sqlite3"
 require "logger"
 require "oj"
+require "sqlite3"
 Oj.optimize_rails
 
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
-# ActiveRecord::Base.logger = Logger.new(STDOUT)
+# ActiveRecord::Base.logger = Logger.new($stdout)
 
 ActiveRecord::Schema.define do
   create_table :posts, force: true do |t|
@@ -70,6 +75,8 @@ class User < ActiveRecord::Base
   has_many :comments
 end
 
+# --- Alba serializers ---
+
 require "alba"
 Alba.backend = :oj
 
@@ -81,17 +88,55 @@ end
 class AlbaPostResource
   include ::Alba::Resource
   attributes :id, :body
-  many :comments, resource: AlbaCommentResource
   attribute :commenter_names do |post|
     post.commenters.pluck(:name)
   end
+  many :comments, resource: AlbaCommentResource
 end
 
+# --- ActiveModelSerializer serializers ---
+
+require "active_model_serializers"
+
+class AMSCommentSerializer < ActiveModel::Serializer
+  attributes :id, :body
+end
+
+class AMSPostSerializer < ActiveModel::Serializer
+  attributes :id, :body
+  attribute :commenter_names
+  has_many :comments, serializer: AMSCommentSerializer
+
+  def commenter_names
+    object.commenters.pluck(:name)
+  end
+end
+
+# --- Blueprint serializers ---
+
+require "blueprinter"
+
+class CommentBlueprint < Blueprinter::Base
+  fields :id, :body
+end
+
+class PostBlueprint < Blueprinter::Base
+  fields :id, :body, :commenter_names
+  association :comments, blueprint: CommentBlueprint
+
+  def commenter_names
+    commenters.pluck(:name)
+  end
+end
+
+# --- JBuilder serializers ---
+
 require "jbuilder"
+
 class Post
   def to_builder
     Jbuilder.new do |post|
-      post.call(self, :id, :body, :comments, :commenter_names)
+      post.call(self, :id, :body, :commenter_names, :comments)
     end
   end
 
@@ -108,34 +153,68 @@ class Comment
   end
 end
 
-require "active_model_serializers"
+# --- JSONAPI:Serializer serializers / (successor of fast_jsonapi) ---
 
-class AMSCommentSerializer < ActiveModel::Serializer
-  attributes :id, :body
+class JsonApiStandardCommentSerializer
+  include JSONAPI::Serializer
+
+  attribute :id
+  attribute :body
 end
 
-class AMSPostSerializer < ActiveModel::Serializer
-  attributes :id, :body
-  has_many :comments, serializer: AMSCommentSerializer
+class JsonApiStandardPostSerializer
+  include JSONAPI::Serializer
+
+  # set_type :post  # optional
+  attribute :id
+  attribute :body
   attribute :commenter_names
-  def commenter_names
-    object.commenters.pluck(:name)
+
+  attribute :comments do |post|
+    post.comments.map { |comment| JsonApiSameFormatCommentSerializer.new(comment) }
   end
 end
 
-require "blueprinter"
+# --- JSONAPI:Serializer serializers that format the code the same flat way as the other gems here ---
 
-class CommentBlueprint < Blueprinter::Base
-  fields :id, :body
-end
+# code to convert from JSON:API output to "flat" JSON, like the other serializers build
+class JsonApiSameFormatSerializer
+  include JSONAPI::Serializer
 
-class PostBlueprint < Blueprinter::Base
-  fields :id, :body, :commenter_names
-  association :comments, blueprint: CommentBlueprint
-  def commenter_names
-    commenters.pluck(:name)
+  def as_json(*_options)
+    hash = serializable_hash
+
+    if hash[:data].is_a? Hash
+      hash[:data][:attributes]
+
+    elsif hash[:data].is_a? Array
+      hash[:data].pluck(:attributes)
+
+    elsif hash[:data].nil?
+      { }
+
+    else
+      raise "unexpected data type #{hash[:data].class}"
+    end
   end
 end
+
+class JsonApiSameFormatCommentSerializer < JsonApiSameFormatSerializer
+  attribute :id
+  attribute :body
+end
+
+class JsonApiSameFormatPostSerializer < JsonApiSameFormatSerializer
+  attribute :id
+  attribute :body
+  attribute :commenter_names
+
+  attribute :comments do |post|
+    post.comments.map { |comment| JsonApiSameFormatCommentSerializer.new(comment) }
+  end
+end
+
+# --- Representable serializers ---
 
 require "representable"
 
@@ -159,6 +238,8 @@ class PostRepresenter < Representable::Decorator
   end
 end
 
+# --- Test data creation ---
+
 post = Post.create!(body: 'post')
 user1 = User.create!(name: 'John')
 user2 = User.create!(name: 'Jane')
@@ -166,12 +247,9 @@ post.comments.create!(commenter: user1, body: 'Comment1')
 post.comments.create!(commenter: user2, body: 'Comment2')
 post.reload
 
+# --- Store the serializers in procs ---
+
 alba = Proc.new { AlbaPostResource.new(post).serialize }
-jbuilder = Proc.new { post.to_builder.target! }
-ams = Proc.new { AMSPostSerializer.new(post, {}).to_json }
-rails = Proc.new { ActiveSupport::JSON.encode(post.serializable_hash(include: :comments)) }
-blueprinter = Proc.new { PostBlueprint.render(post) }
-representable = Proc.new { PostRepresenter.new(post).to_json }
 alba_inline = Proc.new do
   Alba.serialize(post) do
     attributes :id, :body
@@ -183,16 +261,56 @@ alba_inline = Proc.new do
     end
   end
 end
-[alba, jbuilder, ams, rails, blueprinter, representable, alba_inline].each {|x| puts x.call }
+ams = Proc.new { AMSPostSerializer.new(post, {}).to_json }
+blueprinter = Proc.new { PostBlueprint.render(post) }
+jbuilder = Proc.new { post.to_builder.target! }
+jsonapi = proc { JsonApiStandardPostSerializer.new(post).to_json }
+jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(post).to_json }
+rails = Proc.new { ActiveSupport::JSON.encode(post.serializable_hash(include: :comments)) }
+representable = Proc.new { PostRepresenter.new(post).to_json }
+
+# --- Execute the serializers to check their output ---
+
+puts "Serializer outputs ----------------------------------"
+{
+  alba: alba,
+  alba_inline: alba_inline,
+  ams: ams,
+  blueprinter: blueprinter,
+  jbuilder: jbuilder, # different order
+  jsonapi: jsonapi, # nested JSON:API format
+  jsonapi_same_format: jsonapi_same_format,
+  rails: rails,
+  representable: representable
+}.each { |name, serializer| puts "#{name.to_s.ljust(24, ' ')} #{serializer.call}" }
+
+# --- Run the benchmarks ---
 
 require 'benchmark'
 time = 1000
 Benchmark.bmbm do |x|
   x.report(:alba) { time.times(&alba) }
-  x.report(:jbuilder) { time.times(&jbuilder) }
-  x.report(:ams) { time.times(&ams) }
-  x.report(:rails) { time.times(&rails) }
-  x.report(:blueprinter) { time.times(&blueprinter) }
-  x.report(:representable) { time.times(&representable) }
   x.report(:alba_inline) { time.times(&alba_inline) }
+  x.report(:ams) { time.times(&ams) }
+  x.report(:blueprinter) { time.times(&blueprinter) }
+  x.report(:jbuilder) { time.times(&jbuilder) }
+  x.report(:jsonapi) { time.times(&jsonapi) }
+  x.report(:jsonapi_same_format) { time.times(&jsonapi_same_format) }
+  x.report(:rails) { time.times(&rails) }
+  x.report(:representable) { time.times(&representable) }
+end
+
+require 'benchmark/ips'
+Benchmark.ips do |x|
+  x.report(:alba, &alba)
+  x.report(:alba_inline, &alba_inline)
+  x.report(:ams, &ams)
+  x.report(:blueprinter, &blueprinter)
+  x.report(:jbuilder, &jbuilder)
+  x.report(:jsonapi, &jsonapi)
+  x.report(:jsonapi_same_format, &jsonapi_same_format)
+  x.report(:rails, &rails)
+  x.report(:representable, &representable)
+
+  x.compare!
 end
