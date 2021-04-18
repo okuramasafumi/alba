@@ -78,7 +78,6 @@ end
 # --- Alba serializers ---
 
 require "alba"
-Alba.backend = :oj
 
 class AlbaCommentResource
   include ::Alba::Resource
