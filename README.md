@@ -454,11 +454,6 @@ end
 
 Currently, Alba doesn't support caching, primarily due to the behavior of `ActiveRecord::Relation`'s cache. See [the issue](https://github.com/rails/rails/issues/41784).
 
-## Comparison
-
-Alba is faster than alternatives.
-For a performance benchmark, see https://gist.github.com/okuramasafumi/4e375525bd3a28e4ca812d2a3b3e5829.
-
 ## Rails
 
 When you use Alba in Rails, you can create an initializer file with the line below for compatibility with Rails JSON encoder.
