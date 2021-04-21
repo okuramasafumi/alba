@@ -8,6 +8,8 @@ module Alba
     # @!parse extend ClassMethods
     DSLS = {_attributes: {}, _key: nil, _transform_keys: nil, _on_error: nil}.freeze
     private_constant :DSLS
+    CONVERSION_TABLE = {String => :to_s, Integer => :to_i}.freeze
+    private_constant :CONVERSION_TABLE
 
     # @private
     def self.included(base)
@@ -71,6 +73,8 @@ module Alba
             key = transform_key(key)
             if attribute.is_a?(Array) # Conditional
               conditional_attribute(object, key, attribute)
+            elsif attribute.is_a?(Hash) # Typed
+              typed_attribute(object, key, attribute)
             else
               [key, fetch_attribute(object, attribute)]
             end
@@ -97,6 +101,21 @@ module Alba
         return [] if arity >= 2 && !condition.call(object, attr)
 
         [key, fetched_attribute]
+      end
+
+      def typed_attribute(object, key, attribute)
+        fetched_attribute = fetch_attribute(object, attribute.keys.first)
+        type = attribute.values.first
+        typed = case type
+                when Class
+                  fetched_attribute.public_send(CONVERSION_TABLE[type])
+                when Proc
+                  type.call(fetched_attribute)
+                else
+                  raise Alba::Error, 'This cannot happen!'
+                end
+
+        [key, typed]
       end
 
       def handle_error(error, object, key, attribute)
@@ -153,12 +172,21 @@ module Alba
 
       # Set multiple attributes at once
       #
-      # @param attrs [Array<String, Symbol>]
+      # @param attrs [Array<String, Symbol, Class, Proc>]
       # @param options [Hash] option hash including `if` that is a  condition to render these attributes
       def attributes(*attrs, **options)
-        attrs.each do |attr_name|
-          attr = options[:if] ? [attr_name.to_sym, options[:if]] : attr_name.to_sym
-          @_attributes[attr_name.to_sym] = attr
+        lastly_added = nil
+        attrs.each do |attr|
+          case attr
+          when Symbol, String
+            value = options[:if] ? [attr.to_sym, options[:if]] : attr.to_sym
+            @_attributes[attr.to_sym] = value
+          when Class, Proc
+            @_attributes[lastly_added] = {@_attributes[lastly_added] => attr}
+          else
+            raise Alba::Error, "Unknown attributes: #{attr.inspect}"
+          end
+          lastly_added = attr
         end
       end
 
