@@ -453,7 +453,7 @@ end
 
 ### Circular associations control
 
-You can control circular associations with `included` option. `included` option is a nested Hash such as `{book: {authors: books}}`. In this example, Alba serializes a book's authors' books. This means you can reference `BookResource` from `AuthorResource` and vice versa. This is really powerful when you have a complex data structure and serialize certain parts of it.
+You can control circular associations with `within` option. `within` option is a nested Hash such as `{book: {authors: books}}`. In this example, Alba serializes a book's authors' books. This means you can reference `BookResource` from `AuthorResource` and vice versa. This is really powerful when you have a complex data structure and serialize certain parts of it.
 
 For more details, please refer to [test code](https://github.com/okuramasafumi/alba/blob/master/test/usecases/circular_association_test.rb)
 

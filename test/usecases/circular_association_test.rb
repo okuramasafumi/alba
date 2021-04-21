@@ -121,52 +121,52 @@ class CircularAssociationTest < Minitest::Test
     end
   end
 
-  def test_included_option_works_for_serialize
+  def test_within_option_works_for_serialize
     book = @books.sample
-    BookResource.new(book, included: {book: {authors: :books, genre: :books}}).serialize
+    BookResource.new(book, within: {book: {authors: :books, genre: :books}}).serialize
     assert true # No Error
   end
 
-  def test_included_option_with_nil_value_works_for_serialize
+  def test_within_option_with_nil_value_works_for_serialize
     book = @books.sample
-    BookResource.new(book, included: nil).serialize
+    BookResource.new(book, within: nil).serialize
     assert true # No Error
   end
 
-  def test_included_option_with_false_value_works_for_serialize
+  def test_within_option_with_false_value_works_for_serialize
     book = @books.sample
-    BookResource.new(book, included: false).serialize
+    BookResource.new(book, within: false).serialize
     assert true # No Error
   end
 
-  def test_included_option_works_for_serializable_hash
+  def test_within_option_works_for_serializable_hash
     book = @books.sample
-    BookResource.new(book, included: {book: {authors: :books, genre: :books}}).serializable_hash
+    BookResource.new(book, within: {book: {authors: :books, genre: :books}}).serializable_hash
     assert true # No Error
   end
 
-  def test_included_option_works_for_serialize_with_collection
+  def test_within_option_works_for_serialize_with_collection
     books = @books.sample(3)
-    BookResource.new(books, included: {book: {authors: :books, genre: :books}}).serialize
+    BookResource.new(books, within: {book: {authors: :books, genre: :books}}).serialize
     assert true # No Error
   end
 
-  def test_included_option_with_nil_end_works_for_serialize
+  def test_within_option_with_nil_end_works_for_serialize
     book = @books.sample
-    BookResource.new(book, included: {book: {authors: nil, genre: nil}}).serialize
+    BookResource.new(book, within: {book: {authors: nil, genre: nil}}).serialize
     assert true # No Error
   end
 
-  def test_included_option_with_array_end_works_for_serialize
+  def test_within_option_with_array_end_works_for_serialize
     book = @books.sample
-    BookResource.new(book, included: {book: [:authors, :genre]}).serialize
+    BookResource.new(book, within: {book: [:authors, :genre]}).serialize
     assert true # No Error
   end
 
-  def test_included_option_with_invalid_type
+  def test_within_option_with_invalid_type
     book = @books.sample
     assert_raises Alba::Error do
-      BookResource.new(book, included: 'book').serialize # This is not supported
+      BookResource.new(book, within: 'book').serialize # This is not supported
     end
   end
 end

@@ -28,11 +28,11 @@ module Alba
 
       # @param object [Object] the object to be serialized
       # @param params [Hash] user-given Hash for arbitrary data
-      # @param included [Hash] determines what associations to be serialized. If not set, it serializes all associations.
-      def initialize(object, params: {}, included: true)
+      # @param within [Hash] determines what associations to be serialized. If not set, it serializes all associations.
+      def initialize(object, params: {}, within: true)
         @object = object
         @params = params.freeze
-        @included = included
+        @within = within
         DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.public_send(name)) }
       end
 
@@ -132,29 +132,29 @@ module Alba
         when Proc
           instance_exec(object, &attribute)
         when Alba::One, Alba::Many
-          included = check_included
-          return unless included
+          within = check_within
+          return unless within
 
-          attribute.to_hash(object, params: params, included: included)
+          attribute.to_hash(object, params: params, within: within)
         else
           raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
         end
       end
 
-      def check_included
-        case @included
-        when Hash # Traverse included tree
-          @included.fetch(_key.to_sym, nil)
-        when Array # included tree ends with Array
-          @included.find { |item| item.to_sym == _key.to_sym } # Check if at least one item in the array matches current resource
-        when Symbol # included tree could end with Symbol
-          @included == _key.to_sym # Check if the symbol matches current resource
+      def check_within
+        case @within
+        when Hash # Traverse within tree
+          @within.fetch(_key.to_sym, nil)
+        when Array # within tree ends with Array
+          @within.find { |item| item.to_sym == _key.to_sym } # Check if at least one item in the array matches current resource
+        when Symbol # within tree could end with Symbol
+          @within == _key.to_sym # Check if the symbol matches current resource
         when true # In this case, Alba serializes all associations.
           true
         when nil, false # In these cases, Alba stops serialization here.
           false
         else
-          raise Alba::Error, "Unknown type for included option: #{@included.class}"
+          raise Alba::Error, "Unknown type for within option: #{@within.class}"
         end
       end
 
