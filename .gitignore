@@ -8,3 +8,4 @@
 /tmp/
 
 Gemfile.lock
+/gemfiles/*.lock
