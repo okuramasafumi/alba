@@ -30,17 +30,23 @@ Layout/MultilineAssignmentLayout:
 Lint/ConstantResolution:
   Enabled: false
 
-Metrics/ClassLength:
+# In test code we don't care about the metrics!
+Metrics:
   Exclude:
-    - 'test/alba_test.rb'
+    - 'test/**/*.rb'
 
 Metrics/MethodLength:
   Max: 15
+
+# `Resource` module is a core module and its length tends to be long...
+Metrics/ModuleLength:
+  Max: 150
 
 # Resource class includes DSLs, which tend to accept long list of parameters
 Metrics/ParameterLists:
   Exclude:
     - 'lib/alba/resource.rb'
+    - 'test/**/*.rb'
 
 # We need to eval resource code to test errors on resource classes
 Security/Eval:

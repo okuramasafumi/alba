@@ -42,6 +42,10 @@ class AlbaTest < Minitest::Test
     @user.articles << @article1
   end
 
+  def teardown
+    Alba.backend = nil
+  end
+
   def test_it_serializes_object_with_block
     assert_equal(
       '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}',
