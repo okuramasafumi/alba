@@ -130,6 +130,26 @@ class AlbaTest < Minitest::Test
     )
   end
 
+  def test_it_works_with_oj_strict_backend
+    Alba.backend = :oj_strict
+    assert_equal(
+      '{"foo":{"id":1}}',
+      Alba.serialize(@user, key: :foo) do
+        attributes :id
+      end
+    )
+  end
+
+  def test_it_works_with_oj_rails_backend
+    Alba.backend = :oj_rails
+    assert_equal(
+      '{"foo":{"id":1}}',
+      Alba.serialize(@user, key: :foo) do
+        attributes :id
+      end
+    )
+  end
+
   def test_it_raises_error_with_unsupported_backend
     assert_raises(Alba::UnsupportedBackend, 'Unsupported backend, not_supported') do
       Alba.backend = :not_supported
