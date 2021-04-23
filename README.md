@@ -467,6 +467,8 @@ When you use Alba in Rails, you can create an initializer file with the line bel
 
 ```ruby
 Alba.backend = :active_support
+# or
+Alba.backend = :oj_rails
 ```
 
 ## Why named "Alba"?
