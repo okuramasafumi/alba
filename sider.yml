@@ -49,10 +49,8 @@ linter:
 #     norc: true
 
 # # https://help.sider.review/getting-started/custom-configuration#ignore
-# ignore:
-#   - "*.pdf"
-#   - "*.mp4"
-#   - "images/**"
+ignore:
+  - 'test/**/*'
 
 # # https://help.sider.review/getting-started/custom-configuration#branchesexclude
 # branches:
