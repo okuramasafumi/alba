@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2021-04-23
+
+- [Feat] Implement circular associations control [71e1543]
+- [Feat] Support :oj_rails backend [76e519e]
+
 ## [1.0.1] - 2021-04-15
 
 - [Fix] Don't cache resource class for `Alba.serialize` [9ed5253]

@@ -42,6 +42,10 @@ class AlbaTest < Minitest::Test
     @user.articles << @article1
   end
 
+  def teardown
+    Alba.backend = nil
+  end
+
   def test_it_serializes_object_with_block
     assert_equal(
       '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}',
@@ -122,6 +126,26 @@ class AlbaTest < Minitest::Test
         many :articles do
           attributes :title, :body
         end
+      end
+    )
+  end
+
+  def test_it_works_with_oj_strict_backend
+    Alba.backend = :oj_strict
+    assert_equal(
+      '{"foo":{"id":1}}',
+      Alba.serialize(@user, key: :foo) do
+        attributes :id
+      end
+    )
+  end
+
+  def test_it_works_with_oj_rails_backend
+    Alba.backend = :oj_rails
+    assert_equal(
+      '{"foo":{"id":1}}',
+      Alba.serialize(@user, key: :foo) do
+        attributes :id
       end
     )
   end
