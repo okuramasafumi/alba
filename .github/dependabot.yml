@@ -1,0 +1,26 @@
+version: 2
+updates:
+- package-ecosystem: bundler
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "20:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: rubocop
+    versions:
+    - 1.12.0
+    - 1.9.0
+  - dependency-name: rubocop-performance
+    versions:
+    - 1.10.0
+    - 1.10.2
+  - dependency-name: oj
+    versions:
+    - 3.11.3
+  - dependency-name: minitest
+    versions:
+    - 5.14.4
+  - dependency-name: activesupport
+    versions:
+    - 6.1.2
