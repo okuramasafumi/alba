@@ -457,6 +457,45 @@ You can control circular associations with `within` option. `within` option is a
 
 For more details, please refer to [test code](https://github.com/okuramasafumi/alba/blob/master/test/usecases/circular_association_test.rb)
 
+### Types
+
+You can validate and convert input with types.
+
+```ruby
+class User
+  attr_reader :id, :name, :age, :bio, :admin, :created_at
+
+  def initialize(id, name, age, bio = '', admin = false) # rubocop:disable Style/OptionalBooleanParameter
+    @id = id
+    @name = name
+    @age = age
+    @admin = admin
+    @bio = bio
+    @created_at = Time.new(2020, 10, 10)
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  attributes :name, id: [String, true], age: [Integer, true], bio: String, admin: [:Boolean, true], created_at: [String, ->(object) { object.strftime('%F') }]
+end
+
+user = User.new(1, 'Masafumi OKURA', '32', 'Ruby dev')
+UserResource.new(user).serialize
+# => '{"name":"Masafumi OKURA","id":"1","age":32,"bio":"Ruby dev","admin":false,"created_at":"2020-10-10"}'
+```
+
+Notice that `id` and `created_at` are converted to String and `age` is converted to Integer.
+
+If type is not correct and auto conversion is disabled (default), `TypeError` occurs.
+
+```ruby
+user = User.new(1, 'Masafumi OKURA', '32', nil) # bio is nil and auto conversion is disabled for bio
+UserResource.new(user).serialize
+# => TypeError, 'Attribute bio is expected to be String but actually nil.'
+```
+
 ### Caching
 
 Currently, Alba doesn't support caching, primarily due to the behavior of `ActiveRecord::Relation`'s cache. See [the issue](https://github.com/rails/rails/issues/41784).
