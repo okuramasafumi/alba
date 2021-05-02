@@ -7,7 +7,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _on_error: nil, _on_nil: nil, _layout: nil}.freeze # rubocop:disable Layout/LineLength
+    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil}.freeze # rubocop:disable Layout/LineLength
     private_constant :DSLS
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -65,11 +65,7 @@ module Alba
       #
       # @return [Hash]
       def serializable_hash
-        if collection?
-          @object.each_with_object([], &collection_converter)
-        else
-          converter.call(@object)
-        end
+        collection? ? serializable_hash_for_collection : converter.call(@object)
       end
       alias to_h serializable_hash
 
@@ -110,6 +106,14 @@ module Alba
         metadata = @_meta ? instance_eval(&@_meta).merge(meta) : meta
         hash[:meta] = metadata
         hash
+      end
+
+      def serializable_hash_for_collection
+        if @_collection_key
+          @object.to_h { |item| [item.public_send(@_collection_key).to_s, converter.call(item)] }
+        else
+          @object.each_with_object([], &collection_converter)
+        end
       end
 
       def fetch_key
@@ -430,6 +434,13 @@ module Alba
 
         @_transform_type = type
         @_transforming_root_key = root
+      end
+
+      # Sets key for collection serialization
+      #
+      # @param key [String, Symbol]
+      def collection_key(key)
+        @_collection_key = key.to_sym
       end
 
       # Set error handler
