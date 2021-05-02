@@ -112,28 +112,6 @@ class AMSPostSerializer < ActiveModel::Serializer
   end
 end
 
-# --- Primalize serializers ---
-#
-class PrimalizeCommentResource < Primalize::Single
-  attributes id: integer, body: string
-end
-
-class PrimalizePostResource < Primalize::Single
-  alias post object
-
-  attributes(
-    id: integer,
-    body: string,
-    comments: array(primalize(PrimalizeCommentResource)),
-    commenter_names: array(string),
-  )
-
-  def commenter_names
-    post.commenters.pluck(:name)
-  end
-end
-
-
 # --- Blueprint serializers ---
 
 require "blueprinter"
@@ -233,6 +211,27 @@ class JsonApiSameFormatPostSerializer < JsonApiSameFormatSerializer
 
   attribute :comments do |post|
     post.comments.map { |comment| JsonApiSameFormatCommentSerializer.new(comment) }
+  end
+end
+
+# --- Primalize serializers ---
+#
+class PrimalizeCommentResource < Primalize::Single
+  attributes id: integer, body: string
+end
+
+class PrimalizePostResource < Primalize::Single
+  alias post object
+
+  attributes(
+    id: integer,
+    body: string,
+    comments: array(primalize(PrimalizeCommentResource)),
+    commenter_names: array(string),
+  )
+
+  def commenter_names
+    post.commenters.pluck(:name)
   end
 end
 
