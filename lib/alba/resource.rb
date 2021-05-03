@@ -58,13 +58,11 @@ module Alba
 
       # @return [String]
       def _key
-        if @_key == true && Alba.inferring
-          demodulized = ActiveSupport::Inflector.demodulize(self.class.name)
-          meth = collection? ? :tableize : :singularize
-          ActiveSupport::Inflector.public_send(meth, demodulized.delete_suffix('Resource').downcase)
-        else
-          @_key.to_s
-        end
+        return @_key.to_s unless @_key == true && Alba.inferring
+
+        resource_name = self.class.name.demodulize.delete_suffix('Resource').underscore
+
+        transform_key(collection? ? resource_name.pluralize : resource_name)
       end
 
       def converter

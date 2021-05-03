@@ -20,6 +20,14 @@ class WithInferenceTest < Minitest::Test
     end
   end
 
+  class BankAccount
+    attr_accessor :account_number
+
+    def initialize(account_number)
+      @account_number = account_number
+    end
+  end
+
   class ArticleResource
     include Alba::Resource
 
@@ -36,6 +44,14 @@ class WithInferenceTest < Minitest::Test
     many :articles, resource: ArticleResource
   end
 
+  class BankAccountResource
+    include Alba::Resource
+
+    key!
+
+    attributes :account_number
+  end
+
   class UserInferringResource
     Alba.enable_inference! # Need this here instead of initializer
     include Alba::Resource
@@ -49,6 +65,7 @@ class WithInferenceTest < Minitest::Test
     Alba.enable_inference!
     @user = User.new(1)
     @user.articles << Article.new(1, 'The title')
+    @bank_account = BankAccount.new(123456789)
   end
 
   def teardown
@@ -66,6 +83,21 @@ class WithInferenceTest < Minitest::Test
     assert_equal(
       '{"user":{"id":1,"articles":[{"title":"The title"}]}}',
       UserResource.new(@user).serialize
+    )
+  end
+
+  def test_it_infers_key_with_key_bang_when_object_name_has_multiple_words
+    assert_equal(
+      '{"bank_account":{"account_number":123456789}}',
+      BankAccountResource.new(@bank_account).serialize
+    )
+  end
+
+  def test_it_infers_key_with_key_bang_when_object_is_collection_and_object_name_has_multiple_words
+    bank_accounts = [@bank_account]
+    assert_equal(
+      '{"bank_accounts":[{"account_number":123456789}]}',
+      BankAccountResource.new(bank_accounts).serialize
     )
   end
 
