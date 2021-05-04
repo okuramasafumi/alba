@@ -21,6 +21,15 @@ AllCops:
 Bundler/GemComment:
   Enabled: false
 
+# We'd like to write something like:
+#   assert_equal(
+#     expected,
+#     actual
+#   )
+Layout/RedundantLineBreak:
+  Exclude:
+    - 'test/**/*'
+
 Layout/SpaceInsideHashLiteralBraces:
   EnforcedStyle: no_space
 
