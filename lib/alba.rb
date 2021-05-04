@@ -10,7 +10,7 @@ module Alba
   class UnsupportedBackend < Error; end
 
   class << self
-    attr_reader :backend, :encoder, :inferring, :_on_error
+    attr_reader :backend, :encoder, :inferring, :_on_error, :transforming_root_key
 
     # Set the backend, which actually serializes object into JSON
     #
@@ -66,6 +66,16 @@ module Alba
       @_on_error = handler || block
     end
 
+    # Enable root key transformation
+    def enable_root_key_transformation!
+      @transforming_root_key = true
+    end
+
+    # Disable root key transformation
+    def disable_root_key_transformation!
+      @transforming_root_key = false
+    end
+
     private
 
     def set_encoder
@@ -109,4 +119,5 @@ module Alba
 
   @encoder = default_encoder
   @_on_error = :raise
+  @transforming_root_key = false # TODO: This will be true since 2.0
 end

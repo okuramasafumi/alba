@@ -248,7 +248,7 @@ RestrictedFooResouce.new(foo).serialize
 end
 ```
 
-### Attribute key transformation
+### Key transformation
 
 ** Note: You need to install `active_support` gem to use `transform_keys` DSL.
 
@@ -277,6 +277,39 @@ user = User.new(1, 'Masafumi', 'Okura')
 UserResourceCamel.new(user).serialize
 # => '{"id":1,"firstName":"Masafumi","lastName":"Okura"}'
 ```
+
+You can also transform root key when:
+
+* `Alba.enable_inference!` is called
+* `key!` is called in Resource class
+* `root` option of `transform_keys` is set to true or `Alba.enable_root_key_transformation!` is called.
+
+```ruby
+Alba.enable_inference!
+
+class BankAccount
+  attr_reader :account_number
+
+  def initialize(account_number)
+    @account_number = account_number
+  end
+end
+
+class BankAccountResource
+  include Alba::Resource
+
+  key!
+
+  attributes :account_number
+  transform_keys :dash, root: true
+end
+
+bank_account = BankAccount.new(123_456_789)
+BankAccountResource.new(bank_account).serialize
+# => '{"bank-account":{"account-number":123456789}}'
+```
+
+This behavior to transform root key will become default at version 2.
 
 Supported transformation types are :camel, :lower_camel and :dash.
 

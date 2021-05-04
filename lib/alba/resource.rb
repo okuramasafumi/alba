@@ -6,7 +6,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _transform_keys: nil, _on_error: nil}.freeze
+    DSLS = {_attributes: {}, _key: nil, _transform_keys: nil, _transforming_root_key: false, _on_error: nil}.freeze
     private_constant :DSLS
 
     # @private
@@ -61,8 +61,9 @@ module Alba
         return @_key.to_s unless @_key == true && Alba.inferring
 
         resource_name = self.class.name.demodulize.delete_suffix('Resource').underscore
-
-        transform_key(collection? ? resource_name.pluralize : resource_name)
+        key = collection? ? resource_name.pluralize : resource_name
+        transforming_root_key = @_transforming_root_key.nil? ? Alba.transforming_root_key : @_transforming_root_key
+        transforming_root_key ? transform_key(key) : key
       end
 
       def converter
@@ -252,8 +253,10 @@ module Alba
       # Transform keys as specified type
       #
       # @param type [String, Symbol]
-      def transform_keys(type)
+      # @param root [Boolean] decides if root key also should be transformed
+      def transform_keys(type, root: nil)
         @_transform_keys = type.to_sym
+        @_transforming_root_key = root
       end
 
       # Set error handler
