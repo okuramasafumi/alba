@@ -17,6 +17,7 @@ gemfile(true) do
   gem "jbuilder"
   gem "jsonapi-serializer" # successor of fast_jsonapi
   gem "multi_json"
+  gem "primalize"
   gem "oj"
   gem "representable"
   gem "sqlite3"
@@ -213,6 +214,27 @@ class JsonApiSameFormatPostSerializer < JsonApiSameFormatSerializer
   end
 end
 
+# --- Primalize serializers ---
+#
+class PrimalizeCommentResource < Primalize::Single
+  attributes id: integer, body: string
+end
+
+class PrimalizePostResource < Primalize::Single
+  alias post object
+
+  attributes(
+    id: integer,
+    body: string,
+    comments: array(primalize(PrimalizeCommentResource)),
+    commenter_names: array(string),
+  )
+
+  def commenter_names
+    post.commenters.pluck(:name)
+  end
+end
+
 # --- Representable serializers ---
 
 require "representable"
@@ -265,6 +287,7 @@ blueprinter = Proc.new { PostBlueprint.render(post) }
 jbuilder = Proc.new { post.to_builder.target! }
 jsonapi = proc { JsonApiStandardPostSerializer.new(post).to_json }
 jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(post).to_json }
+primalize = proc { PrimalizePostResource.new(post).to_json }
 rails = Proc.new { ActiveSupport::JSON.encode(post.serializable_hash(include: :comments)) }
 representable = Proc.new { PostRepresenter.new(post).to_json }
 
@@ -279,6 +302,7 @@ puts "Serializer outputs ----------------------------------"
   jbuilder: jbuilder, # different order
   jsonapi: jsonapi, # nested JSON:API format
   jsonapi_same_format: jsonapi_same_format,
+  primalize: primalize,
   rails: rails,
   representable: representable
 }.each { |name, serializer| puts "#{name.to_s.ljust(24, ' ')} #{serializer.call}" }
@@ -295,6 +319,7 @@ Benchmark.bmbm do |x|
   x.report(:jbuilder) { time.times(&jbuilder) }
   x.report(:jsonapi) { time.times(&jsonapi) }
   x.report(:jsonapi_same_format) { time.times(&jsonapi_same_format) }
+  x.report(:primalize) { time.times(&primalize) }
   x.report(:rails) { time.times(&rails) }
   x.report(:representable) { time.times(&representable) }
 end
@@ -308,6 +333,7 @@ Benchmark.ips do |x|
   x.report(:jbuilder, &jbuilder)
   x.report(:jsonapi, &jsonapi)
   x.report(:jsonapi_same_format, &jsonapi_same_format)
+  x.report(:primalize, &primalize)
   x.report(:rails, &rails)
   x.report(:representable, &representable)
 
