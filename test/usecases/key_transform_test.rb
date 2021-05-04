@@ -11,6 +11,14 @@ class KeyTransformTest < Minitest::Test
     end
   end
 
+  class BankAccount
+    attr_reader :account_number
+
+    def initialize(account_number)
+      @account_number = account_number
+    end
+  end
+
   class UserResource
     include Alba::Resource
 
@@ -33,8 +41,24 @@ class KeyTransformTest < Minitest::Test
     transform_keys :unknown
   end
 
+  class BankAccountResource
+    include Alba::Resource
+
+    key!
+
+    attributes :account_number
+    transform_keys :dash
+  end
+
   def setup
+    Alba.enable_inference!
+
     @user = User.new(1, 'Masafumi', 'Okura')
+    @bank_account = BankAccount.new(123456789)
+  end
+
+  def teardown
+    Alba.disable_inference!
   end
 
   def test_transform_key_to_camel
@@ -55,6 +79,13 @@ class KeyTransformTest < Minitest::Test
     assert_equal(
       '{"id":1,"first-name":"Masafumi","last-name":"Okura"}',
       UserResourceDash.new(@user).serialize
+    )
+  end
+
+  def test_transform_key_to_dash_with_key_inference
+    assert_equal(
+      '{"bank-account":{"account-number":123456789}}',
+      BankAccountResource.new(@bank_account).serialize
     )
   end
 
