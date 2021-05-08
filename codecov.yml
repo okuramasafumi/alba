@@ -5,4 +5,4 @@ coverage:
         informational: true
     patch:
       default:
-        target: 98%
+        target: 90%
