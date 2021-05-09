@@ -59,11 +59,6 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 
 ## Features
 
-* Resource-based serialization
-* Arbitrary attribute definition
-* One and many association with the ability to define them inline
-* Adding condition and filter to association
-* Parameters can be injected and used in attributes and associations
 * Conditional attributes and associations
 * Selectable backend
 * Key transformation
@@ -71,6 +66,7 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Error handling
 * Resource name inflection based on association name
 * Circular associations control
+* Types for validation and conversion
 * No runtime dependencies
 
 ## Anti features
