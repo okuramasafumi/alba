@@ -457,6 +457,37 @@ You can control circular associations with `within` option. `within` option is a
 
 For more details, please refer to [test code](https://github.com/okuramasafumi/alba/blob/master/test/usecases/circular_association_test.rb)
 
+### Collection serialization into Hash
+
+Sometimes we want to serialize a collection into a Hash, not an Array. It's possible with Alba.
+
+```ruby
+class User
+  attr_reader :id, :name
+  def initialize(id, name)
+    @id, @name = id, name
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  collection_key :id # This line is important
+
+  attributes :id, :name
+end
+
+user1 = User.new(1, 'John')
+user2 = User.new(2, 'Masafumi')
+
+UserResource.new([user1, user2]).serialize
+# => '{"1":{"id":1,"name":"John"},"2":{"id":2,"name":"Masafumi"}}'
+```
+
+In the snippet above, `collection_key :id` specifies the key used for the key of the collection hash. In this example it's `:id`.
+
+Make sure that collection key is unique for the collection.
+
 ### Caching
 
 Currently, Alba doesn't support caching, primarily due to the behavior of `ActiveRecord::Relation`'s cache. See [the issue](https://github.com/rails/rails/issues/41784).

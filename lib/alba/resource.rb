@@ -6,7 +6,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _transform_keys: nil, _on_error: nil}.freeze
+    DSLS = {_attributes: {}, _key: nil, _transform_keys: nil, _on_error: nil, _collection_key: nil}.freeze
     private_constant :DSLS
 
     # @private
@@ -50,11 +50,19 @@ module Alba
       #
       # @return [Hash]
       def serializable_hash
-        collection? ? @object.map(&converter) : converter.call(@object)
+        collection? ? serializable_hash_for_collection : converter.call(@object)
       end
       alias to_hash serializable_hash
 
       private
+
+      def serializable_hash_for_collection
+        if @_collection_key
+          @object.to_h { |item| [item.public_send(@_collection_key).to_s, converter.call(item)] }
+        else
+          @object.map(&converter)
+        end
+      end
 
       # @return [String]
       def _key
@@ -254,6 +262,13 @@ module Alba
       # @param type [String, Symbol]
       def transform_keys(type)
         @_transform_keys = type.to_sym
+      end
+
+      # Sets key for collection serialization
+      #
+      # @param key [String, Symbol]
+      def collection_key(key)
+        @_collection_key = key.to_sym
       end
 
       # Set error handler
