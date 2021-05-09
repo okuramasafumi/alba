@@ -9,6 +9,9 @@ module Alba
   # Error class for backend which is not supported
   class UnsupportedBackend < Error; end
 
+  # Error class for type which is not supported
+  class UnsupportedType < Error; end
+
   class << self
     attr_reader :backend, :encoder, :inferring, :_on_error
 
