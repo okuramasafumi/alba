@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] 2021-05-09
+
+- [Fix] multiple word key inference [6c18e73]
+  - https://github.com/okuramasafumi/alba/pull/120
+  - Thank you @alfonsojimenez !
+- [Feat] Add `Alba.enable_root_key_transformation!` [f172839]
+  - https://github.com/okuramasafumi/alba/pull/121
+- [Feat] Implement type validation and auto conversion [cbe00c7]
+  - https://github.com/okuramasafumi/alba/pull/122
+
 ## [1.1.0] - 2021-04-23
 
 - [Feat] Implement circular associations control [71e1543]
