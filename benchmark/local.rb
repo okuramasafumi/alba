@@ -20,6 +20,7 @@ gemfile(true) do
   gem "primalize"
   gem "oj"
   gem "representable"
+  gem "simple_ams"
   gem "sqlite3"
 end
 
@@ -259,6 +260,28 @@ class PostRepresenter < Representable::Decorator
   end
 end
 
+# --- SimpleAMS serializers ---
+
+require "simple_ams"
+
+class SimpleAMSCommentSerializer
+  include SimpleAMS::DSL
+
+  attributes :id, :body
+end
+
+class SimpleAMSPostSerializer
+  include SimpleAMS::DSL
+
+  attributes :id, :body
+  attribute :commenter_names
+  has_many :comments, serializer: SimpleAMSCommentSerializer
+
+  def commenter_names
+    object.commenters.pluck(:name)
+  end
+end
+
 # --- Test data creation ---
 
 post = Post.create!(body: 'post')
@@ -290,6 +313,7 @@ jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(post).to_json }
 primalize = proc { PrimalizePostResource.new(post).to_json }
 rails = Proc.new { ActiveSupport::JSON.encode(post.serializable_hash(include: :comments)) }
 representable = Proc.new { PostRepresenter.new(post).to_json }
+simple_ams = Proc.new { SimpleAMS::Renderer.new(post, serializer: SimpleAMSPostSerializer).to_json }
 
 # --- Execute the serializers to check their output ---
 
@@ -304,7 +328,8 @@ puts "Serializer outputs ----------------------------------"
   jsonapi_same_format: jsonapi_same_format,
   primalize: primalize,
   rails: rails,
-  representable: representable
+  representable: representable,
+  simple_ams: simple_ams,
 }.each { |name, serializer| puts "#{name.to_s.ljust(24, ' ')} #{serializer.call}" }
 
 # --- Run the benchmarks ---
@@ -322,6 +347,7 @@ Benchmark.bmbm do |x|
   x.report(:primalize) { time.times(&primalize) }
   x.report(:rails) { time.times(&rails) }
   x.report(:representable) { time.times(&representable) }
+  x.report(:simple_ams) { time.times(&simple_ams) }
 end
 
 require 'benchmark/ips'
@@ -336,6 +362,7 @@ Benchmark.ips do |x|
   x.report(:primalize, &primalize)
   x.report(:rails, &rails)
   x.report(:representable, &representable)
+  x.report(:simple_ams, &simple_ams)
 
   x.compare!
 end
