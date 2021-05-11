@@ -350,3 +350,21 @@ Benchmark.ips do |x|
 
   x.compare!
 end
+
+
+require 'benchmark/memory'
+Benchmark.memory do |x|
+  x.report(:alba, &alba)
+  x.report(:alba_inline, &alba_inline)
+  x.report(:ams, &ams)
+  x.report(:blueprinter, &blueprinter)
+  x.report(:jbuilder, &jbuilder)
+  x.report(:jsonapi, &jsonapi)
+  x.report(:jsonapi_same_format, &jsonapi_same_format)
+  x.report(:primalize, &primalize)
+  x.report(:rails, &rails)
+  x.report(:representable, &representable)
+  x.report(:simple_ams, &simple_ams)
+
+  x.compare!
+end
