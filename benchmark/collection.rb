@@ -293,15 +293,17 @@ end
 
 # --- Test data creation ---
 
-10.times do |i|
+100.times do |i|
   post = Post.create!(body: "post#{i}")
   user1 = User.create!(name: "John#{i}")
   user2 = User.create!(name: "Jane#{i}")
-  post.comments.create!(commenter: user1, body: "Comment1_#{i}")
-  post.comments.create!(commenter: user2, body: "Comment2_#{i}")
+  10.times do |n|
+    post.comments.create!(commenter: user1, body: "Comment1_#{i}_#{n}")
+    post.comments.create!(commenter: user2, body: "Comment2_#{i}_#{n}")
+  end
 end
 
-posts = Post.all
+posts = Post.all.to_a
 
 # --- Store the serializers in procs ---
 
