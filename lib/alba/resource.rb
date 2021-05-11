@@ -9,6 +9,9 @@ module Alba
     DSLS = {_attributes: {}, _key: nil, _transform_keys: nil, _transforming_root_key: false, _on_error: nil}.freeze
     private_constant :DSLS
 
+    WITHIN_DEFAULT = Object.new.freeze
+    private_constant :WITHIN_DEFAULT
+
     # @private
     def self.included(base)
       super
@@ -29,7 +32,7 @@ module Alba
       # @param object [Object] the object to be serialized
       # @param params [Hash] user-given Hash for arbitrary data
       # @param within [Hash] determines what associations to be serialized. If not set, it serializes all associations.
-      def initialize(object, params: {}, within: true)
+      def initialize(object, params: {}, within: WITHIN_DEFAULT)
         @object = object
         @params = params.freeze
         @within = within
@@ -186,15 +189,15 @@ module Alba
 
       def check_within
         case @within
+        when WITHIN_DEFAULT # Default value, doesn't check within tree
+          WITHIN_DEFAULT
         when Hash # Traverse within tree
           @within.fetch(_key.to_sym, nil)
         when Array # within tree ends with Array
           @within.find { |item| item.to_sym == _key.to_sym } # Check if at least one item in the array matches current resource
         when Symbol # within tree could end with Symbol
           @within == _key.to_sym # Check if the symbol matches current resource
-        when true # In this case, Alba serializes all associations.
-          true
-        when nil, false # In these cases, Alba stops serialization here.
+        when nil, true, false # In these cases, Alba stops serialization here.
           false
         else
           raise Alba::Error, "Unknown type for within option: #{@within.class}"

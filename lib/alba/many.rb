@@ -15,7 +15,7 @@ module Alba
       return if @object.nil?
 
       @resource = constantize(@resource)
-      @object.map { |o| @resource.new(o, params: params, within: within).to_hash }
+      @resource.new(@object, params: params, within: within).to_hash
     end
   end
 end
