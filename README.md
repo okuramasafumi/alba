@@ -66,7 +66,7 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Error handling
 * Resource name inflection based on association name
 * Circular associations control
-* Types for validation and conversion
+* [Experimental] Types for validation and conversion
 * No runtime dependencies
 
 ## Anti features
@@ -486,7 +486,7 @@ You can control circular associations with `within` option. `within` option is a
 
 For more details, please refer to [test code](https://github.com/okuramasafumi/alba/blob/master/test/usecases/circular_association_test.rb)
 
-### Types
+### Experimental support of types
 
 You can validate and convert input with types.
 
@@ -524,6 +524,8 @@ user = User.new(1, 'Masafumi OKURA', '32', nil) # bio is nil and auto conversion
 UserResource.new(user).serialize
 # => TypeError, 'Attribute bio is expected to be String but actually nil.'
 ```
+
+Note that this feature is experimental and interfaces are subject to change.
 
 ### Caching
 
