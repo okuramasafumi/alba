@@ -354,22 +354,6 @@ puts "Serializer outputs ----------------------------------"
 
 # --- Run the benchmarks ---
 
-require 'benchmark'
-time = 1000
-Benchmark.bmbm do |x|
-  x.report(:alba) { time.times(&alba) }
-  x.report(:alba_inline) { time.times(&alba_inline) }
-  x.report(:ams) { time.times(&ams) }
-  x.report(:blueprinter) { time.times(&blueprinter) }
-  x.report(:jbuilder) { time.times(&jbuilder) }
-  x.report(:jsonapi) { time.times(&jsonapi) }
-  x.report(:jsonapi_same_format) { time.times(&jsonapi_same_format) }
-  x.report(:primalize) { time.times(&primalize) }
-  x.report(:rails) { time.times(&rails) }
-  x.report(:representable) { time.times(&representable) }
-  x.report(:simple_ams) { time.times(&simple_ams) }
-end
-
 require 'benchmark/ips'
 Benchmark.ips do |x|
   x.report(:alba, &alba)
