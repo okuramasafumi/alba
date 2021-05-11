@@ -13,6 +13,7 @@ gemfile(true) do
   gem "activerecord", "6.1.3"
   gem "alba", path: '../'
   gem "benchmark-ips"
+  gem "benchmark-memory"
   gem "blueprinter"
   gem "jbuilder"
   gem "jsonapi-serializer" # successor of fast_jsonapi
@@ -20,6 +21,7 @@ gemfile(true) do
   gem "primalize"
   gem "oj"
   gem "representable"
+  gem "simple_ams"
   gem "sqlite3"
 end
 
@@ -97,6 +99,8 @@ end
 # --- ActiveModelSerializer serializers ---
 
 require "active_model_serializers"
+
+ActiveModelSerializers.logger = Logger.new(nil)
 
 class AMSCommentSerializer < ActiveModel::Serializer
   attributes :id, :body
@@ -235,6 +239,10 @@ class PrimalizePostResource < Primalize::Single
   end
 end
 
+class PrimalizePostsResource < Primalize::Many
+  attributes posts: enumerable(PrimalizePostResource)
+end
+
 # --- Representable serializers ---
 
 require "representable"
@@ -246,33 +254,62 @@ class CommentRepresenter < Representable::Decorator
   property :body
 end
 
-class PostRepresenter < Representable::Decorator
-  include Representable::JSON
+class PostsRepresenter < Representable::Decorator
+  include Representable::JSON::Collection
 
-  property :id
-  property :body
-  property :commenter_names
-  collection :comments
+  items class: Post do
+    property :id
+    property :body
+    property :commenter_names
+    collection :comments
+  end
 
   def commenter_names
     commenters.pluck(:name)
   end
 end
 
+# --- SimpleAMS serializers ---
+
+require "simple_ams"
+
+class SimpleAMSCommentSerializer
+  include SimpleAMS::DSL
+
+  attributes :id, :body
+end
+
+class SimpleAMSPostSerializer
+  include SimpleAMS::DSL
+
+  attributes :id, :body
+  attribute :commenter_names
+  has_many :comments, serializer: SimpleAMSCommentSerializer
+
+  def commenter_names
+    object.commenters.pluck(:name)
+  end
+end
+
 # --- Test data creation ---
 
-post = Post.create!(body: 'post')
-user1 = User.create!(name: 'John')
-user2 = User.create!(name: 'Jane')
-post.comments.create!(commenter: user1, body: 'Comment1')
-post.comments.create!(commenter: user2, body: 'Comment2')
-post.reload
+100.times do |i|
+  post = Post.create!(body: "post#{i}")
+  user1 = User.create!(name: "John#{i}")
+  user2 = User.create!(name: "Jane#{i}")
+  10.times do |n|
+    post.comments.create!(commenter: user1, body: "Comment1_#{i}_#{n}")
+    post.comments.create!(commenter: user2, body: "Comment2_#{i}_#{n}")
+  end
+end
+
+posts = Post.all.to_a
 
 # --- Store the serializers in procs ---
 
-alba = Proc.new { AlbaPostResource.new(post).serialize }
+alba = Proc.new { AlbaPostResource.new(posts).serialize }
 alba_inline = Proc.new do
-  Alba.serialize(post) do
+  Alba.serialize(posts) do
     attributes :id, :body
     attribute :commenter_names do |post|
       post.commenters.pluck(:name)
@@ -282,14 +319,23 @@ alba_inline = Proc.new do
     end
   end
 end
-ams = Proc.new { AMSPostSerializer.new(post, {}).to_json }
-blueprinter = Proc.new { PostBlueprint.render(post) }
-jbuilder = Proc.new { post.to_builder.target! }
-jsonapi = proc { JsonApiStandardPostSerializer.new(post).to_json }
-jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(post).to_json }
-primalize = proc { PrimalizePostResource.new(post).to_json }
-rails = Proc.new { ActiveSupport::JSON.encode(post.serializable_hash(include: :comments)) }
-representable = Proc.new { PostRepresenter.new(post).to_json }
+ams = Proc.new { ActiveModelSerializers::SerializableResource.new(posts, {}).as_json }
+blueprinter = Proc.new { PostBlueprint.render(posts) }
+jbuilder = Proc.new do
+  Jbuilder.new do |json|
+    json.array!(posts) do |post|
+      json.post post.to_builder
+    end
+  end.target!
+end
+jsonapi = proc { JsonApiStandardPostSerializer.new(posts).to_json }
+jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(posts).to_json }
+primalize = proc { PrimalizePostsResource.new(posts: posts).to_json }
+rails = Proc.new do
+  ActiveSupport::JSON.encode(posts.map{ |post| post.serializable_hash(include: :comments) })
+end
+representable = Proc.new { PostsRepresenter.new(posts).to_json }
+simple_ams = Proc.new { SimpleAMS::Renderer::Collection.new(posts, serializer: SimpleAMSPostSerializer).to_json }
 
 # --- Execute the serializers to check their output ---
 
@@ -304,25 +350,11 @@ puts "Serializer outputs ----------------------------------"
   jsonapi_same_format: jsonapi_same_format,
   primalize: primalize,
   rails: rails,
-  representable: representable
+  representable: representable,
+  simple_ams: simple_ams,
 }.each { |name, serializer| puts "#{name.to_s.ljust(24, ' ')} #{serializer.call}" }
 
 # --- Run the benchmarks ---
-
-require 'benchmark'
-time = 1000
-Benchmark.bmbm do |x|
-  x.report(:alba) { time.times(&alba) }
-  x.report(:alba_inline) { time.times(&alba_inline) }
-  x.report(:ams) { time.times(&ams) }
-  x.report(:blueprinter) { time.times(&blueprinter) }
-  x.report(:jbuilder) { time.times(&jbuilder) }
-  x.report(:jsonapi) { time.times(&jsonapi) }
-  x.report(:jsonapi_same_format) { time.times(&jsonapi_same_format) }
-  x.report(:primalize) { time.times(&primalize) }
-  x.report(:rails) { time.times(&rails) }
-  x.report(:representable) { time.times(&representable) }
-end
 
 require 'benchmark/ips'
 Benchmark.ips do |x|
@@ -336,6 +368,25 @@ Benchmark.ips do |x|
   x.report(:primalize, &primalize)
   x.report(:rails, &rails)
   x.report(:representable, &representable)
+  x.report(:simple_ams, &simple_ams)
+
+  x.compare!
+end
+
+
+require 'benchmark/memory'
+Benchmark.memory do |x|
+  x.report(:alba, &alba)
+  x.report(:alba_inline, &alba_inline)
+  x.report(:ams, &ams)
+  x.report(:blueprinter, &blueprinter)
+  x.report(:jbuilder, &jbuilder)
+  x.report(:jsonapi, &jsonapi)
+  x.report(:jsonapi_same_format, &jsonapi_same_format)
+  x.report(:primalize, &primalize)
+  x.report(:rails, &rails)
+  x.report(:representable, &representable)
+  x.report(:simple_ams, &simple_ams)
 
   x.compare!
 end
