@@ -313,11 +313,11 @@ Supported transformation types are :camel, :lower_camel and :dash.
 
 #### Custom inflector
 
-A custom inflector can be plugged in as follows:
+A custom inflector can be plugged in as follows...
 ```ruby
 Alba.inflector = MyCustomInflector
 ```
-A custom inflector has to implement following interface:
+...and has to implement following interface (the parameter `key` is of type `String`):
 ```ruby
 module InflectorInterface
   def camelize(key)
