@@ -37,10 +37,6 @@ class KeyTransformTest < Minitest::Test
     transform_keys :dash
   end
 
-  class UserResourceUnknown < UserResource
-    transform_keys :unknown
-  end
-
   class BankAccountResource
     include Alba::Resource
 
@@ -68,6 +64,14 @@ class KeyTransformTest < Minitest::Test
   def teardown
     Alba.disable_inference!
     Alba.disable_root_key_transformation!
+  end
+
+  def test_fails_with_alba_error_in_the_code_load_phase_if_key_transforms_setting_is_not_known
+    assert_raises(Alba::Error) {
+      Class.new(UserResource) do
+        transform_keys :unknown
+      end
+    }
   end
 
   def test_transform_key_to_camel
@@ -121,7 +125,4 @@ class KeyTransformTest < Minitest::Test
     )
   end
 
-  def test_transform_key_to_unknown
-    assert_raises(Alba::Error) { UserResourceUnknown.new(@user).serialize }
-  end
 end
