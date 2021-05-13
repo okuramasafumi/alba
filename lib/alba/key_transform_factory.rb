@@ -12,7 +12,7 @@ module Alba
         when :camel
           ->(key) { _inflector.camelize(key) }
         when :lower_camel
-          ->(key) { _inflector.lower_camelize(key) }
+          ->(key) { _inflector.camelize_lower(key) }
         when :dash
           ->(key) { _inflector.dasherize(key) }
         else

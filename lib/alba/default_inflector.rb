@@ -12,7 +12,7 @@ module Alba
       ActiveSupport::Inflector.camelize(key)
     end
 
-    def lower_camelize(key)
+    def camelize_lower(key)
       ActiveSupport::Inflector.camelize(key, false)
     end
 
