@@ -246,9 +246,11 @@ end
 
 ### Key transformation
 
-** Note: You need to install `active_support` gem to use `transform_keys` DSL.
+If you want to use `transform_keys` DSL and you already have `active_support` installed, key transformation will work out of the box using `ActiveSupport::Inflector`. If `active_support` is not arround, you have 2 possibilities:
+* install it
+* use a [custom inflector](#custom-inflector)
 
-With `active_support` installed, you can transform attribute keys.
+With `transform_keys` DSL, you can transform attribute keys.
 
 ```ruby
 class User
@@ -308,6 +310,34 @@ BankAccountResource.new(bank_account).serialize
 This behavior to transform root key will become default at version 2.
 
 Supported transformation types are :camel, :lower_camel and :dash.
+
+## Custom inflector
+
+A custom inflector can be plugged in as follows:
+```ruby
+Alba.inflector = MyCustomInflector
+```
+A custom inflector has to implement following interface:
+```ruby
+module InflectorInterface
+  def camelize(key)
+    raise "Not implemented"
+  end
+
+  def camelize_lower(key)
+    raise "Not implemented"
+  end
+
+  def dasherize(key)
+    raise "Not implemented"
+  end
+end
+
+```
+For example you could use `Dry::Inflector`, which implements exactly the above interface. If you are developping a `Hanami`-Application `Dry::Inflector` is around. In this case the following would be sufficient:
+```ruby
+Alba.inflector = Dry::Inflector.new
+```
 
 ### Filtering attributes
 
