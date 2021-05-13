@@ -1,7 +1,7 @@
 module Alba
+  # This module creates key transform functions
   module KeyTransformFactory
     class << self
-
       # Create key transform function for given transform_type
       #
       # @params transform_type [Symbol] transform type
@@ -24,11 +24,10 @@ module Alba
 
       def _inflector
         Alba.inflector || begin
-          require_relative "./default_inflector.rb"
+          require_relative './default_inflector'
           Alba::DefaultInflector
         end
       end
-
     end
   end
 end

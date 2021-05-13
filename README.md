@@ -246,7 +246,7 @@ end
 
 ### Key transformation
 
-If you want to use `transform_keys` DSL and you already have `active_support` installed, key transformation will work out of the box, using `ActiveSupport::Inflector`. If `active_support` is not arround, you have 2 possibilities:
+If you want to use `transform_keys` DSL and you already have `active_support` installed, key transformation will work out of the box, using `ActiveSupport::Inflector`. If `active_support` is not around, you have 2 possibilities:
 * install it
 * use a [custom inflector](#custom-inflector)
 

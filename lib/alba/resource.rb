@@ -120,6 +120,7 @@ module Alba
       # Override this method to supply custom key transform method
       def transform_key(key)
         return key if @_transform_key_function.nil?
+
         @_transform_key_function.call(key.to_s)
       end
 
