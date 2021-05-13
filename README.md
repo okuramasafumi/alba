@@ -334,7 +334,7 @@ module InflectorInterface
 end
 
 ```
-For example you could use `Dry::Inflector`, which implements exactly the above interface. If you are developping a `Hanami`-Application `Dry::Inflector` is around. In this case the following would be sufficient:
+For example you could use `Dry::Inflector`, which implements exactly the above interface. If you are developing a `Hanami`-Application `Dry::Inflector` is around. In this case the following would be sufficient:
 ```ruby
 Alba.inflector = Dry::Inflector.new
 ```
