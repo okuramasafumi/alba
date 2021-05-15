@@ -1,12 +1,13 @@
 require_relative 'one'
 require_relative 'many'
+require_relative 'key_transform_factory'
 
 module Alba
   # This module represents what should be serialized
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _transform_keys: nil, _transforming_root_key: false, _on_error: nil}.freeze
+    DSLS = {_attributes: {}, _key: nil, _transform_key_function: nil, _transforming_root_key: false, _on_error: nil}.freeze
     private_constant :DSLS
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -121,10 +122,9 @@ module Alba
 
       # Override this method to supply custom key transform method
       def transform_key(key)
-        return key unless @_transform_keys
+        return key if @_transform_key_function.nil?
 
-        require_relative 'key_transformer'
-        KeyTransformer.transform(key, @_transform_keys)
+        @_transform_key_function.call(key.to_s)
       end
 
       def fetch_attribute(object, attribute)
@@ -310,7 +310,7 @@ module Alba
       # @param type [String, Symbol]
       # @param root [Boolean] decides if root key also should be transformed
       def transform_keys(type, root: nil)
-        @_transform_keys = type.to_sym
+        @_transform_key_function = KeyTransformFactory.create(type.to_sym)
         @_transforming_root_key = root
       end
 

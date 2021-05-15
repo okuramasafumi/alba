@@ -37,10 +37,6 @@ class KeyTransformTest < Minitest::Test
     transform_keys :dash
   end
 
-  class UserResourceUnknown < UserResource
-    transform_keys :unknown
-  end
-
   class BankAccountResource
     include Alba::Resource
 
@@ -58,6 +54,12 @@ class KeyTransformTest < Minitest::Test
     transform_keys :dash, root: false
   end
 
+  class CustomInflector
+    def camelize(key)
+      "camelized_#{key}"
+    end
+  end
+
   def setup
     Alba.enable_inference!
 
@@ -68,6 +70,19 @@ class KeyTransformTest < Minitest::Test
   def teardown
     Alba.disable_inference!
     Alba.disable_root_key_transformation!
+    Alba.inflector = nil
+  end
+
+  def test_alba_error_is_raised_in_the_code_load_phase_if_key_transforms_setting_is_not_known
+    err = assert_raises(Alba::Error) {
+      Class.new(UserResource) do
+        transform_keys :unknown
+      end
+    }
+    assert_equal(
+      err.message,
+      "Unknown transform_type: unknown. Supported transform_type are :camel, :lower_camel and :dash."
+    )
   end
 
   def test_transform_key_to_camel
@@ -121,7 +136,12 @@ class KeyTransformTest < Minitest::Test
     )
   end
 
-  def test_transform_key_to_unknown
-    assert_raises(Alba::Error) { UserResourceUnknown.new(@user).serialize }
+  def test_custom_inflector_is_used_if_defined
+    Alba.inflector = CustomInflector.new
+    assert_equal(
+      '{"camelized_id":1,"camelized_first_name":"Masafumi","camelized_last_name":"Okura"}',
+      UserResourceCamel.new(@user).serialize
+    )
   end
+
 end
