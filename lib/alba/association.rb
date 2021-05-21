@@ -15,14 +15,7 @@ module Alba
       @resource = resource
       return if @resource
 
-      if @block
-        @resource = resource_class
-      elsif Alba.inferring
-        const_parent = nesting.nil? ? Object : Object.const_get(nesting)
-        @resource = const_parent.const_get("#{ActiveSupport::Inflector.classify(@name)}Resource")
-      else
-        raise ArgumentError, 'When Alba.inferring is false, either resource or block is required'
-      end
+      assign_resource(nesting)
     end
 
     private
@@ -33,6 +26,17 @@ module Alba
         resource
       when Symbol, String
         Object.const_get(resource)
+      end
+    end
+
+    def assign_resource(nesting)
+      if @block
+        @resource = resource_class
+      elsif Alba.inferring
+        const_parent = nesting.nil? ? Object : Object.const_get(nesting)
+        @resource = const_parent.const_get("#{ActiveSupport::Inflector.classify(@name)}Resource")
+      else
+        raise ArgumentError, 'When Alba.inferring is false, either resource or block is required'
       end
     end
 
