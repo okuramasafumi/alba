@@ -222,7 +222,8 @@ module Alba
       # Set multiple attributes at once
       #
       # @param attrs [Array<String, Symbol>]
-      # @param options [Hash] option hash including `if` that is a  condition to render these attributes
+      # @param if [Boolean] condition to decide if it should render these attributes
+      # @param attrs_with_types [Hash] attributes with name in its key and type and optional type converter in its value
       def attributes(*attrs, if: nil, **attrs_with_types) # rubocop:disable Naming/MethodParameterName
         if_value = binding.local_variable_get(:if)
         attrs.each do |attr_name|
