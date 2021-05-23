@@ -32,10 +32,10 @@ class DependenciesTest < MiniTest::Test
     end
 
     def test_alba_error_is_raised_if_keys_should_be_transformed_but_active_support_is_no_dependency
-      err = assert_raises(Alba::Error) {
+      err = assert_raises(Alba::Error) do
         UserResourceCamel.new(@user).serialize
-      }
-      assert_equal("To use transform_keys, please install `ActiveSupport` gem.", err.message)      
+      end
+      assert_equal('To use transform_keys, please install `ActiveSupport` gem.', err.message)
     end
 
     def test_it_warns_when_set_backend_as_active_support_but_active_support_is_not_available
