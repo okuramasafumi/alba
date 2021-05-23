@@ -82,18 +82,22 @@ module Alba
       def converter
         lambda do |object|
           arrays = @_attributes.map do |key, attribute|
-            key = transform_key(key)
-            if attribute.is_a?(Array) # Conditional
-              conditional_attribute(object, key, attribute)
-            else
-              [key, fetch_attribute(object, attribute)]
-            end
+            key_and_attribute_body_from(object, key, attribute)
           rescue ::Alba::Error, FrozenError, TypeError
             raise
           rescue StandardError => e
             handle_error(e, object, key, attribute)
           end
           arrays.reject(&:empty?).to_h
+        end
+      end
+
+      def key_and_attribute_body_from(object, key, attribute)
+        key = transform_key(key)
+        if attribute.is_a?(Array) # Conditional
+          conditional_attribute(object, key, attribute)
+        else
+          [key, fetch_attribute(object, attribute)]
         end
       end
 
