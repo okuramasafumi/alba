@@ -64,10 +64,19 @@ module Alba
       def _key
         return @_key.to_s unless @_key == true && Alba.inferring
 
-        resource_name = self.class.name.demodulize.delete_suffix('Resource').underscore
-        key = collection? ? resource_name.pluralize : resource_name
-        transforming_root_key = @_transforming_root_key.nil? ? Alba.transforming_root_key : @_transforming_root_key
-        transforming_root_key ? transform_key(key) : key
+        transforming_root_key? ? transform_key(key_from_resource_name) : key_from_resource_name
+      end
+
+      def key_from_resource_name
+        collection? ? resource_name.pluralize : resource_name
+      end
+
+      def resource_name
+        self.class.name.demodulize.delete_suffix('Resource').underscore
+      end
+
+      def transforming_root_key?
+        @_transforming_root_key.nil? ? Alba.transforming_root_key : @_transforming_root_key
       end
 
       def converter
