@@ -161,13 +161,13 @@ module Alba
       def typed_attribute(object, hash)
         attr_name = hash[:attr_name]
         type = hash[:type]
-        type_converter = hash[:type_converter]
         value, result = type_check(object, attr_name, type)
         return value if result
+
+        type_converter = hash[:type_converter]
         raise TypeError if !result && !type_converter
 
-        type_converter = type_converter_for(type) if type_converter == true
-        type_converter.call(value)
+        try_convert_type(type, value, type_converter)
       rescue TypeError
         raise TypeError, "Attribute #{attr_name} is expected to be #{type} but actually #{value.nil? ? 'nil' : value.class.name}."
       end
@@ -185,6 +185,11 @@ module Alba
                          raise Alba::UnsupportedType, "Unknown type: #{type}"
                        end
         [value, type_correct]
+      end
+
+      def try_convert_type(type, value, type_converter)
+        type_converter = type_converter_for(type) if type_converter == true
+        type_converter.call(value)
       end
 
       def type_converter_for(type)
