@@ -49,7 +49,8 @@ Metrics/MethodLength:
 
 # `Resource` module is a core module and its length tends to be long...
 Metrics/ModuleLength:
-  Max: 150
+  Exclude:
+    - 'lib/alba/resource.rb'
 
 # Resource class includes DSLs, which tend to accept long list of parameters
 Metrics/ParameterLists:

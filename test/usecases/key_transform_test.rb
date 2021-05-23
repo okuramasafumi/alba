@@ -74,14 +74,14 @@ class KeyTransformTest < Minitest::Test
   end
 
   def test_alba_error_is_raised_in_the_code_load_phase_if_key_transforms_setting_is_not_known
-    err = assert_raises(Alba::Error) {
+    err = assert_raises(Alba::Error) do
       Class.new(UserResource) do
         transform_keys :unknown
       end
-    }
+    end
     assert_equal(
-      err.message,
-      "Unknown transform_type: unknown. Supported transform_type are :camel, :lower_camel and :dash."
+      'Unknown transform_type: unknown. Supported transform_type are :camel, :lower_camel and :dash.',
+      err.message
     )
   end
 
@@ -143,5 +143,4 @@ class KeyTransformTest < Minitest::Test
       UserResourceCamel.new(@user).serialize
     )
   end
-
 end

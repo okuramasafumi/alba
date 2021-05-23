@@ -64,27 +64,40 @@ module Alba
       def _key
         return @_key.to_s unless @_key == true && Alba.inferring
 
-        resource_name = self.class.name.demodulize.delete_suffix('Resource').underscore
-        key = collection? ? resource_name.pluralize : resource_name
-        transforming_root_key = @_transforming_root_key.nil? ? Alba.transforming_root_key : @_transforming_root_key
-        transforming_root_key ? transform_key(key) : key
+        transforming_root_key? ? transform_key(key_from_resource_name) : key_from_resource_name
+      end
+
+      def key_from_resource_name
+        collection? ? resource_name.pluralize : resource_name
+      end
+
+      def resource_name
+        self.class.name.demodulize.delete_suffix('Resource').underscore
+      end
+
+      def transforming_root_key?
+        @_transforming_root_key.nil? ? Alba.transforming_root_key : @_transforming_root_key
       end
 
       def converter
         lambda do |object|
           arrays = @_attributes.map do |key, attribute|
-            key = transform_key(key)
-            if attribute.is_a?(Array) # Conditional
-              conditional_attribute(object, key, attribute)
-            else
-              [key, fetch_attribute(object, attribute)]
-            end
+            key_and_attribute_body_from(object, key, attribute)
           rescue ::Alba::Error, FrozenError, TypeError
             raise
           rescue StandardError => e
             handle_error(e, object, key, attribute)
           end
           arrays.reject(&:empty?).to_h
+        end
+      end
+
+      def key_and_attribute_body_from(object, key, attribute)
+        key = transform_key(key)
+        if attribute.is_a?(Array) # Conditional
+          conditional_attribute(object, key, attribute)
+        else
+          [key, fetch_attribute(object, attribute)]
         end
       end
 
@@ -148,13 +161,13 @@ module Alba
       def typed_attribute(object, hash)
         attr_name = hash[:attr_name]
         type = hash[:type]
-        type_converter = hash[:type_converter]
         value, result = type_check(object, attr_name, type)
         return value if result
+
+        type_converter = hash[:type_converter]
         raise TypeError if !result && !type_converter
 
-        type_converter = type_converter_for(type) if type_converter == true
-        type_converter.call(value)
+        try_convert_type(type, value, type_converter)
       rescue TypeError
         raise TypeError, "Attribute #{attr_name} is expected to be #{type} but actually #{value.nil? ? 'nil' : value.class.name}."
       end
@@ -172,6 +185,11 @@ module Alba
                          raise Alba::UnsupportedType, "Unknown type: #{type}"
                        end
         [value, type_correct]
+      end
+
+      def try_convert_type(type, value, type_converter)
+        type_converter = type_converter_for(type) if type_converter == true
+        type_converter.call(value)
       end
 
       def type_converter_for(type)
@@ -226,10 +244,19 @@ module Alba
       # @param attrs_with_types [Hash] attributes with name in its key and type and optional type converter in its value
       def attributes(*attrs, if: nil, **attrs_with_types) # rubocop:disable Naming/MethodParameterName
         if_value = binding.local_variable_get(:if)
+        assign_attributes(attrs, if_value)
+        assign_attributes_with_types(attrs_with_types, if_value)
+      end
+
+      def assign_attributes(attrs, if_value)
         attrs.each do |attr_name|
           attr = if_value ? [attr_name.to_sym, if_value] : attr_name.to_sym
           @_attributes[attr_name.to_sym] = attr
         end
+      end
+      private :assign_attributes
+
+      def assign_attributes_with_types(attrs_with_types, if_value)
         attrs_with_types.each do |attr_name, type_and_converter|
           attr_name = attr_name.to_sym
           type, type_converter = type_and_converter
@@ -238,6 +265,7 @@ module Alba
           @_attributes[attr_name] = attr
         end
       end
+      private :assign_attributes_with_types
 
       # Set an attribute with the given block
       #

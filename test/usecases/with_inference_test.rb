@@ -65,7 +65,7 @@ class WithInferenceTest < Minitest::Test
     Alba.enable_inference!
     @user = User.new(1)
     @user.articles << Article.new(1, 'The title')
-    @bank_account = BankAccount.new(123456789)
+    @bank_account = BankAccount.new(123_456_789)
   end
 
   def teardown
