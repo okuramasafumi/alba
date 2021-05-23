@@ -239,10 +239,19 @@ module Alba
       # @param attrs_with_types [Hash] attributes with name in its key and type and optional type converter in its value
       def attributes(*attrs, if: nil, **attrs_with_types) # rubocop:disable Naming/MethodParameterName
         if_value = binding.local_variable_get(:if)
+        assign_attributes(attrs, if_value)
+        assign_attributes_with_types(attrs_with_types, if_value)
+      end
+
+      def assign_attributes(attrs, if_value)
         attrs.each do |attr_name|
           attr = if_value ? [attr_name.to_sym, if_value] : attr_name.to_sym
           @_attributes[attr_name.to_sym] = attr
         end
+      end
+      private :assign_attributes
+
+      def assign_attributes_with_types(attrs_with_types, if_value)
         attrs_with_types.each do |attr_name, type_and_converter|
           attr_name = attr_name.to_sym
           type, type_converter = type_and_converter
@@ -251,6 +260,7 @@ module Alba
           @_attributes[attr_name] = attr
         end
       end
+      private :assign_attributes_with_types
 
       # Set an attribute with the given block
       #
