@@ -104,7 +104,7 @@ module Alba
       def conditional_attribute(object, key, attribute)
         condition = attribute.last
         arity = condition.arity
-        return [] if arity <= 1 && !condition.call(object)
+        return [] if arity <= 1 && !instance_exec(object, &condition)
 
         fetched_attribute = fetch_attribute(object, attribute.first)
         attr = if attribute.first.is_a?(Alba::Association)
@@ -112,7 +112,7 @@ module Alba
                else
                  fetched_attribute
                end
-        return [] if arity >= 2 && !condition.call(object, attr)
+        return [] if arity >= 2 && !instance_exec(object, attr, &condition)
 
         [key, fetched_attribute]
       end

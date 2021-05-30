@@ -74,6 +74,14 @@ class ConditionalAttributesTest < MiniTest::Test
     attributes :name, if: proc { |_user| print 'foo' or true }
   end
 
+  class UserResource8 < UserResource
+    attributes :name, if: proc { !!params[:should_have_name] }
+  end
+
+  class UserResource9 < UserResource
+    attributes :name, if: proc { |_user, _name| !!params[:should_have_name] }
+  end
+
   def setup
     @user = User.new(1, 'Masafumi OKURA')
     profile = Profile.new(1, 'test@example.com')
@@ -141,5 +149,35 @@ class ConditionalAttributesTest < MiniTest::Test
 
   def test_conditional_attribute_with_if_with_one_parameter_yields_only_once
     assert_output('foo') { UserResource7.new(@user).serialize }
+  end
+
+  def test_conditional_attributes_with_params_in_if_without_block_parameters
+    assert_equal(
+      '{"id":1,"name":"Masafumi OKURA"}',
+      UserResource8.new(@user, params: {should_have_name: true}).serialize
+    )
+    assert_equal(
+      '{"id":1}',
+      UserResource8.new(@user, params: {should_have_name: false}).serialize
+    )
+    assert_equal(
+      '{"id":1}',
+      UserResource8.new(@user).serialize
+    )
+  end
+
+  def test_conditional_attributes_with_params_in_if_with_block_parameters
+    assert_equal(
+      '{"id":1,"name":"Masafumi OKURA"}',
+      UserResource9.new(@user, params: {should_have_name: true}).serialize
+    )
+    assert_equal(
+      '{"id":1}',
+      UserResource9.new(@user, params: {should_have_name: false}).serialize
+    )
+    assert_equal(
+      '{"id":1}',
+      UserResource9.new(@user).serialize
+    )
   end
 end
