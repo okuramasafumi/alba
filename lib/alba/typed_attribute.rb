@@ -16,9 +16,7 @@ module Alba
       value, result = check(object)
       return value if result
 
-      raise TypeError if !result && !@converter
-
-      @converter.call(value)
+      @converter ? @converter.call(value) : raise(TypeError)
     rescue TypeError
       raise TypeError, "Attribute #{@name} is expected to be #{@type} but actually #{value.nil? ? 'nil' : value.class.name}."
     end
