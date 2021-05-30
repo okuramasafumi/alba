@@ -20,7 +20,7 @@ module Alba
       value, result = check(object)
       result ? value : @converter.call(value)
     rescue TypeError
-      raise TypeError, "Attribute #{@name} is expected to be #{@type} but actually #{value.nil? ? 'nil' : value.class.name}."
+      raise TypeError, "Attribute #{@name} is expected to be #{@type} but actually #{display_value_for(value)}."
     end
 
     private
@@ -55,6 +55,10 @@ module Alba
 
     def null_converter
       ->(_) { raise TypeError }
+    end
+
+    def display_value_for(value)
+      value.nil? ? 'nil' : value.class.name
     end
   end
 end
