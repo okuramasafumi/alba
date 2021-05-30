@@ -1,6 +1,7 @@
 require_relative 'one'
 require_relative 'many'
 require_relative 'key_transform_factory'
+require_relative 'typed_attribute'
 
 module Alba
   # This module represents what should be serialized
@@ -151,57 +152,10 @@ module Alba
           return unless within
 
           attribute.to_hash(object, params: params, within: within)
-        when Hash # Typed Attribute
-          typed_attribute(object, attribute)
+        when TypedAttribute
+          attribute.value(object)
         else
           raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
-        end
-      end
-
-      def typed_attribute(object, hash)
-        attr_name = hash[:attr_name]
-        type = hash[:type]
-        value, result = type_check(object, attr_name, type)
-        return value if result
-
-        type_converter = hash[:type_converter]
-        raise TypeError if !result && !type_converter
-
-        try_convert_type(type, value, type_converter)
-      rescue TypeError
-        raise TypeError, "Attribute #{attr_name} is expected to be #{type} but actually #{value.nil? ? 'nil' : value.class.name}."
-      end
-
-      def type_check(object, attr_name, type)
-        value = object.public_send(attr_name)
-        type_correct = case type
-                       when :String, ->(klass) { klass == String }
-                         value.is_a?(String)
-                       when :Integer, ->(klass) { klass == Integer }
-                         value.is_a?(Integer)
-                       when :Boolean
-                         [true, false].include?(attr_name)
-                       else
-                         raise Alba::UnsupportedType, "Unknown type: #{type}"
-                       end
-        [value, type_correct]
-      end
-
-      def try_convert_type(type, value, type_converter)
-        type_converter = type_converter_for(type) if type_converter == true
-        type_converter.call(value)
-      end
-
-      def type_converter_for(type)
-        case type
-        when :String, ->(klass) { klass == String }
-          ->(object) { object.to_s }
-        when :Integer, ->(klass) { klass == Integer }
-          ->(object) { Integer(object) }
-        when :Boolean
-          ->(object) { !!object }
-        else
-          raise Alba::UnsupportedType, "Unknown type: #{type}"
         end
       end
 
@@ -260,7 +214,7 @@ module Alba
         attrs_with_types.each do |attr_name, type_and_converter|
           attr_name = attr_name.to_sym
           type, type_converter = type_and_converter
-          typed_attr = {attr_name: attr_name, type: type, type_converter: type_converter}
+          typed_attr = TypedAttribute.new(name: attr_name, type: type, converter: type_converter)
           attr = if_value ? [typed_attr, if_value] : typed_attr
           @_attributes[attr_name] = attr
         end
