@@ -7,16 +7,18 @@ module Alba
     def initialize(name:, type:, converter:)
       @name = name
       @type = type
-      @converter = converter == true ? default_converter : converter
+      @converter = case converter
+                   when true then default_converter
+                   when false, nil then null_converter
+                   else converter
+                   end
     end
 
     # @param object [Object] target to check and convert type with
     # @return [String, Integer, Boolean] type-checked or type-converted object
     def value(object)
       value, result = check(object)
-      return value if result
-
-      @converter ? @converter.call(value) : raise(TypeError)
+      result ? value : @converter.call(value)
     rescue TypeError
       raise TypeError, "Attribute #{@name} is expected to be #{@type} but actually #{value.nil? ? 'nil' : value.class.name}."
     end
@@ -49,6 +51,10 @@ module Alba
       else
         raise Alba::UnsupportedType, "Unknown type: #{@type}"
       end
+    end
+
+    def null_converter
+      ->(_) { raise TypeError }
     end
   end
 end
