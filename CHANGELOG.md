@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] 2021-05-31
+
+- [Perf] Improve performance for `many` [641d8f9]
+  - https://github.com/okuramasafumi/alba/pull/125
+- [Feat] Add custom inflector feature (#126) [ad73291]
+  - https://github.com/okuramasafumi/alba/pull/126
+  - Thank you @wuarmin !
+- [Feat] Support params in if condition [6e9915e]
+  - https://github.com/okuramasafumi/alba/pull/128
+- [Fix] fundamentally broken "circular association control" [fbbc9a1]
+  - https://github.com/okuramasafumi/alba/pull/130
+
 ## [1.2.0] 2021-05-09
 
 - [Fix] multiple word key inference [6c18e73]
