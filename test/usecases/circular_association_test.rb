@@ -123,44 +123,62 @@ class CircularAssociationTest < Minitest::Test
 
   def test_within_option_works_for_serialize
     book = @books.sample
-    BookResource.new(book, within: {book: {authors: :books, genre: :books}}).serialize
-    assert true # No Error
+    result = JSON.parse(BookResource.new(book, within: {authors: :books, genre: :books}).serialize)
+    assert result['book']['authors'][0]['books']
+    assert books = result.dig('book', 'genre', 'books')
+    refute books.first['authors']
+  end
+
+  def test_within_option_that_deeply_nested
+    book = @books.sample
+    result = JSON.parse(BookResource.new(book, within: {authors: {books: {authors: :books}}, genre: :books}).serialize)
+    assert result['book']['authors'][0]['books'][0]['authors'][0]['books']
+    refute result['book']['authors'][0]['books'][0]['authors'][0]['books'][0]['authors']
+  end
+
+  def test_within_ignores_typo
+    book = @books.sample
+    result = JSON.parse(BookResource.new(book, within: {authors: :boks, genre: :boks}).serialize)
+    assert result['book']['authors']
+    refute result['book']['authors'][0]['books']
+    refute result.dig('book', 'genre', 'books')
   end
 
   def test_within_option_with_nil_value_works_for_serialize
     book = @books.sample
-    BookResource.new(book, within: nil).serialize
-    assert true # No Error
+    result = JSON.parse(BookResource.new(book, within: nil).serialize)
+    assert result['book']
+    refute result.dig('book', 'authors')
   end
 
   def test_within_option_with_false_value_works_for_serialize
     book = @books.sample
-    BookResource.new(book, within: false).serialize
-    assert true # No Error
-  end
-
-  def test_within_option_works_for_serializable_hash
-    book = @books.sample
-    BookResource.new(book, within: {book: {authors: :books, genre: :books}}).serializable_hash
-    assert true # No Error
+    result = JSON.parse(BookResource.new(book, within: false).serialize)
+    assert result['book']
+    refute result.dig('book', 'authors')
   end
 
   def test_within_option_works_for_serialize_with_collection
     books = @books.sample(3)
-    BookResource.new(books, within: {book: {authors: :books, genre: :books}}).serialize
-    assert true # No Error
-  end
-
-  def test_within_option_with_nil_end_works_for_serialize
-    book = @books.sample
-    BookResource.new(book, within: {book: {authors: nil, genre: nil}}).serialize
-    assert true # No Error
+    result = JSON.parse(BookResource.new(books, within: {authors: :books, genre: :books}).serialize(key: :books))
+    assert books = result['books']
+    assert books[0]['authors'][0]['books']
+    refute books[0]['authors'][0]['books'][0]['authors']
   end
 
   def test_within_option_with_array_end_works_for_serialize
     book = @books.sample
-    BookResource.new(book, within: {book: [:authors, :genre]}).serialize
-    assert true # No Error
+    result = JSON.parse(BookResource.new(book, within: [:authors, :genre]).serialize)
+    assert authors = result.dig('book', 'authors')
+    refute authors[0]['books']
+    refute result.dig('book', 'genre', 'books')
+  end
+
+  def test_within_option_with_array_end_that_does_not_include_all_associations
+    book = @books.sample
+    result = JSON.parse(BookResource.new(book, within: [:authors]).serialize)
+    assert result['book']['authors']
+    refute result['book']['genre']
   end
 
   def test_within_option_with_invalid_type

@@ -148,7 +148,7 @@ module Alba
         when Proc
           instance_exec(object, &attribute)
         when Alba::One, Alba::Many
-          within = check_within
+          within = check_within(attribute.name.to_sym)
           return unless within
 
           attribute.to_hash(object, params: params, within: within)
@@ -159,16 +159,16 @@ module Alba
         end
       end
 
-      def check_within
+      def check_within(association_name)
         case @within
         when WITHIN_DEFAULT # Default value, doesn't check within tree
           WITHIN_DEFAULT
         when Hash # Traverse within tree
-          @within.fetch(_key.to_sym, nil)
+          @within.fetch(association_name, nil)
         when Array # within tree ends with Array
-          @within.find { |item| item.to_sym == _key.to_sym } # Check if at least one item in the array matches current resource
+          @within.find { |item| item.to_sym == association_name }
         when Symbol # within tree could end with Symbol
-          @within == _key.to_sym # Check if the symbol matches current resource
+          @within == association_name
         when nil, true, false # In these cases, Alba stops serialization here.
           false
         else
