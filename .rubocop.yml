@@ -21,6 +21,10 @@ AllCops:
 Bundler/GemComment:
   Enabled: false
 
+# Items in Gemfile is dev dependencies and we don't have to specify versions.
+Bundler/GemVersion:
+  Enabled: false
+
 # We'd like to write something like:
 #   assert_equal(
 #     expected,
