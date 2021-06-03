@@ -33,15 +33,10 @@ module Alba
       @resource = if @block
                     Alba.resource_class(&@block)
                   elsif Alba.inferring
-                    resource_class_with_nesting(nesting)
+                    Alba.infer_resource_class(@name, nesting: nesting)
                   else
                     raise ArgumentError, 'When Alba.inferring is false, either resource or block is required'
                   end
-    end
-
-    def resource_class_with_nesting(nesting)
-      const_parent = nesting.nil? ? Object : Object.const_get(nesting)
-      const_parent.const_get("#{ActiveSupport::Inflector.classify(@name)}Resource")
     end
   end
 end

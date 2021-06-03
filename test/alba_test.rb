@@ -155,4 +155,36 @@ class AlbaTest < Minitest::Test
       Alba.backend = :not_supported
     end
   end
+
+  class ArticleResource
+    include Alba::Resource
+
+    attributes :title, :body
+  end
+
+  class UserResource
+    include Alba::Resource
+
+    attributes :id
+
+    many :articles, resource: ArticleResource
+  end
+
+  def test_it_serializes_object_with_inferred_resource
+    assert_equal(
+      '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}',
+      Alba.serialize(@user)
+    )
+    assert_equal(
+      '{"user":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
+      Alba.serialize(@user, key: :user)
+    )
+  end
+
+  class Foo # rubocop:disable Lint/EmptyClass
+  end
+
+  def test_it_raises_error_when_inferred_resource_does_not_exist
+    assert_raises(NameError) { Alba.serialize(Foo.new) }
+  end
 end
