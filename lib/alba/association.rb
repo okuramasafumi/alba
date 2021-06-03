@@ -31,19 +31,12 @@ module Alba
 
     def assign_resource(nesting)
       @resource = if @block
-                    resource_class
+                    Alba.resource_class(&@block)
                   elsif Alba.inferring
                     resource_class_with_nesting(nesting)
                   else
                     raise ArgumentError, 'When Alba.inferring is false, either resource or block is required'
                   end
-    end
-
-    def resource_class
-      klass = Class.new
-      klass.include(Alba::Resource)
-      klass.class_eval(&@block)
-      klass
     end
 
     def resource_class_with_nesting(nesting)

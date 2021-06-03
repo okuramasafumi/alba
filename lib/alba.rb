@@ -37,10 +37,7 @@ module Alba
     def serialize(object, key: nil, &block)
       raise ArgumentError, 'Block required' unless block
 
-      klass = Class.new
-      klass.include(Alba::Resource)
-      klass.class_eval(&block)
-      resource = klass.new(object)
+      resource = resource_class(&block).new(object)
       resource.serialize(key: key)
     end
 
@@ -78,6 +75,15 @@ module Alba
     # Disable root key transformation
     def disable_root_key_transformation!
       @transforming_root_key = false
+    end
+
+    # @param block [Block] resource body
+    # @return [Class<Alba::Resource>] resource class
+    def resource_class(&block)
+      klass = Class.new
+      klass.include(Alba::Resource)
+      klass.class_eval(&block)
+      klass
     end
 
     private
