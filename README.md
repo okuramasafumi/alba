@@ -403,6 +403,20 @@ user = User.new(1, nil, nil)
 UserResource.new(user).serialize # => '{"id":1}'
 ```
 
+### Default
+
+Alba doesn't support default value for attributes, but it's easy to set a default value.
+
+```ruby
+class FooResource
+  attribute :bar do |foo|
+    foo.bar || 'default bar'
+  end
+end
+```
+
+We believe this is clearer than using some (not implemented yet) DSL such as `default` because there are some conditions where default values should be applied (`nil`, `blank?`, `empty?` etc.)
+
 ### Inference
 
 After `Alba.enable_inference!` called, Alba tries to infer root key and association resource name.
