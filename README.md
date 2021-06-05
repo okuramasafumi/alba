@@ -199,6 +199,35 @@ UserResource.new(user).serialize
 # => '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}'
 ```
 
+You can define associations inline if you don't need a class for association.
+
+```ruby
+class ArticleResource
+  include Alba::Resource
+
+  attributes :title
+end
+
+class UserResource
+  include Alba::Resource
+
+  attributes :id
+
+  many :articles, resource: ArticleResource
+end
+
+# This class works the same as `UserResource`
+class AnotherUserResource
+  include Alba::Resource
+
+  attributes :id
+
+  many :articles do
+    attributes :title
+  end
+end
+```
+
 ### Inline definition with `Alba.serialize`
 
 `Alba.serialize` method is a shortcut to define everything inline.
