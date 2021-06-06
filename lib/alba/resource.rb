@@ -33,7 +33,7 @@ module Alba
 
       # @param object [Object] the object to be serialized
       # @param params [Hash] user-given Hash for arbitrary data
-      # @param within [Hash] determines what associations to be serialized. If not set, it serializes all associations.
+      # @param within [Object, nil, false, true] determines what associations to be serialized. If not set, it serializes all associations.
       def initialize(object, params: {}, within: WITHIN_DEFAULT)
         @object = object
         @params = params.freeze
@@ -43,7 +43,7 @@ module Alba
 
       # Serialize object into JSON string
       #
-      # @param key [Symbol]
+      # @param key [Symbol, nil, true]
       # @return [String] serialized JSON string
       def serialize(key: nil)
         key = key.nil? ? _key : key
@@ -194,7 +194,7 @@ module Alba
       # Set multiple attributes at once
       #
       # @param attrs [Array<String, Symbol>]
-      # @param if [Boolean] condition to decide if it should render these attributes
+      # @param if [Proc] condition to decide if it should render these attributes
       # @param attrs_with_types [Hash] attributes with name in its key and type and optional type converter in its value
       def attributes(*attrs, if: nil, **attrs_with_types) # rubocop:disable Naming/MethodParameterName
         if_value = binding.local_variable_get(:if)
@@ -237,7 +237,7 @@ module Alba
       #
       # @param name [String, Symbol]
       # @param condition [Proc]
-      # @param resource [Class<Alba::Resource>]
+      # @param resource [Class<Alba::Resource>, String] representing resource for this association
       # @param key [String, Symbol] used as key when given
       # @param options [Hash] option hash including `if` that is a  condition to render
       # @param block [Block]
@@ -253,7 +253,7 @@ module Alba
       #
       # @param name [String, Symbol]
       # @param condition [Proc]
-      # @param resource [Class<Alba::Resource>]
+      # @param resource [Class<Alba::Resource>, String] representing resource for this association
       # @param key [String, Symbol] used as key when given
       # @param options [Hash] option hash including `if` that is a  condition to render
       # @param block [Block]

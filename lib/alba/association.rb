@@ -4,9 +4,9 @@ module Alba
   class Association
     attr_reader :object, :name
 
-    # @param name [Symbol] name of the method to fetch association
-    # @param condition [Proc] a proc filtering data
-    # @param resource [Class<Alba::Resource>] a resource class for the association
+    # @param name [Symbol, String] name of the method to fetch association
+    # @param condition [Proc, nil] a proc filtering data
+    # @param resource [Class<Alba::Resource>, nil] a resource class for the association
     # @param block [Block] used to define resource when resource arg is absent
     def initialize(name:, condition: nil, resource: nil, nesting: nil, &block)
       @name = name
