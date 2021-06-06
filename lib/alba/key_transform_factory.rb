@@ -4,7 +4,7 @@ module Alba
     class << self
       # Create key transform function for given transform_type
       #
-      # @params transform_type [Symbol] transform type
+      # @param transform_type [Symbol] transform type
       # @return [Proc] transform function
       # @raise [Alba::Error] when transform_type is not supported
       def create(transform_type)

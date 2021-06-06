@@ -11,7 +11,7 @@ module Alba
 
     # Camelizes a key
     #
-    # @params key [String] key to be camelized
+    # @param key [String] key to be camelized
     # @return [String] camelized key
     def camelize(key)
       ActiveSupport::Inflector.camelize(key)
@@ -19,7 +19,7 @@ module Alba
 
     # Camelizes a key, 1st letter lowercase
     #
-    # @params key [String] key to be camelized
+    # @param key [String] key to be camelized
     # @return [String] camelized key
     def camelize_lower(key)
       ActiveSupport::Inflector.camelize(key, false)
@@ -27,7 +27,7 @@ module Alba
 
     # Dasherizes a key
     #
-    # @params key [String] key to be dasherized
+    # @param key [String] key to be dasherized
     # @return [String] dasherized key
     def dasherize(key)
       ActiveSupport::Inflector.dasherize(key)
