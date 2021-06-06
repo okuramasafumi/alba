@@ -265,13 +265,12 @@ class GenericFooResource
   attributes :id, :name, :body
 end
 
-class RestrictedFooResouce < GenericFooResource
+class RestrictedFooResource < GenericFooResource
   ignoring :id, :body
 end
 
-RestrictedFooResouce.new(foo).serialize
+RestrictedFooResource.new(foo).serialize
 # => '{"name":"my foo"}'
-end
 ```
 
 ### Key transformation
