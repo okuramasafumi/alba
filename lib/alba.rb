@@ -14,6 +14,8 @@ module Alba
 
   class << self
     attr_reader :backend, :encoder, :inferring, :_on_error, :transforming_root_key
+
+    # Accessor for inflector, a module responsible for incflecting strings
     attr_accessor :inflector
 
     # Set the backend, which actually serializes object into JSON
@@ -60,6 +62,9 @@ module Alba
     #
     # @param [Symbol] handler
     # @param [Block]
+    # @raise [ArgumentError] if both handler and block params exist
+    # @raise [ArgumentError] if both handler and block params don't exist
+    # @return [void]
     def on_error(handler = nil, &block)
       raise ArgumentError, 'You cannot specify error handler with both Symbol and block' if handler && block
       raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
