@@ -194,8 +194,10 @@ module Alba
       # Set multiple attributes at once
       #
       # @param attrs [Array<String, Symbol>]
-      # @param if [Proc] condition to decide if it should render these attributes
-      # @param attrs_with_types [Hash] attributes with name in its key and type and optional type converter in its value
+      # @param if [Proc] condition to decide if it should serialize these attributes
+      # @param attrs_with_types [Hash<[Symbol, String], [Array<Symbol, Proc>, Symbol]>]
+      #   attributes with name in its key and type and optional type converter in its value
+      # @return [void]
       def attributes(*attrs, if: nil, **attrs_with_types) # rubocop:disable Naming/MethodParameterName
         if_value = binding.local_variable_get(:if)
         assign_attributes(attrs, if_value)
@@ -224,9 +226,11 @@ module Alba
       # Set an attribute with the given block
       #
       # @param name [String, Symbol] key name
-      # @param options [Hash] option hash including `if` that is a  condition to render
+      # @param options [Hash<Symbol, Proc>]
+      # @option options [Proc] if a condition to decide if this attribute should be serialized
       # @param block [Block] the block called during serialization
       # @raise [ArgumentError] if block is absent
+      # @return [void]
       def attribute(name, **options, &block)
         raise ArgumentError, 'No block given in attribute method' unless block
 
@@ -235,12 +239,14 @@ module Alba
 
       # Set One association
       #
-      # @param name [String, Symbol]
-      # @param condition [Proc]
-      # @param resource [Class<Alba::Resource>, String] representing resource for this association
-      # @param key [String, Symbol] used as key when given
-      # @param options [Hash] option hash including `if` that is a  condition to render
+      # @param name [String, Symbol] name of the association, used as key when `key` param doesn't exist
+      # @param condition [Proc, nil] a Proc to modify the association
+      # @param resource [Class<Alba::Resource>, String, nil] representing resource for this association
+      # @param key [String, Symbol, nil] used as key when given
+      # @param options [Hash<Symbol, Proc>]
+      # @option options [Proc] if a condition to decide if this association should be serialized
       # @param block [Block]
+      # @return [void]
       # @see Alba::One#initialize
       def one(name, condition = nil, resource: nil, key: nil, **options, &block)
         nesting = self.name&.rpartition('::')&.first
@@ -251,12 +257,14 @@ module Alba
 
       # Set Many association
       #
-      # @param name [String, Symbol]
-      # @param condition [Proc]
-      # @param resource [Class<Alba::Resource>, String] representing resource for this association
-      # @param key [String, Symbol] used as key when given
-      # @param options [Hash] option hash including `if` that is a  condition to render
+      # @param name [String, Symbol] name of the association, used as key when `key` param doesn't exist
+      # @param condition [Proc, nil] a Proc to filter the collection
+      # @param resource [Class<Alba::Resource>, String, nil] representing resource for this association
+      # @param key [String, Symbol, nil] used as key when given
+      # @param options [Hash<Symbol, Proc>]
+      # @option options [Proc] if a condition to decide if this association should be serialized
       # @param block [Block]
+      # @return [void]
       # @see Alba::Many#initialize
       def many(name, condition = nil, resource: nil, key: nil, **options, &block)
         nesting = self.name&.rpartition('::')&.first
@@ -273,7 +281,6 @@ module Alba
       end
 
       # Set key to true
-      #
       def key!
         @_key = true
       end
@@ -298,9 +305,10 @@ module Alba
       end
 
       # Set error handler
+      # If this is set it's used as a error handler overriding global one
       #
-      # @param [Symbol] handler
-      # @param [Block]
+      # @param handler [Symbol] `:raise`, `:ignore` or `:nullify`
+      # @param block [Block]
       def on_error(handler = nil, &block)
         raise ArgumentError, 'You cannot specify error handler with both Symbol and block' if handler && block
         raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
