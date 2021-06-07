@@ -7,6 +7,7 @@ module Alba
     # @param name [Symbol, String] name of the method to fetch association
     # @param condition [Proc, nil] a proc filtering data
     # @param resource [Class<Alba::Resource>, nil] a resource class for the association
+    # @param nesting [String] a namespace where source class is inferred with
     # @param block [Block] used to define resource when resource arg is absent
     def initialize(name:, condition: nil, resource: nil, nesting: nil, &block)
       @name = name
