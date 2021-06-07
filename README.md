@@ -242,6 +242,13 @@ end
 # => '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}}'
 ```
 
+`Alba.serialize` can be used when you don't know what kind of object you serialize. For example:
+
+```ruby
+Alba.serialize(something)
+# => Same as `FooResource.new(something).serialize` when `something` is an instance of `Foo`.
+```
+
 Although this might be useful sometimes, it's generally recommended to define a class for Resource.
 
 ### Inheritance and Ignorance
