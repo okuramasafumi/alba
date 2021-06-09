@@ -28,12 +28,9 @@ module Alba
     def check(object)
       value = object.public_send(@name)
       type_correct = case @type
-                     when :String, ->(klass) { klass == String }
-                       value.is_a?(String)
-                     when :Integer, ->(klass) { klass == Integer }
-                       value.is_a?(Integer)
-                     when :Boolean
-                       [true, false].include?(value)
+                     when :String, ->(klass) { klass == String } then value.is_a?(String)
+                     when :Integer, ->(klass) { klass == Integer } then value.is_a?(Integer)
+                     when :Boolean then [true, false].include?(value)
                      else
                        raise Alba::UnsupportedType, "Unknown type: #{@type}"
                      end

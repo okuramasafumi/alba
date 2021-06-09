@@ -104,14 +104,10 @@ module Alba
 
     def set_encoder
       @encoder = case @backend
-                 when :oj, :oj_strict
-                   try_oj
-                 when :oj_rails
-                   try_oj(mode: :rails)
-                 when :active_support
-                   try_active_support
-                 when nil, :default, :json
-                   default_encoder
+                 when :oj, :oj_strict then try_oj
+                 when :oj_rails then try_oj(mode: :rails)
+                 when :active_support then try_active_support
+                 when nil, :default, :json then default_encoder
                  else
                    raise Alba::UnsupportedBackend, "Unsupported backend, #{backend}"
                  end

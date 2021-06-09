@@ -105,14 +105,11 @@ module Alba
       def conditional_attribute(object, key, attribute)
         condition = attribute.last
         arity = condition.arity
+        # We can return early to skip fetch_attribute
         return [] if arity <= 1 && !instance_exec(object, &condition)
 
         fetched_attribute = fetch_attribute(object, attribute.first)
-        attr = if attribute.first.is_a?(Alba::Association)
-                 attribute.first.object
-               else
-                 fetched_attribute
-               end
+        attr = attribute.first.is_a?(Alba::Association) ? attribute.first.object : fetched_attribute
         return [] if arity >= 2 && !instance_exec(object, attr, &condition)
 
         [key, fetched_attribute]
@@ -121,14 +118,10 @@ module Alba
       def handle_error(error, object, key, attribute)
         on_error = @_on_error || Alba._on_error
         case on_error
-        when :raise, nil
-          raise
-        when :nullify
-          [key, nil]
-        when :ignore
-          []
-        when Proc
-          on_error.call(error, object, key, attribute, self.class)
+        when :raise, nil then raise
+        when :nullify then [key, nil]
+        when :ignore then []
+        when Proc then on_error.call(error, object, key, attribute, self.class)
         else
           raise ::Alba::Error, "Unknown on_error: #{on_error.inspect}"
         end
@@ -143,34 +136,27 @@ module Alba
 
       def fetch_attribute(object, attribute)
         case attribute
-        when Symbol
-          object.public_send attribute
-        when Proc
-          instance_exec(object, &attribute)
-        when Alba::One, Alba::Many
-          within = check_within(attribute.name.to_sym)
-          return unless within
-
-          attribute.to_hash(object, params: params, within: within)
-        when TypedAttribute
-          attribute.value(object)
+        when Symbol then object.public_send attribute
+        when Proc then instance_exec(object, &attribute)
+        when Alba::One, Alba::Many then yield_if_within(attribute.name.to_sym) { |within| attribute.to_hash(object, params: params, within: within) }
+        when TypedAttribute then attribute.value(object)
         else
           raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
         end
       end
 
+      def yield_if_within(association_name)
+        within = check_within(association_name)
+        yield(within) if within
+      end
+
       def check_within(association_name)
         case @within
-        when WITHIN_DEFAULT # Default value, doesn't check within tree
-          WITHIN_DEFAULT
-        when Hash # Traverse within tree
-          @within.fetch(association_name, nil)
-        when Array # within tree ends with Array
-          @within.find { |item| item.to_sym == association_name }
-        when Symbol # within tree could end with Symbol
-          @within == association_name
-        when nil, true, false # In these cases, Alba stops serialization here.
-          false
+        when WITHIN_DEFAULT then WITHIN_DEFAULT # Default value, doesn't check within tree
+        when Hash then @within.fetch(association_name, nil) # Traverse within tree
+        when Array then @within.find { |item| item.to_sym == association_name }
+        when Symbol then @within == association_name
+        when nil, true, false then false # Stop here
         else
           raise Alba::Error, "Unknown type for within option: #{@within.class}"
         end
