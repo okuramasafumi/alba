@@ -44,9 +44,6 @@ Metrics:
   Exclude:
     - 'test/**/*.rb'
 
-Metrics/MethodLength:
-  Max: 15
-
 # `Resource` module is a core module and its length tends to be long...
 Metrics/ModuleLength:
   Exclude:
@@ -55,7 +52,6 @@ Metrics/ModuleLength:
 # Resource class includes DSLs, which tend to accept long list of parameters
 Metrics/ParameterLists:
   Exclude:
-    - 'lib/alba/resource.rb'
     - 'test/**/*.rb'
 
 # We need to eval resource code to test errors on resource classes
@@ -81,7 +77,10 @@ Style/InlineComment:
   Enabled: false
 
 Style/MethodCallWithArgsParentheses:
-  Enabled: false
+  IgnoredMethods: ['require', 'require_relative', 'include', 'extend', 'puts', 'p', 'warn', 'raise', 'send', 'public_send']
+  Exclude:
+    # There are so many `attributes` call without parenthese and that's absolutely fine
+    - 'test/**/*.rb'
 
 # There are so many cases we just want `if` expression!
 Style/MissingElse:
