@@ -52,7 +52,6 @@ Metrics/ModuleLength:
 # Resource class includes DSLs, which tend to accept long list of parameters
 Metrics/ParameterLists:
   Exclude:
-    - 'lib/alba/resource.rb'
     - 'test/**/*.rb'
 
 # We need to eval resource code to test errors on resource classes

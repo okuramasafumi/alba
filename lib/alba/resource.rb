@@ -177,6 +177,9 @@ module Alba
         DSLS.each_key { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}").clone) }
       end
 
+      # Defining methods for DSLs and disable parameter number check since for users' benefits increasing params is fine
+      # rubocop:disable Metrics/ParameterLists
+
       # Set multiple attributes at once
       #
       # @param attrs [Array<String, Symbol>]
@@ -301,6 +304,8 @@ module Alba
 
         @_on_error = handler || block
       end
+
+      # rubocop:enable Metrics/ParameterLists
     end
   end
 end
