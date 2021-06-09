@@ -44,9 +44,6 @@ Metrics:
   Exclude:
     - 'test/**/*.rb'
 
-Metrics/MethodLength:
-  Max: 15
-
 # `Resource` module is a core module and its length tends to be long...
 Metrics/ModuleLength:
   Exclude:
