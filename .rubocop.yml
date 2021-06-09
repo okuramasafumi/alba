@@ -13,6 +13,7 @@ AllCops:
     - 'Rakefile'
     - 'alba.gemspec'
     - 'benchmark/**/*.rb'
+    - 'script/**/*.rb'
   NewCops: enable
   EnabledByDefault: true
   TargetRubyVersion: 2.5
