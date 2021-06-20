@@ -37,7 +37,7 @@ class WithInferenceTest < Minitest::Test
   class UserResource
     include Alba::Resource
 
-    key!
+    root_key!
 
     attributes :id
 
@@ -47,7 +47,7 @@ class WithInferenceTest < Minitest::Test
   class BankAccountResource
     include Alba::Resource
 
-    key!
+    root_key!
 
     attributes :account_number
   end

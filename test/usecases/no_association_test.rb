@@ -87,6 +87,17 @@ class NoAssociationTest < MiniTest::Test
     end
   end
 
+  class UserResourceWithRootKey < UserResource
+    root_key :user, :users
+  end
+
+  def test_it_returns_json_with_second_argument_to_root_key_as_key_for_collection
+    assert_equal(
+      '{"users":[{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}]}',
+      UserResourceWithRootKey.new([@user]).serialize
+    )
+  end
+
   def test_it_returns_correct_json_with_with_option_in_serialize_method
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
