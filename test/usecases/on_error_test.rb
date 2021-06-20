@@ -22,7 +22,7 @@ class OnErrorTest < MiniTest::Test
   class UserResource
     include Alba::Resource
 
-    key :user
+    root_key :user
 
     attributes :id, :name, :email
   end

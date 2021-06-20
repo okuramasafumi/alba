@@ -24,7 +24,7 @@ class NoAssociationTest < MiniTest::Test
   end
 
   class UserResourceWithKeyOnly < UserResource
-    key :user
+    root_key :user
   end
 
   def setup
@@ -144,7 +144,7 @@ class NoAssociationTest < MiniTest::Test
   class UserResourceWithKey
     include Alba::Resource
     attributes :id
-    key :not_user
+    root_key :not_user
   end
 
   def test_serializer_key_overwrites_resource_key

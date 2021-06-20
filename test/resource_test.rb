@@ -16,7 +16,7 @@ class ResourceTest < MiniTest::Test
 
   class FooResource
     include Alba::Resource
-    key :foo
+    root_key :foo
     attributes :id
     many :bars, resource: BarResource
   end

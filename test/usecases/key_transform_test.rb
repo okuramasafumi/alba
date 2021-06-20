@@ -40,7 +40,7 @@ class KeyTransformTest < Minitest::Test
   class BankAccountResource
     include Alba::Resource
 
-    key!
+    root_key!
 
     attributes :account_number
     transform_keys :dash

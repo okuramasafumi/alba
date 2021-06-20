@@ -59,7 +59,7 @@ class CircularAssociationTest < Minitest::Test
   class AuthorResource
     include Alba::Resource
 
-    key!
+    root_key!
 
     attributes :id, :first_name, :last_name
     has_many :books, resource: 'CircularAssociationTest::BookResource'
@@ -68,7 +68,7 @@ class CircularAssociationTest < Minitest::Test
   class GenreResource
     include Alba::Resource
 
-    key!
+    root_key!
 
     attributes :id, :title, :description
     has_many :books, resource: 'CircularAssociationTest::BookResource'
@@ -77,7 +77,7 @@ class CircularAssociationTest < Minitest::Test
   class BookResource
     include Alba::Resource
 
-    key!
+    root_key!
 
     attributes :id, :title, :description, :published_at
     has_many :authors, resource: 'CircularAssociationTest::AuthorResource'
