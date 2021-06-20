@@ -265,12 +265,30 @@ module Alba
       # Set key
       #
       # @param key [String, Symbol]
+      # @deprecated Use {#root_key} instead
       def key(key)
+        warn '[DEPRECATION] `key` is deprecated, use `root_key` instead.'
         @_key = key.respond_to?(:to_sym) ? key.to_sym : key
       end
 
+      # Set root key
+      #
+      # @param key [String, Symbol]
+      # @raise [NoMethodError] when key doesn't respond to `to_sym` method
+      def root_key(key)
+        @_key = key.to_sym
+      end
+
       # Set key to true
+      #
+      # @deprecated Use {#root_key!} instead
       def key!
+        warn '[DEPRECATION] `key!` is deprecated, use `root_key!` instead.'
+        @_key = true
+      end
+
+      # Set root key to true
+      def root_key!
         @_key = true
       end
 

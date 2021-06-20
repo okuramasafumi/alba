@@ -47,6 +47,46 @@ class NoAssociationTest < MiniTest::Test
     )
   end
 
+  def test_it_prints_warnings_when_key_is_called
+    assert_output('', "[DEPRECATION] `key` is deprecated, use `root_key` instead.\n") do
+      Class.new do
+        include Alba::Resource
+
+        key :foo
+      end
+    end
+  end
+
+  def test_it_prints_warnings_when_key_bang_is_called
+    assert_output('', "[DEPRECATION] `key!` is deprecated, use `root_key!` instead.\n") do
+      Class.new do
+        include Alba::Resource
+
+        key!
+      end
+    end
+  end
+
+  def test_it_does_not_print_warnings_when_root_key_is_called
+    assert_silent do
+      Class.new do
+        include Alba::Resource
+
+        root_key :foo
+      end
+    end
+  end
+
+  def test_it_does_not_print_warnings_when_root_key_bang_is_called
+    assert_silent do
+      Class.new do
+        include Alba::Resource
+
+        root_key!
+      end
+    end
+  end
+
   def test_it_returns_correct_json_with_with_option_in_serialize_method
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
