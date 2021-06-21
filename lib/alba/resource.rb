@@ -8,7 +8,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _transform_key_function: nil, _transforming_root_key: false, _on_error: nil}.freeze
+    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_key_function: nil, _transforming_root_key: false, _on_error: nil}.freeze # rubocop:disable Layout/LineLength
     private_constant :DSLS
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -45,11 +45,17 @@ module Alba
       #
       # @param key [Symbol, nil, true] DEPRECATED, use root_key instead
       # @param root_key [Symbol, nil, true]
+      # @param meta [Hash] metadata for this seialization
       # @return [String] serialized JSON string
-      def serialize(key: nil, root_key: nil)
+      def serialize(key: nil, root_key: nil, meta: {})
         warn '`key` option to `serialize` method is deprecated, use `root_key` instead.' if key
         key = key.nil? && root_key.nil? ? fetch_key : root_key || key
-        hash = key && key != '' ? {key.to_s => serializable_hash} : serializable_hash
+        hash = if key && key != ''
+                 h = {key.to_s => serializable_hash}
+                 hash_with_metadata(h, meta)
+               else
+                 serializable_hash
+               end
         Alba.encoder.call(hash)
       end
 
@@ -62,6 +68,13 @@ module Alba
       alias to_hash serializable_hash
 
       private
+
+      def hash_with_metadata(hash, meta)
+        base = @_meta ? instance_eval(&@_meta) : {}
+        metadata = base.merge(meta)
+        hash[:meta] = metadata unless metadata.empty?
+        hash
+      end
 
       def fetch_key
         collection? ? _key_for_collection : _key
@@ -303,6 +316,11 @@ module Alba
       def root_key!
         @_key = true
         @_key_for_collection = true
+      end
+
+      # Set metadata
+      def meta(&block)
+        @_meta = block
       end
 
       # Delete attributes
