@@ -294,6 +294,7 @@ module Alba
       def key!
         warn '[DEPRECATION] `key!` is deprecated, use `root_key!` instead.'
         @_key = true
+        @_key_for_collection = true
       end
 
       # Set root key to true
