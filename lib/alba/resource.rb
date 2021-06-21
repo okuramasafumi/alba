@@ -43,10 +43,12 @@ module Alba
 
       # Serialize object into JSON string
       #
-      # @param key [Symbol, nil, true]
+      # @param key [Symbol, nil, true] DEPRECATED, use root_key instead
+      # @param root_key [Symbol, nil, true]
       # @return [String] serialized JSON string
-      def serialize(key: nil)
-        key = key.nil? ? fetch_key : key
+      def serialize(key: nil, root_key: nil)
+        warn '`key` option to `serialize` method is deprecated, use `root_key` instead.' if key
+        key = key.nil? && root_key.nil? ? fetch_key : root_key || key
         hash = key && key != '' ? {key.to_s => serializable_hash} : serializable_hash
         Alba.encoder.call(hash)
       end

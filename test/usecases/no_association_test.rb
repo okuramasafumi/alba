@@ -98,18 +98,15 @@ class NoAssociationTest < MiniTest::Test
     )
   end
 
-  def test_it_returns_correct_json_with_with_option_in_serialize_method
+  def test_it_returns_correct_json_with_with_root_key_option_to_serialize_method
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource.new(@user).serialize(key: :user)
+      UserResource.new(@user).serialize(root_key: :user)
     )
   end
 
-  def test_it_returns_correct_json_with_with_option_in_serialize_method_while_overwriting_default_serializer
-    assert_equal(
-      '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource.new(@user).serialize(key: :user)
-    )
+  def test_it_prints_warnings_when_key_option_is_given_to_serialize
+    assert_output('', "`key` option to `serialize` method is deprecated, use `root_key` instead.\n") { UserResource.new(@user).serialize(key: :user) }
   end
 
   class UserResource2
@@ -123,21 +120,21 @@ class NoAssociationTest < MiniTest::Test
   def test_attribute_works_without_block_args
     assert_equal(
       '{"user":{"name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource2.new(@user).serialize(key: :user)
+      UserResource2.new(@user).serialize(root_key: :user)
     )
   end
 
   def test_serialiaze_method_with_option_as_proc
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource.new(@user).serialize(key: :user)
+      UserResource.new(@user).serialize(root_key: :user)
     )
   end
 
   def test_serialiaze_method_with_option_and_key_is_true
     assert_equal(
       '{"true":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource.new(@user).serialize(key: true)
+      UserResource.new(@user).serialize(root_key: true)
     )
   end
 
@@ -150,7 +147,7 @@ class NoAssociationTest < MiniTest::Test
   def test_serializer_key_overwrites_resource_key
     assert_equal(
       '{"user":{"id":1}}',
-      UserResourceWithKey.new(@user).serialize(key: :user)
+      UserResourceWithKey.new(@user).serialize(root_key: :user)
     )
   end
 

@@ -32,15 +32,17 @@ module Alba
     # Serialize the object with inline definitions
     #
     # @param object [Object] the object to be serialized
-    # @param key [Symbol]
+    # @param key [Symbol, nil, true] DEPRECATED, use root_key instead
+    # @param root_key [Symbol, nil, true]
     # @param block [Block] resource block
     # @return [String] serialized JSON string
     # @raise [ArgumentError] if block is absent or `with` argument's type is wrong
-    def serialize(object, key: nil, &block)
+    def serialize(object, key: nil, root_key: nil, &block)
+      warn '`key` option to `serialize` method is deprecated, use `root_key` instead.' if key
       klass = block ? resource_class(&block) : infer_resource_class(object.class.name)
 
       resource = klass.new(object)
-      resource.serialize(key: key)
+      resource.serialize(root_key: root_key || key)
     end
 
     # Enable inference for key and resource name

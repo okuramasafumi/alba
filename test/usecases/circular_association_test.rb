@@ -160,7 +160,7 @@ class CircularAssociationTest < Minitest::Test
 
   def test_within_option_works_for_serialize_with_collection
     books = @books.sample(3)
-    result = JSON.parse(BookResource.new(books, within: {authors: :books, genre: :books}).serialize(key: :books))
+    result = JSON.parse(BookResource.new(books, within: {authors: :books, genre: :books}).serialize(root_key: :books))
     assert books = result['books']
     assert books[0]['authors'][0]['books']
     refute books[0]['authors'][0]['books'][0]['authors']

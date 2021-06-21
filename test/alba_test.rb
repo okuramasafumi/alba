@@ -61,7 +61,7 @@ class AlbaTest < Minitest::Test
   def test_it_serializes_object_with_block_with_with_option
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
-      Alba.serialize(@user, key: :foo) do
+      Alba.serialize(@user, root_key: :foo) do
         attributes :id
         many :articles do
           attributes :title, :body
@@ -73,7 +73,7 @@ class AlbaTest < Minitest::Test
   def test_it_serializes_object_with_fully_inlined_definitions
     assert_equal(
       '{"foo":{"id":1,"profile":{"email":"test@example.com"},"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
-      Alba.serialize(@user, key: :foo) do
+      Alba.serialize(@user, root_key: :foo) do
         attributes :id
         one :profile do
           attributes :email
@@ -90,7 +90,7 @@ class AlbaTest < Minitest::Test
 
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
-      Alba.serialize(@user, key: :foo) do
+      Alba.serialize(@user, root_key: :foo) do
         attributes :id
         many :articles do
           attributes :title, :body
@@ -106,7 +106,7 @@ class AlbaTest < Minitest::Test
 
       assert_equal(
         '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
-        Alba.serialize(@user, key: :foo) do
+        Alba.serialize(@user, root_key: :foo) do
           attributes :id
           many :articles do
             attributes :title, :body
@@ -121,7 +121,7 @@ class AlbaTest < Minitest::Test
 
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
-      Alba.serialize(@user, key: :foo) do
+      Alba.serialize(@user, root_key: :foo) do
         attributes :id
         many :articles do
           attributes :title, :body
@@ -134,7 +134,7 @@ class AlbaTest < Minitest::Test
     Alba.backend = :oj_strict
     assert_equal(
       '{"foo":{"id":1}}',
-      Alba.serialize(@user, key: :foo) do
+      Alba.serialize(@user, root_key: :foo) do
         attributes :id
       end
     )
@@ -144,7 +144,7 @@ class AlbaTest < Minitest::Test
     Alba.backend = :oj_rails
     assert_equal(
       '{"foo":{"id":1}}',
-      Alba.serialize(@user, key: :foo) do
+      Alba.serialize(@user, root_key: :foo) do
         attributes :id
       end
     )
@@ -177,7 +177,7 @@ class AlbaTest < Minitest::Test
     )
     assert_equal(
       '{"user":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
-      Alba.serialize(@user, key: :user)
+      Alba.serialize(@user, root_key: :user)
     )
   end
 
