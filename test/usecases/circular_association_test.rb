@@ -59,7 +59,7 @@ class CircularAssociationTest < Minitest::Test
   class AuthorResource
     include Alba::Resource
 
-    key!
+    root_key!
 
     attributes :id, :first_name, :last_name
     has_many :books, resource: 'CircularAssociationTest::BookResource'
@@ -68,7 +68,7 @@ class CircularAssociationTest < Minitest::Test
   class GenreResource
     include Alba::Resource
 
-    key!
+    root_key!
 
     attributes :id, :title, :description
     has_many :books, resource: 'CircularAssociationTest::BookResource'
@@ -77,7 +77,7 @@ class CircularAssociationTest < Minitest::Test
   class BookResource
     include Alba::Resource
 
-    key!
+    root_key!
 
     attributes :id, :title, :description, :published_at
     has_many :authors, resource: 'CircularAssociationTest::AuthorResource'
@@ -160,7 +160,7 @@ class CircularAssociationTest < Minitest::Test
 
   def test_within_option_works_for_serialize_with_collection
     books = @books.sample(3)
-    result = JSON.parse(BookResource.new(books, within: {authors: :books, genre: :books}).serialize(key: :books))
+    result = JSON.parse(BookResource.new(books, within: {authors: :books, genre: :books}).serialize(root_key: :books))
     assert books = result['books']
     assert books[0]['authors'][0]['books']
     refute books[0]['authors'][0]['books'][0]['authors']

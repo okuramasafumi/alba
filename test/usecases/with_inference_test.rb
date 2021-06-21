@@ -37,7 +37,7 @@ class WithInferenceTest < Minitest::Test
   class UserResource
     include Alba::Resource
 
-    key!
+    root_key!
 
     attributes :id
 
@@ -47,7 +47,7 @@ class WithInferenceTest < Minitest::Test
   class BankAccountResource
     include Alba::Resource
 
-    key!
+    root_key!
 
     attributes :account_number
   end
@@ -112,7 +112,7 @@ class WithInferenceTest < Minitest::Test
   def test_it_prioritize_serialize_arg_with_key_bang
     assert_equal(
       '{"foo":{"id":1,"articles":[{"title":"The title"}]}}',
-      UserResource.new(@user).serialize(key: :foo)
+      UserResource.new(@user).serialize(root_key: :foo)
     )
   end
 

@@ -49,7 +49,7 @@ class CollectionTest < Minitest::Test
   def test_array
     assert_equal(
       '{"users":[{"id":1,"articles":[{"title":"Hello World!"}]},{"id":2,"articles":[{"title":"Super nice"}]}]}',
-      UserResource.new([@user1, @user2]).serialize(key: :users)
+      UserResource.new([@user1, @user2]).serialize(root_key: :users)
     )
   end
 

@@ -8,7 +8,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _transform_key_function: nil, _transforming_root_key: false, _on_error: nil}.freeze
+    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _transform_key_function: nil, _transforming_root_key: false, _on_error: nil}.freeze
     private_constant :DSLS
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -43,10 +43,12 @@ module Alba
 
       # Serialize object into JSON string
       #
-      # @param key [Symbol, nil, true]
+      # @param key [Symbol, nil, true] DEPRECATED, use root_key instead
+      # @param root_key [Symbol, nil, true]
       # @return [String] serialized JSON string
-      def serialize(key: nil)
-        key = key.nil? ? _key : key
+      def serialize(key: nil, root_key: nil)
+        warn '`key` option to `serialize` method is deprecated, use `root_key` instead.' if key
+        key = key.nil? && root_key.nil? ? fetch_key : root_key || key
         hash = key && key != '' ? {key.to_s => serializable_hash} : serializable_hash
         Alba.encoder.call(hash)
       end
@@ -61,15 +63,22 @@ module Alba
 
       private
 
+      def fetch_key
+        collection? ? _key_for_collection : _key
+      end
+
+      def _key_for_collection
+        return @_key_for_collection.to_s unless @_key_for_collection == true && Alba.inferring
+
+        key = resource_name.pluralize
+        transforming_root_key? ? transform_key(key) : key
+      end
+
       # @return [String]
       def _key
         return @_key.to_s unless @_key == true && Alba.inferring
 
-        transforming_root_key? ? transform_key(key_from_resource_name) : key_from_resource_name
-      end
-
-      def key_from_resource_name
-        collection? ? resource_name.pluralize : resource_name
+        transforming_root_key? ? transform_key(resource_name) : resource_name
       end
 
       def resource_name
@@ -265,13 +274,35 @@ module Alba
       # Set key
       #
       # @param key [String, Symbol]
+      # @deprecated Use {#root_key} instead
       def key(key)
+        warn '[DEPRECATION] `key` is deprecated, use `root_key` instead.'
         @_key = key.respond_to?(:to_sym) ? key.to_sym : key
       end
 
+      # Set root key
+      #
+      # @param key [String, Symbol]
+      # @param key_for_collection [String, Symbol]
+      # @raise [NoMethodError] when key doesn't respond to `to_sym` method
+      def root_key(key, key_for_collection = nil)
+        @_key = key.to_sym
+        @_key_for_collection = key_for_collection&.to_sym
+      end
+
       # Set key to true
+      #
+      # @deprecated Use {#root_key!} instead
       def key!
+        warn '[DEPRECATION] `key!` is deprecated, use `root_key!` instead.'
         @_key = true
+        @_key_for_collection = true
+      end
+
+      # Set root key to true
+      def root_key!
+        @_key = true
+        @_key_for_collection = true
       end
 
       # Delete attributes

@@ -37,7 +37,7 @@ class ParamsTest < MiniTest::Test
 
   class UserResource
     include Alba::Resource
-    key :user
+    root_key :user
 
     attributes :id, :name
 
@@ -68,7 +68,7 @@ class ParamsTest < MiniTest::Test
 
   class UserResource2
     include Alba::Resource
-    key :user
+    root_key :user
 
     attributes :id
 
