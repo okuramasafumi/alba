@@ -1,3 +1,4 @@
+require 'json'
 require_relative 'alba/version'
 require_relative 'alba/resource'
 
@@ -133,7 +134,6 @@ module Alba
 
     def default_encoder
       lambda do |hash|
-        require 'json'
         JSON.dump(hash)
       end
     end
