@@ -129,7 +129,7 @@ Alba.on_error :ignore
 
 For the details, see [Error handling section](#error-handling)
 
-### Simple serialization with key
+### Simple serialization with root key
 
 ```ruby
 class User
@@ -146,7 +146,7 @@ end
 class UserResource
   include Alba::Resource
 
-  key :user
+  root_key :user
 
   attributes :id, :name
 
@@ -243,7 +243,7 @@ end
 `Alba.serialize` method is a shortcut to define everything inline.
 
 ```ruby
-Alba.serialize(user, key: :foo) do
+Alba.serialize(user, root_key: :foo) do
   attributes :id
   many :articles do
     attributes :title, :body
@@ -325,7 +325,7 @@ UserResourceCamel.new(user).serialize
 You can also transform root key when:
 
 * `Alba.enable_inference!` is called
-* `key!` is called in Resource class
+* `root_key!` is called in Resource class
 * `root` option of `transform_keys` is set to true or `Alba.enable_root_key_transformation!` is called.
 
 ```ruby
@@ -342,7 +342,7 @@ end
 class BankAccountResource
   include Alba::Resource
 
-  key!
+  root_key!
 
   attributes :account_number
   transform_keys :dash, root: true
