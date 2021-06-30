@@ -156,6 +156,29 @@ class AlbaTest < Minitest::Test
     end
   end
 
+  def test_it_sets_encoder_directly
+    Alba.encoder = ->(hash) { JSON.generate(hash) }
+    assert_equal(
+      '{"foo":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
+      Alba.serialize(@user, root_key: :foo) do
+        attributes :id
+        many :articles do
+          attributes :title, :body
+        end
+      end
+    )
+    assert_equal(:custom, Alba.backend)
+  end
+
+  def test_it_raises_argument_error_when_encoder_is_not_following_spec
+    assert_raises(ArgumentError, 'Encoder must be a Proc accepting one argument') do
+      Alba.encoder = :does_not_work
+    end
+    assert_raises(ArgumentError, 'Encoder must be a Proc accepting one argument') do
+      Alba.encoder = -> {}
+    end
+  end
+
   class ArticleResource
     include Alba::Resource
 

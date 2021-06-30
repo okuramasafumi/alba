@@ -30,6 +30,18 @@ module Alba
       set_encoder
     end
 
+    # Set encoder, a Proc object that accepts an object and generates JSON from it
+    # Set backend as `:custom` which indicates no preset encoder is used
+    #
+    # @param encoder [Proc]
+    # @raise [ArgumentError] if given encoder is not a Proc or its arity is not one
+    def encoder=(encoder)
+      raise ArgumentError, 'Encoder must be a Proc accepting one argument' unless encoder.is_a?(Proc) && encoder.arity == 1
+
+      @encoder = encoder
+      @backend = :custom
+    end
+
     # Serialize the object with inline definitions
     #
     # @param object [Object] the object to be serialized
