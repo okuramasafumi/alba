@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] 2021-06-30
+
+- [Feat] Add a config method to set encoder directly
+- [Feat] Implement `meta` method and option for metadata
+- [Feat] Add `root_key` option to `Resource#serialize`
+- [Feat] Enable setting key for collection with `root_key`
+- [Feat] Add `Resource.root_key` and `Resource.root_key!`
+- [Feat] `Alba.serialize` now infers resource class
+
 ## [1.3.0] 2021-05-31
 
 - [Perf] Improve performance for `many` [641d8f9]
