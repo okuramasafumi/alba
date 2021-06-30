@@ -27,7 +27,7 @@ module Alba
     # @raise [Alba::UnsupportedBackend] if backend is not supported
     def backend=(backend)
       @backend = backend&.to_sym
-      set_encoder
+      set_encoder_from_backend
     end
 
     # Set encoder, a Proc object that accepts an object and generates JSON from it
@@ -117,7 +117,7 @@ module Alba
 
     private
 
-    def set_encoder
+    def set_encoder_from_backend
       @encoder = case @backend
                  when :oj, :oj_strict then try_oj
                  when :oj_rails then try_oj(mode: :rails)
