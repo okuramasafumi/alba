@@ -99,6 +99,16 @@ You can set a backend like this:
 Alba.backend = :oj
 ```
 
+#### Encoder configuration
+
+You can also set JSON encoder directly with a Proc.
+
+```ruby
+Alba.encoder = ->(object) { JSON.generate(object) }
+```
+
+You can consider setting a backend with Symbol as a shortcut to set encoder.
+
 #### Inference configuration
 
 You can enable inference feature using `enable_inference!` method.

@@ -1,3 +1,4 @@
+require 'json'
 require_relative 'alba/version'
 require_relative 'alba/resource'
 
@@ -26,7 +27,19 @@ module Alba
     # @raise [Alba::UnsupportedBackend] if backend is not supported
     def backend=(backend)
       @backend = backend&.to_sym
-      set_encoder
+      set_encoder_from_backend
+    end
+
+    # Set encoder, a Proc object that accepts an object and generates JSON from it
+    # Set backend as `:custom` which indicates no preset encoder is used
+    #
+    # @param encoder [Proc]
+    # @raise [ArgumentError] if given encoder is not a Proc or its arity is not one
+    def encoder=(encoder)
+      raise ArgumentError, 'Encoder must be a Proc accepting one argument' unless encoder.is_a?(Proc) && encoder.arity == 1
+
+      @encoder = encoder
+      @backend = :custom
     end
 
     # Serialize the object with inline definitions
@@ -104,7 +117,7 @@ module Alba
 
     private
 
-    def set_encoder
+    def set_encoder_from_backend
       @encoder = case @backend
                  when :oj, :oj_strict then try_oj
                  when :oj_rails then try_oj(mode: :rails)
@@ -133,7 +146,6 @@ module Alba
 
     def default_encoder
       lambda do |hash|
-        require 'json'
         JSON.dump(hash)
       end
     end
