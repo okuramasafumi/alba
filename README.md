@@ -560,6 +560,54 @@ Alba.on_error do |error, object, key, attribute, resource_class|
 end
 ```
 
+### Metadata
+
+You can set a metadata with `meta` DSL or `meta` option.
+
+```ruby
+class UserResource
+  include Alba::Resource
+
+  root_key :user, :users
+
+  attributes :id, :name
+
+  meta do
+    if object.is_a?(Enumerable)
+      {size: object.size}
+    else
+      {foo: :bar}
+    end
+  end
+end
+
+user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
+UserResource.new([user]).serialize
+# => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"meta":{"size":1}}'
+
+# You can merge metadata with `meta` option
+
+UserResource.new([user]).serialize(meta: {foo: :bar})
+# => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"meta":{"size":1,"foo":"bar"}}'
+
+# You can set metadata with `meta` option alone
+
+class UserResourceWithoutMeta
+  include Alba::Resource
+
+  root_key :user, :users
+
+  attributes :id, :name
+end
+
+UserResource.new([user]).serialize(meta: {foo: :bar})
+# => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"meta":{"foo":"bar"}}'
+```
+
+You can use `object` method to access the underlying object and `params` to access the params in `meta` block.
+
+Note that setting root key is required when setting a metadata.
+
 ### Circular associations control
 
 **Note that this feature works correctly since version 1.3. In previous versions it doesn't work as expected.**
