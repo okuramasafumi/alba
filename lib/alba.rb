@@ -14,7 +14,7 @@ module Alba
   class UnsupportedType < Error; end
 
   class << self
-    attr_reader :backend, :encoder, :inferring, :_on_error, :transforming_root_key
+    attr_reader :backend, :encoder, :inferring, :_on_error, :_on_nil, :transforming_root_key
 
     # Accessor for inflector, a module responsible for incflecting strings
     attr_accessor :inflector
@@ -85,6 +85,14 @@ module Alba
       raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
 
       @_on_error = handler || block
+    end
+
+    # Set nil handler
+    #
+    # @param block [Block]
+    # @return [void]
+    def on_nil(&block)
+      @_on_nil = block
     end
 
     # Enable root key transformation

@@ -65,6 +65,7 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Key transformation
 * Root key inference
 * Error handling
+* Nil handling
 * Resource name inflection based on association name
 * Circular associations control
 * [Experimental] Types for validation and conversion
@@ -568,6 +569,95 @@ Alba.on_error do |error, object, key, attribute, resource_class|
     [key, error.message]
   end
 end
+```
+
+### Nil handling
+
+Sometimes we want to convert `nil` to different values such as empty string. Alba provides a flexible way to handle `nil`.
+
+```ruby
+class User
+  attr_reader :id, :name, :age
+
+  def initialize(id, name = nil, age = nil)
+    @id = id
+    @name = name
+    @age = age
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  on_nil { '' }
+
+  root_key :user, :users
+
+  attributes :id, :name, :age
+end
+
+UserResource.new(User.new(1)).serialize
+# => '{"user":{"id":1,"name":"","age":""}}'
+```
+
+You can get various information via block parameters.
+
+```ruby
+class UserResource
+  include Alba::Resource
+
+  on_nil do |object, key|
+    if key == age
+      20
+    else
+      "User#{object.id}"
+    end
+  end
+
+  root_key :user, :users
+
+  attributes :id, :name, :age
+end
+
+UserResource.new(User.new(1)).serialize
+# => '{"user":{"id":1,"name":"User1","age":20}}'
+```
+
+You can also set global nil handler.
+
+```ruby
+Alba.on_nil { 'default name' }
+
+class Foo
+  attr_reader :name
+  def initialize(name)
+    @name = name
+  end
+end
+
+class FooResource
+  include Alba::Resource
+
+  key :foo
+
+  attributes :name
+end
+
+FooResource.new(Foo.new).serialize
+# => '{"foo":{"name":"default name"}}'
+
+class FooResource2
+  include Alba::Resource
+
+  key :foo
+
+  on_nil { '' } # This is applied instead of global handler
+
+  attributes :name
+end
+
+FooResource2.new(Foo.new).serialize
+# => '{"foo":{"name":""}}'
 ```
 
 ### Metadata

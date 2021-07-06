@@ -8,7 +8,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_key_function: nil, _transforming_root_key: false, _on_error: nil}.freeze # rubocop:disable Layout/LineLength
+    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_key_function: nil, _transforming_root_key: false, _on_error: nil, _on_nil: nil}.freeze # rubocop:disable Layout/LineLength
     private_constant :DSLS
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -120,7 +120,8 @@ module Alba
         if attribute.is_a?(Array) # Conditional
           conditional_attribute(object, key, attribute)
         else
-          [key, fetch_attribute(object, attribute)]
+          fetched_attribute = fetch_attribute(object, key, attribute)
+          [key, fetched_attribute]
         end
       end
 
@@ -130,7 +131,7 @@ module Alba
         # We can return early to skip fetch_attribute
         return [] if arity <= 1 && !instance_exec(object, &condition)
 
-        fetched_attribute = fetch_attribute(object, attribute.first)
+        fetched_attribute = fetch_attribute(object, key, attribute.first)
         attr = attribute.first.is_a?(Alba::Association) ? attribute.first.object : fetched_attribute
         return [] if arity >= 2 && !instance_exec(object, attr, &condition)
 
@@ -156,15 +157,20 @@ module Alba
         @_transform_key_function.call(key.to_s)
       end
 
-      def fetch_attribute(object, attribute)
-        case attribute
-        when Symbol then object.public_send attribute
-        when Proc then instance_exec(object, &attribute)
-        when Alba::One, Alba::Many then yield_if_within(attribute.name.to_sym) { |within| attribute.to_hash(object, params: params, within: within) }
-        when TypedAttribute then attribute.value(object)
-        else
-          raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
-        end
+      def fetch_attribute(object, key, attribute)
+        value = case attribute
+                when Symbol then object.public_send attribute
+                when Proc then instance_exec(object, &attribute)
+                when Alba::One, Alba::Many then yield_if_within(attribute.name.to_sym) { |within| attribute.to_hash(object, params: params, within: within) }
+                when TypedAttribute then attribute.value(object)
+                else
+                  raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
+                end
+        value.nil? && nil_handler ? instance_exec(object, key, attribute, &nil_handler) : value
+      end
+
+      def nil_handler
+        @nil_handler ||= (@_on_nil || Alba._on_nil)
       end
 
       def yield_if_within(association_name)
@@ -352,6 +358,13 @@ module Alba
         raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
 
         @_on_error = handler || block
+      end
+
+      # Set nil handler
+      #
+      # @param block [Block]
+      def on_nil(&block)
+        @_on_nil = block
       end
 
       # rubocop:enable Metrics/ParameterLists
