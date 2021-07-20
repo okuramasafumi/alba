@@ -62,8 +62,6 @@ class NilHandlerTest < Minitest::Test
   end
 
   def setup
-    Alba.on_nil { nil } # reset nil handler
-
     @user1 = User.new(1, 'User1')
     article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
     @user1.articles << article1
@@ -75,6 +73,10 @@ class NilHandlerTest < Minitest::Test
     profile2 = Profile.new(2, 'test2@example.com', 'John', 'Doe')
     @user2.profile = profile2
     @user3 = User.new(3, 'User3', 19)
+  end
+
+  def teardown
+    Alba.reset!
   end
 
   def test_without_nil_handler

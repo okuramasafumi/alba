@@ -123,6 +123,15 @@ module Alba
       const_parent.const_get("#{ActiveSupport::Inflector.classify(name)}Resource")
     end
 
+    # Reset config variables
+    # Useful for test cleanup
+    def reset!
+      @encoder = default_encoder
+      @_on_error = :raise
+      @_on_nil = nil
+      @transforming_root_key = false # TODO: This will be true since 2.0
+    end
+
     private
 
     def set_encoder_from_backend
@@ -159,7 +168,5 @@ module Alba
     end
   end
 
-  @encoder = default_encoder
-  @_on_error = :raise
-  @transforming_root_key = false # TODO: This will be true since 2.0
+  reset!
 end
