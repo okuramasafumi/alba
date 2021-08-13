@@ -18,6 +18,8 @@ gemfile(true) do
   gem "jbuilder"
   gem "jsonapi-serializer" # successor of fast_jsonapi
   gem "multi_json"
+  gem "panko_serializer"
+  gem "pg"
   gem "primalize"
   gem "oj"
   gem "representable"
@@ -27,7 +29,9 @@ end
 
 # --- Test data model setup ---
 
+require "pg"
 require "active_record"
+require "active_record/connection_adapters/postgresql_adapter"
 require "logger"
 require "oj"
 require "sqlite3"
@@ -218,6 +222,26 @@ class JsonApiSameFormatPostSerializer < JsonApiSameFormatSerializer
   end
 end
 
+# --- Panko serializers ---
+#
+
+require "panko_serializer"
+
+class PankoCommentSerializer < Panko::Serializer
+  attributes :id, :body
+end
+
+
+class PankoPostSerializer < Panko::Serializer
+  attributes :id, :body, :commenter_names
+
+  has_many :comments, serializer: PankoCommentSerializer
+
+  def commenter_names
+    object.comments.pluck(:name)
+  end
+end
+
 # --- Primalize serializers ---
 #
 class PrimalizeCommentResource < Primalize::Single
@@ -330,6 +354,7 @@ jbuilder = Proc.new do
 end
 jsonapi = proc { JsonApiStandardPostSerializer.new(posts).to_json }
 jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(posts).to_json }
+panko = proc { Panko::ArraySerializer.new(posts, each_serializer: PankoPostSerializer).to_json }
 primalize = proc { PrimalizePostsResource.new(posts: posts).to_json }
 rails = Proc.new do
   ActiveSupport::JSON.encode(posts.map{ |post| post.serializable_hash(include: :comments) })
@@ -348,6 +373,7 @@ puts "Serializer outputs ----------------------------------"
   jbuilder: jbuilder, # different order
   jsonapi: jsonapi, # nested JSON:API format
   jsonapi_same_format: jsonapi_same_format,
+  panko: panko,
   primalize: primalize,
   rails: rails,
   representable: representable,
@@ -365,6 +391,7 @@ Benchmark.ips do |x|
   x.report(:jbuilder, &jbuilder)
   x.report(:jsonapi, &jsonapi)
   x.report(:jsonapi_same_format, &jsonapi_same_format)
+  x.report(:panko, &panko)
   x.report(:primalize, &primalize)
   x.report(:rails, &rails)
   x.report(:representable, &representable)
@@ -383,6 +410,7 @@ Benchmark.memory do |x|
   x.report(:jbuilder, &jbuilder)
   x.report(:jsonapi, &jsonapi)
   x.report(:jsonapi_same_format, &jsonapi_same_format)
+  x.report(:panko, &panko)
   x.report(:primalize, &primalize)
   x.report(:rails, &rails)
   x.report(:representable, &representable)
