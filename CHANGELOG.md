@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Feat] Enable setting key for collection with `root_key`
 - [Feat] Add `Resource.root_key` and `Resource.root_key!`
 - [Feat] `Alba.serialize` now infers resource class
+- [Deprecated] `Resource.key` and `Resource.key!` are deprecated
 
 ## [1.3.0] 2021-05-31
 
