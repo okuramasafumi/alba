@@ -14,7 +14,7 @@ module Alba
   class UnsupportedType < Error; end
 
   class << self
-    attr_reader :backend, :encoder, :inferring, :_on_error, :transforming_root_key
+    attr_reader :backend, :encoder, :inferring, :_on_error, :_on_nil, :transforming_root_key
 
     # Accessor for inflector, a module responsible for incflecting strings
     attr_accessor :inflector
@@ -87,6 +87,14 @@ module Alba
       @_on_error = handler || block
     end
 
+    # Set nil handler
+    #
+    # @param block [Block]
+    # @return [void]
+    def on_nil(&block)
+      @_on_nil = block
+    end
+
     # Enable root key transformation
     def enable_root_key_transformation!
       @transforming_root_key = true
@@ -113,6 +121,15 @@ module Alba
       enable_inference!
       const_parent = nesting.nil? ? Object : Object.const_get(nesting)
       const_parent.const_get("#{ActiveSupport::Inflector.classify(name)}Resource")
+    end
+
+    # Reset config variables
+    # Useful for test cleanup
+    def reset!
+      @encoder = default_encoder
+      @_on_error = :raise
+      @_on_nil = nil
+      @transforming_root_key = false # TODO: This will be true since 2.0
     end
 
     private
@@ -151,7 +168,5 @@ module Alba
     end
   end
 
-  @encoder = default_encoder
-  @_on_error = :raise
-  @transforming_root_key = false # TODO: This will be true since 2.0
+  reset!
 end
