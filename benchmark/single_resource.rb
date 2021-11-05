@@ -16,6 +16,7 @@ gemfile(true) do
   gem "benchmark-memory"
   gem "blueprinter"
   gem "jbuilder"
+  gem "jserializer"
   gem "jsonapi-serializer" # successor of fast_jsonapi
   gem "multi_json"
   gem "panko_serializer"
@@ -158,6 +159,23 @@ class Comment
     end
   end
 end
+
+# --- Jserializer serializers ---
+
+require 'jserializer'
+
+class JserializerCommentSerializer < Jserializer::Base
+  attributes :id, :body
+end
+
+class JserializerPostSerializer < Jserializer::Base
+  attributes :id, :body, :commenter_names
+  has_many :comments, serializer: JserializerCommentSerializer
+  def commenter_names
+    object.commenters.pluck(:name)
+  end
+end
+
 
 # --- JSONAPI:Serializer serializers / (successor of fast_jsonapi) ---
 
@@ -332,6 +350,7 @@ end
 ams = Proc.new { AMSPostSerializer.new(post, {}).to_json }
 blueprinter = Proc.new { PostBlueprint.render(post) }
 jbuilder = Proc.new { post.to_builder.target! }
+jserializer = Proc.new { JserializerPostSerializer.new(post).to_json }
 jsonapi = proc { JsonApiStandardPostSerializer.new(post).to_json }
 jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(post).to_json }
 panko = proc { PankoPostSerializer.new.serialize_to_json(post) }
@@ -349,6 +368,7 @@ puts "Serializer outputs ----------------------------------"
   ams: ams,
   blueprinter: blueprinter,
   jbuilder: jbuilder, # different order
+  jserializer: jserializer,
   jsonapi: jsonapi, # nested JSON:API format
   jsonapi_same_format: jsonapi_same_format,
   panko: panko,
@@ -367,6 +387,7 @@ Benchmark.ips do |x|
   x.report(:ams, &ams)
   x.report(:blueprinter, &blueprinter)
   x.report(:jbuilder, &jbuilder)
+  x.report(:jserializer, &jserializer)
   x.report(:jsonapi, &jsonapi)
   x.report(:jsonapi_same_format, &jsonapi_same_format)
   x.report(:panko, &panko)
@@ -386,6 +407,7 @@ Benchmark.memory do |x|
   x.report(:ams, &ams)
   x.report(:blueprinter, &blueprinter)
   x.report(:jbuilder, &jbuilder)
+  x.report(:jserializer, &jserializer)
   x.report(:jsonapi, &jsonapi)
   x.report(:jsonapi_same_format, &jsonapi_same_format)
   x.report(:panko, &panko)

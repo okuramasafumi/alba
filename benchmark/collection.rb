@@ -16,6 +16,7 @@ gemfile(true) do
   gem "benchmark-memory"
   gem "blueprinter"
   gem "jbuilder"
+  gem "jserializer"
   gem "jsonapi-serializer" # successor of fast_jsonapi
   gem "multi_json"
   gem "panko_serializer"
@@ -158,6 +159,22 @@ class Comment
     Jbuilder.new do |comment|
       comment.call(self, :id, :body)
     end
+  end
+end
+
+# --- Jserializer serializers ---
+
+require 'jserializer'
+
+class JserializerCommentSerializer < Jserializer::Base
+  attributes :id, :body
+end
+
+class JserializerPostSerializer < Jserializer::Base
+  attributes :id, :body, :commenter_names
+  has_many :comments, serializer: JserializerCommentSerializer
+  def commenter_names
+    object.commenters.pluck(:name)
   end
 end
 
@@ -352,6 +369,7 @@ jbuilder = Proc.new do
     end
   end.target!
 end
+jserializer = Proc.new { JserializerPostSerializer.new(posts, is_collection: true).to_json }
 jsonapi = proc { JsonApiStandardPostSerializer.new(posts).to_json }
 jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(posts).to_json }
 panko = proc { Panko::ArraySerializer.new(posts, each_serializer: PankoPostSerializer).to_json }
@@ -371,6 +389,7 @@ puts "Serializer outputs ----------------------------------"
   ams: ams,
   blueprinter: blueprinter,
   jbuilder: jbuilder, # different order
+  jserializer: jserializer,
   jsonapi: jsonapi, # nested JSON:API format
   jsonapi_same_format: jsonapi_same_format,
   panko: panko,
@@ -389,6 +408,7 @@ Benchmark.ips do |x|
   x.report(:ams, &ams)
   x.report(:blueprinter, &blueprinter)
   x.report(:jbuilder, &jbuilder)
+  x.report(:jserializer, &jserializer)
   x.report(:jsonapi, &jsonapi)
   x.report(:jsonapi_same_format, &jsonapi_same_format)
   x.report(:panko, &panko)
@@ -408,6 +428,7 @@ Benchmark.memory do |x|
   x.report(:ams, &ams)
   x.report(:blueprinter, &blueprinter)
   x.report(:jbuilder, &jbuilder)
+  x.report(:jserializer, &jserializer)
   x.report(:jsonapi, &jsonapi)
   x.report(:jsonapi_same_format, &jsonapi_same_format)
   x.report(:panko, &panko)
