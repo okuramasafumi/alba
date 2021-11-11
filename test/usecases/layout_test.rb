@@ -44,4 +44,30 @@ class LayoutTest < MiniTest::Test
       JSON.parse(UserResourceWithPaginationLayout.new(@user, params: {pagination: {page: 1}}).serialize)
     )
   end
+
+  class UserResourceWithInlineLayoutReturningString < UserResource
+    layout inline: proc {
+      %({"header":"my header", "body": #{serialized_json}})
+    }
+  end
+
+  def test_it_renders_json_within_inline_layout_returning_string
+    assert_equal(
+      {'header' => 'my header', 'body' => {'id' => 1, 'name' => 'Masafumi OKURA'}}, # rubocop:disable Style/StringHashKeys
+      JSON.parse(UserResourceWithInlineLayoutReturningString.new(@user).serialize)
+    )
+  end
+
+  class UserResourceWithInlineLayoutReturningHash < UserResource
+    layout inline: proc {
+      {header: 'my header', body: serializable_hash}
+    }
+  end
+
+  def test_it_renders_json_within_inline_layout_returning_hash
+    assert_equal(
+      {'header' => 'my header', 'body' => {'id' => 1, 'name' => 'Masafumi OKURA'}}, # rubocop:disable Style/StringHashKeys
+      JSON.parse(UserResourceWithInlineLayoutReturningHash.new(@user).serialize)
+    )
+  end
 end

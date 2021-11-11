@@ -69,13 +69,23 @@ module Alba
 
       private
 
+      attr_reader :serialized_json # Mainly for layout
+
       def encode(hash)
         Alba.encoder.call(hash)
       end
 
       def serialize_with(hash)
-        serialized_json = encode(hash)
-        @_layout ? ERB.new(File.read(@_layout)).result(binding) : serialized_json
+        @serialized_json = encode(hash)
+        case @_layout
+        when String # file
+          ERB.new(File.read(@_layout)).result(binding)
+        when Proc # inline
+          inline = instance_eval(&@_layout)
+          inline.is_a?(Hash) ? encode(inline) : inline
+        else # no layout
+          @serialized_json
+        end
       end
 
       def hash_with_metadata(hash, meta)
@@ -339,8 +349,11 @@ module Alba
       end
 
       # Set layout
-      def layout(file:)
-        @_layout = file
+      #
+      # @params file [String] name of the layout file
+      # @params inline [Proc] a proc returning JSON string or a Hash representing JSON
+      def layout(file: nil, inline: nil)
+        @_layout = file || inline
       end
 
       # Delete attributes

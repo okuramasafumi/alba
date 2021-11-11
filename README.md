@@ -780,11 +780,45 @@ end
 
 Note that layout files are treated as `json` and `erb` and evaluated in a context of the resource, meaning
 
-* A layout must be a valid JSON
+* A layout file must be a valid JSON
 * You must write `<%= serialized_json %>` in a layout to put serialized JSON string into a layout
 * You can access `params` in a layout so that you can add virtually any objects to a layout
   * When you access `params`, it's usually a Hash. You can use `encode` method in a layout to convert `params` Hash into a JSON with the backend you use
 * You can also access `object`, the underlying object for the resource
+
+In case you don't want to have a file for layout, Alba lets you define and apply layouts inline:
+
+```ruby
+class FooResource
+  include Alba::Resource
+  layout inline: proc do
+    {
+      header: 'my header',
+      body: serializable_hash
+    }
+  end
+end
+```
+
+In the example above, we specify a Proc which returns a Hash as an inline layout. In the Proc we can use `serializable_hash` method to access a Hash right before serialization.
+
+You can also use a Proc which returns String, not a Hash, for an inline layout.
+
+```ruby
+class FooResource
+  include Alba::Resource
+  layout inline: proc do
+    %({
+      "header": "my header",
+      "body": #{serialized_json}
+    })
+  end
+end
+```
+
+It looks similar to file layout but you must use string interpolation for method calls since it's not an ERB.
+
+Also note that we use percentage notation here to use double quotes. Using single quotes in inline string layout causes the error which might be resolved in other ways.
 
 ### Caching
 
