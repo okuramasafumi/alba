@@ -8,7 +8,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_key_function: nil, _transforming_root_key: false, _on_error: nil, _on_nil: nil}.freeze # rubocop:disable Layout/LineLength
+    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_key_function: nil, _transforming_root_key: false, _on_error: nil, _on_nil: nil, _layout: nil}.freeze # rubocop:disable Layout/LineLength
     private_constant :DSLS
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -56,7 +56,7 @@ module Alba
                else
                  serializable_hash
                end
-        Alba.encoder.call(hash)
+        serialize_with(hash)
       end
 
       # A Hash for serialization
@@ -68,6 +68,25 @@ module Alba
       alias to_hash serializable_hash
 
       private
+
+      attr_reader :serialized_json # Mainly for layout
+
+      def encode(hash)
+        Alba.encoder.call(hash)
+      end
+
+      def serialize_with(hash)
+        @serialized_json = encode(hash)
+        case @_layout
+        when String # file
+          ERB.new(File.read(@_layout)).result(binding)
+        when Proc # inline
+          inline = instance_eval(&@_layout)
+          inline.is_a?(Hash) ? encode(inline) : inline
+        else # no layout
+          @serialized_json
+        end
+      end
 
       def hash_with_metadata(hash, meta)
         base = @_meta ? instance_eval(&@_meta) : {}
@@ -327,6 +346,14 @@ module Alba
       # Set metadata
       def meta(&block)
         @_meta = block
+      end
+
+      # Set layout
+      #
+      # @params file [String] name of the layout file
+      # @params inline [Proc] a proc returning JSON string or a Hash representing JSON
+      def layout(file: nil, inline: nil)
+        @_layout = file || inline
       end
 
       # Delete attributes

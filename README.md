@@ -69,6 +69,7 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Resource name inflection based on association name
 * Circular associations control
 * [Experimental] Types for validation and conversion
+* Layout
 * No runtime dependencies
 
 ## Anti features
@@ -756,6 +757,68 @@ UserResource.new(user).serialize
 ```
 
 Note that this feature is experimental and interfaces are subject to change.
+
+### Layout
+
+Sometimes we'd like to serialize JSON into a template. In other words, we need some structure OUTSIDE OF serialized JSON. IN HTML world, we call it a "layout".
+
+Alba supports serializing JSON in a layout. You need a file for layout and then to specify file with `layout` method.
+
+```erb
+{
+  "header": "my_header",
+  "body": <%= serialized_json %>
+}
+```
+
+```ruby
+class FooResource
+  include Alba::Resource
+  layout file: 'my_layout.json.erb'
+end
+```
+
+Note that layout files are treated as `json` and `erb` and evaluated in a context of the resource, meaning
+
+* A layout file must be a valid JSON
+* You must write `<%= serialized_json %>` in a layout to put serialized JSON string into a layout
+* You can access `params` in a layout so that you can add virtually any objects to a layout
+  * When you access `params`, it's usually a Hash. You can use `encode` method in a layout to convert `params` Hash into a JSON with the backend you use
+* You can also access `object`, the underlying object for the resource
+
+In case you don't want to have a file for layout, Alba lets you define and apply layouts inline:
+
+```ruby
+class FooResource
+  include Alba::Resource
+  layout inline: proc do
+    {
+      header: 'my header',
+      body: serializable_hash
+    }
+  end
+end
+```
+
+In the example above, we specify a Proc which returns a Hash as an inline layout. In the Proc we can use `serializable_hash` method to access a Hash right before serialization.
+
+You can also use a Proc which returns String, not a Hash, for an inline layout.
+
+```ruby
+class FooResource
+  include Alba::Resource
+  layout inline: proc do
+    %({
+      "header": "my header",
+      "body": #{serialized_json}
+    })
+  end
+end
+```
+
+It looks similar to file layout but you must use string interpolation for method calls since it's not an ERB.
+
+Also note that we use percentage notation here to use double quotes. Using single quotes in inline string layout causes the error which might be resolved in other ways.
 
 ### Caching
 
