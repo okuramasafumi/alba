@@ -180,4 +180,31 @@ class ConditionalAttributesTest < MiniTest::Test
       UserResource9.new(@user).serialize
     )
   end
+
+  class UserResource10 < UserResource
+    attributes :name, if: :method_returning_true
+
+    def method_returning_true
+      true
+    end
+  end
+
+  class UserResource11 < UserResource
+    attributes :name, if: :method_returning_false
+
+    def method_returning_false
+      false
+    end
+  end
+
+  def test_conditional_attributes_with_if_with_symbol_method_name
+    assert_equal(
+      '{"id":1,"name":"Masafumi OKURA"}',
+      UserResource10.new(@user).serialize
+    )
+    assert_equal(
+      '{"id":1}',
+      UserResource11.new(@user).serialize
+    )
+  end
 end
