@@ -146,15 +146,29 @@ module Alba
 
       def conditional_attribute(object, key, attribute)
         condition = attribute.last
+        if condition.is_a?(Proc)
+          conditional_attribute_with_proc(object, key, attribute.first, condition)
+        else
+          conditional_attribute_with_symbol(object, key, attribute.first, condition)
+        end
+      end
+
+      def conditional_attribute_with_proc(object, key, attribute, condition)
         arity = condition.arity
         # We can return early to skip fetch_attribute
         return [] if arity <= 1 && !instance_exec(object, &condition)
 
-        fetched_attribute = fetch_attribute(object, key, attribute.first)
-        attr = attribute.first.is_a?(Alba::Association) ? attribute.first.object : fetched_attribute
+        fetched_attribute = fetch_attribute(object, key, attribute)
+        attr = attribute.is_a?(Alba::Association) ? attribute.object : fetched_attribute
         return [] if arity >= 2 && !instance_exec(object, attr, &condition)
 
         [key, fetched_attribute]
+      end
+
+      def conditional_attribute_with_symbol(object, key, attribute, condition)
+        return [] unless __send__(condition)
+
+        [key, fetch_attribute(object, key, attribute)]
       end
 
       def handle_error(error, object, key, attribute)
