@@ -58,6 +58,7 @@ module Alba
                end
         serialize_with(hash)
       end
+      alias to_json serialize
 
       # A Hash for serialization
       #
