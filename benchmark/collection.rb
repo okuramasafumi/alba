@@ -10,6 +10,7 @@ gemfile(true) do
   git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
   gem "active_model_serializers"
+  gem "fast_serializer_ruby"
   gem "activerecord", "6.1.3"
   gem "alba", path: '../'
   gem "benchmark-ips"
@@ -81,6 +82,27 @@ end
 
 class User < ActiveRecord::Base
   has_many :comments
+end
+
+# --- Fast Serializer Ruby
+
+require "fast_serializer"
+
+class FastSerializerCommentResource
+  include ::FastSerializer::Schema::Mixin
+  attributes :id, :body
+end
+
+class FastSerializerPostResource
+  include ::FastSerializer::Schema::Mixin
+
+  attributes :id, :body
+
+  attribute :commenter_names do
+    object.commenters.pluck(:name)
+  end
+
+  has_many :comments, serializer: FastSerializerCommentResource
 end
 
 # --- Alba serializers ---
@@ -360,6 +382,8 @@ alba_inline = Proc.new do
     end
   end
 end
+
+fast_serializer = Proc.new { FastSerializerPostResource.new(posts).serializable_hash }
 ams = Proc.new { ActiveModelSerializers::SerializableResource.new(posts, {}).as_json }
 blueprinter = Proc.new { PostBlueprint.render(posts) }
 jbuilder = Proc.new do
@@ -381,11 +405,12 @@ representable = Proc.new { PostsRepresenter.new(posts).to_json }
 simple_ams = Proc.new { SimpleAMS::Renderer::Collection.new(posts, serializer: SimpleAMSPostSerializer).to_json }
 
 # --- Execute the serializers to check their output ---
-
+GC.disable
 puts "Serializer outputs ----------------------------------"
 {
   alba: alba,
   alba_inline: alba_inline,
+  fast_serializer: fast_serializer,
   ams: ams,
   blueprinter: blueprinter,
   jbuilder: jbuilder, # different order
@@ -404,6 +429,7 @@ puts "Serializer outputs ----------------------------------"
 require 'benchmark/ips'
 Benchmark.ips do |x|
   x.report(:alba, &alba)
+  x.report(:fast_serializer, &fast_serializer)
   x.report(:alba_inline, &alba_inline)
   x.report(:ams, &ams)
   x.report(:blueprinter, &blueprinter)
@@ -425,6 +451,7 @@ require 'benchmark/memory'
 Benchmark.memory do |x|
   x.report(:alba, &alba)
   x.report(:alba_inline, &alba_inline)
+  x.report(:fast_serializer, &fast_serializer)
   x.report(:ams, &ams)
   x.report(:blueprinter, &blueprinter)
   x.report(:jbuilder, &jbuilder)
