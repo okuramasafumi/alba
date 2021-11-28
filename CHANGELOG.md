@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] 2021-11-28
+
+- [Feat] Add nil handler
+- [Feat] Implement layout feature
+- [Improve] if option now works with Symbol
+- [Improve] Add an alias for serialize
+- [Improve] Deprecation warning now printed with caller
+
 ## [1.4.0] 2021-06-30
 
 - [Feat] Add a config method to set encoder directly
