@@ -48,7 +48,7 @@ class NoAssociationTest < MiniTest::Test
   end
 
   def test_it_prints_warnings_when_key_is_called
-    assert_output('', "[DEPRECATION] `key` is deprecated, use `root_key` instead.\n") do
+    assert_output('', /\[DEPRECATION\] `key` is deprecated, use `root_key` instead.\n/) do
       Class.new do
         include Alba::Resource
 
@@ -58,7 +58,7 @@ class NoAssociationTest < MiniTest::Test
   end
 
   def test_it_prints_warnings_when_key_bang_is_called
-    assert_output('', "[DEPRECATION] `key!` is deprecated, use `root_key!` instead.\n") do
+    assert_output('', /\[DEPRECATION\] `key!` is deprecated, use `root_key!` instead.\n/) do
       Class.new do
         include Alba::Resource
 
@@ -106,7 +106,7 @@ class NoAssociationTest < MiniTest::Test
   end
 
   def test_it_prints_warnings_when_key_option_is_given_to_serialize
-    assert_output('', "`key` option to `serialize` method is deprecated, use `root_key` instead.\n") { UserResource.new(@user).serialize(key: :user) }
+    assert_output('', /`key` option to `serialize` method is deprecated, use `root_key` instead.\n/) { UserResource.new(@user).serialize(key: :user) }
   end
 
   class UserResource2

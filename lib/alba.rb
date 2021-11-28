@@ -1,6 +1,7 @@
 require 'json'
 require_relative 'alba/version'
 require_relative 'alba/resource'
+require_relative 'alba/deprecation'
 
 # Core module
 module Alba
@@ -51,7 +52,7 @@ module Alba
     # @return [String] serialized JSON string
     # @raise [ArgumentError] if block is absent or `with` argument's type is wrong
     def serialize(object, key: nil, root_key: nil, &block)
-      warn '`key` option to `serialize` method is deprecated, use `root_key` instead.' if key
+      Alba::Deprecation.warn '`key` option to `serialize` method is deprecated, use `root_key` instead.' if key
       klass = block ? resource_class(&block) : infer_resource_class(object.class.name)
 
       resource = klass.new(object)

@@ -2,6 +2,7 @@ require_relative 'one'
 require_relative 'many'
 require_relative 'key_transform_factory'
 require_relative 'typed_attribute'
+require_relative 'deprecation'
 
 module Alba
   # This module represents what should be serialized
@@ -48,7 +49,7 @@ module Alba
       # @param meta [Hash] metadata for this seialization
       # @return [String] serialized JSON string
       def serialize(key: nil, root_key: nil, meta: {})
-        warn '`key` option to `serialize` method is deprecated, use `root_key` instead.' if key
+        Alba::Deprecation.warn '`key` option to `serialize` method is deprecated, use `root_key` instead.' if key
         key = key.nil? && root_key.nil? ? fetch_key : root_key || key
         hash = if key && key != ''
                  h = {key.to_s => serializable_hash}
@@ -329,7 +330,7 @@ module Alba
       # @param key [String, Symbol]
       # @deprecated Use {#root_key} instead
       def key(key)
-        warn '[DEPRECATION] `key` is deprecated, use `root_key` instead.'
+        Alba::Deprecation.warn '[DEPRECATION] `key` is deprecated, use `root_key` instead.'
         @_key = key.respond_to?(:to_sym) ? key.to_sym : key
       end
 
@@ -347,7 +348,7 @@ module Alba
       #
       # @deprecated Use {#root_key!} instead
       def key!
-        warn '[DEPRECATION] `key!` is deprecated, use `root_key!` instead.'
+        Alba::Deprecation.warn '[DEPRECATION] `key!` is deprecated, use `root_key!` instead.'
         @_key = true
         @_key_for_collection = true
       end
