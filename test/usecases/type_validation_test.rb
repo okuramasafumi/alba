@@ -67,4 +67,47 @@ class TypeValidationTest < MiniTest::Test
   def test_it_raises_error_when_type_is_not_supported
     assert_raises(Alba::UnsupportedType) { UnsupportedTypeUserResource.new(@user).serialize }
   end
+
+  class Foo
+    attr_reader :number
+
+    def initialize(number)
+      @number = number
+    end
+  end
+
+  class FooResource
+    include Alba::Resource
+
+    attributes number: :Number
+  end
+
+  def test_it_validates_number_type
+    foo = Foo.new(42.0)
+    assert_equal '{"number":42.0}', FooResource.new(foo).serialize
+    foo2 = Foo.new('foo')
+    assert_raises(TypeError) { FooResource.new(foo2).serialize }
+  end
+
+  class FooResourceWithAutoConversion
+    include Alba::Resource
+
+    attributes number: [:Number, true]
+  end
+
+  def test_it_provides_default_converter_for_number
+    foo = Foo.new('42.0')
+    assert_equal '{"number":42.0}', FooResourceWithAutoConversion.new(foo).serialize
+  end
+
+  class FooResourceWithFloat
+    include Alba::Resource
+
+    attributes number: Float
+  end
+
+  def test_it_works_with_float_type
+    foo = Foo.new(42.0)
+    assert_equal '{"number":42.0}', FooResourceWithFloat.new(foo).serialize
+  end
 end

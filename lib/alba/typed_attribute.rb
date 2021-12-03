@@ -31,6 +31,7 @@ module Alba
                      when :String, ->(klass) { klass == String } then value.is_a?(String)
                      when :Integer, ->(klass) { klass == Integer } then value.is_a?(Integer)
                      when :Boolean then [true, false].include?(value)
+                     when :Number, ->(klass) { klass == Float } then value.is_a?(Numeric)
                      else
                        raise Alba::UnsupportedType, "Unknown type: #{@type}"
                      end
@@ -39,12 +40,10 @@ module Alba
 
     def default_converter
       case @type
-      when :String, ->(klass) { klass == String }
-        ->(object) { object.to_s }
-      when :Integer, ->(klass) { klass == Integer }
-        ->(object) { Integer(object) }
-      when :Boolean
-        ->(object) { !!object }
+      when :String, ->(klass) { klass == String } then ->(object) { object.to_s }
+      when :Integer, ->(klass) { klass == Integer } then ->(object) { Integer(object) }
+      when :Boolean then ->(object) { !!object }
+      when :Number, ->(klass) { klass == Float } then ->(object) { Float(object) }
       else
         raise Alba::UnsupportedType, "Unknown type: #{@type}"
       end
