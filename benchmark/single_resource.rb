@@ -253,7 +253,7 @@ class PankoPostSerializer < Panko::Serializer
   has_many :comments, serializer: PankoCommentSerializer
 
   def commenter_names
-    object.comments.pluck(:name)
+    object.commenters.pluck(:name)
   end
 end
 
