@@ -72,15 +72,6 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Layout
 * No runtime dependencies
 
-## Anti features
-
-* Sorting keys
-* Class level support of parameters
-* Supporting all existing JSON encoder/decoder
-* Cache
-* [JSON:API](https://jsonapi.org) support
-* And many others
-
 ## Usage
 
 ### Configuration
