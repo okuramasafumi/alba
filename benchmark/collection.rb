@@ -16,6 +16,7 @@ gemfile(true) do
   gem "benchmark-memory"
   gem "blueprinter"
   gem "jbuilder"
+  gem 'turbostreamer'
   gem "jserializer"
   gem "jsonapi-serializer" # successor of fast_jsonapi
   gem "multi_json"
@@ -332,6 +333,31 @@ class SimpleAMSPostSerializer
   end
 end
 
+require 'turbostreamer'
+TurboStreamer.set_default_encoder(:json, :oj)
+
+class TurbostreamerSerializer
+  def initialize(posts)
+    @posts = posts
+  end
+
+  def to_json
+    TurboStreamer.encode do |json|
+      json.array! @posts do |post|
+        json.object! do
+          json.extract! post, :id, :body, :commenter_names
+
+          json.comments post.comments do |comment|
+            json.object! do
+              json.extract! comment, :id, :body
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
 # --- Test data creation ---
 
 100.times do |i|
@@ -379,6 +405,7 @@ rails = Proc.new do
 end
 representable = Proc.new { PostsRepresenter.new(posts).to_json }
 simple_ams = Proc.new { SimpleAMS::Renderer::Collection.new(posts, serializer: SimpleAMSPostSerializer).to_json }
+turbostreamer = Proc.new { TurbostreamerSerializer.new(posts).to_json }
 
 # --- Execute the serializers to check their output ---
 
@@ -397,6 +424,7 @@ puts "Serializer outputs ----------------------------------"
   rails: rails,
   representable: representable,
   simple_ams: simple_ams,
+  turbostreamer: turbostreamer
 }.each { |name, serializer| puts "#{name.to_s.ljust(24, ' ')} #{serializer.call}" }
 
 # --- Run the benchmarks ---
@@ -416,6 +444,7 @@ Benchmark.ips do |x|
   x.report(:rails, &rails)
   x.report(:representable, &representable)
   x.report(:simple_ams, &simple_ams)
+  x.report(:turbostreamer, &turbostreamer)
 
   x.compare!
 end
@@ -436,6 +465,7 @@ Benchmark.memory do |x|
   x.report(:rails, &rails)
   x.report(:representable, &representable)
   x.report(:simple_ams, &simple_ams)
+  x.report(:turbostreamer, &turbostreamer)
 
   x.compare!
 end
