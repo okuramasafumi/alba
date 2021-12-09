@@ -231,6 +231,63 @@ class AnotherUserResource
 end
 ```
 
+You can "filter" association using second proc argument. This proc takes association object and `params`.
+
+This feature is useful when you want to modify association, such as adding `includes` or `order` to ActiveRecord relations.
+
+```ruby
+class User
+  attr_reader :id
+  attr_accessor :articles
+
+  def initialize(id)
+    @id = id
+    @articles = []
+  end
+end
+
+class Article
+  attr_accessor :id, :title, :body
+
+  def initialize(id, title, body)
+    @id = id
+    @title = title
+    @body = body
+  end
+end
+
+class ArticleResource
+  include Alba::Resource
+
+  attributes :title
+end
+
+class UserResource
+  include Alba::Resource
+
+  attributes :id
+
+  # Second proc works as a filter
+  many :articles,
+    proc { |articles, params|
+      filter = params[:filter] || :odd?
+      articles.select {|a| a.id.send(filter) }
+    },
+    resource: ArticleResource
+end
+
+user = User.new(1)
+article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
+user.articles << article1
+article2 = Article.new(2, 'Super nice', 'Really nice!')
+user.articles << article2
+
+UserResource.new(user).serialize
+# => '{"id":1,"articles":[{"title":"Hello World!"}]}'
+UserResource.new(user, params: {filter: :even?}).serialize
+# => '{"id":1,"articles":[{"title":"Super nice"}]}'
+```
+
 ### Inline definition with `Alba.serialize`
 
 `Alba.serialize` method is a shortcut to define everything inline.
