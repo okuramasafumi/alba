@@ -127,7 +127,7 @@ class NilHandlerTest < Minitest::Test
       when :age
         20
       when :profile
-        ProfileResource2.new(Profile.new(object.id, 'default@example.com')).to_hash
+        ProfileResource2.new(Profile.new(object.id, 'default@example.com')).serializable_hash
       else
         ''
       end
