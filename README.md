@@ -2,7 +2,6 @@
 [![CI](https://github.com/okuramasafumi/alba/actions/workflows/main.yml/badge.svg)](https://github.com/okuramasafumi/alba/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/okuramasafumi/alba/branch/master/graph/badge.svg?token=3D3HEZ5OXT)](https://codecov.io/gh/okuramasafumi/alba)
 [![Maintainability](https://api.codeclimate.com/v1/badges/fdab4cc0de0b9addcfe8/maintainability)](https://codeclimate.com/github/okuramasafumi/alba/maintainability)
-[![Inline docs](http://inch-ci.org/github/okuramasafumi/alba.svg?branch=main)](http://inch-ci.org/github/okuramasafumi/alba)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/okuramasafumi/alba)
 ![GitHub](https://img.shields.io/github/license/okuramasafumi/alba)
 
