@@ -1,6 +1,6 @@
 module Alba
   # Base class for `One` and `Many`
-  # Child class should implement `to_hash` method
+  # Child class should implement `to_h` method
   class Association
     attr_reader :object, :name
 

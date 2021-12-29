@@ -67,7 +67,13 @@ module Alba
       def serializable_hash
         collection? ? @object.map(&converter) : converter.call(@object)
       end
-      alias to_hash serializable_hash
+      alias to_h serializable_hash
+
+      # @deprecated Use {#serializable_hash} instead
+      def to_hash
+        warn '[DEPRECATION] `to_hash` is deprecated, use `serializable_hash` instead.'
+        serializable_hash
+      end
 
       private
 
@@ -196,7 +202,7 @@ module Alba
         value = case attribute
                 when Symbol then object.public_send attribute
                 when Proc then instance_exec(object, &attribute)
-                when Alba::One, Alba::Many then yield_if_within(attribute.name.to_sym) { |within| attribute.to_hash(object, params: params, within: within) }
+                when Alba::One, Alba::Many then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(object, params: params, within: within) }
                 when TypedAttribute then attribute.value(object)
                 else
                   raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
