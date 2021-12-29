@@ -12,6 +12,8 @@ jobs:
         gemfile: [all, without_active_support, without_oj]
         exclude:
           - os: windows-latest
+            ruby: 3.1
+          - os: windows-latest
             ruby: jruby
           - os: windows-latest
             ruby: truffleruby
