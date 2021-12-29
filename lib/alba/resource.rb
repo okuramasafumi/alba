@@ -243,7 +243,6 @@ module Alba
       end
 
       # Defining methods for DSLs and disable parameter number check since for users' benefits increasing params is fine
-      # rubocop:disable Metrics/ParameterLists
 
       # Set multiple attributes at once
       #
@@ -411,8 +410,6 @@ module Alba
       def on_nil(&block)
         @_on_nil = block
       end
-
-      # rubocop:enable Metrics/ParameterLists
     end
   end
 end
