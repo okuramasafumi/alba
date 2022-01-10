@@ -149,7 +149,7 @@ end
 
 user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
 UserResource.new(user).serialize
-# => "{\"id\":1,\"name\":\"Masafumi OKURA\",\"name_with_email\":\"Masafumi OKURA: masafumi@example.com\"}"
+# => "{\"user\":{\"id\":1,\"name\":\"Masafumi OKURA\",\"name_with_email\":\"Masafumi OKURA: masafumi@example.com\"}}"
 ```
 
 ### Serialization with associations
