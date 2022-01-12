@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
     'changelog_uri' => 'https://github.com/okuramasafumi/alba/blob/main/CHANGELOG.md',
     'documentation_uri' => 'https://rubydoc.info/github/okuramasafumi/alba',
     'source_code_uri' => 'https://github.com/okuramasafumi/alba',
-    'require_mfa_required' => true
+    'rubygems_mfa_required' => true
   }
 
   # Specify which files should be added to the gem when it is released.
