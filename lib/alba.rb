@@ -2,6 +2,7 @@ require 'json'
 require_relative 'alba/version'
 require_relative 'alba/resource'
 require_relative 'alba/deprecation'
+require_relative 'alba/type_converter'
 
 # Core module
 module Alba
@@ -15,7 +16,7 @@ module Alba
   class UnsupportedType < Error; end
 
   class << self
-    attr_reader :backend, :encoder, :inferring, :_on_error, :_on_nil, :transforming_root_key
+    attr_reader :backend, :encoder, :inferring, :_on_error, :_on_nil, :transforming_root_key, :type_converters
 
     # Accessor for inflector, a module responsible for incflecting strings
     attr_accessor :inflector
@@ -131,6 +132,12 @@ module Alba
       @_on_error = :raise
       @_on_nil = nil
       @transforming_root_key = false # TODO: This will be true since 2.0
+    end
+
+    # Register type converter
+    def register_type_converter(from:, to:, &block)
+      @type_converters ||= []
+      @type_converters << TypeConverter.new(from, to, &block)
     end
 
     private

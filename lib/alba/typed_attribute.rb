@@ -8,7 +8,7 @@ module Alba
       @name = name
       @type = type
       @converter = case converter
-                   when true then default_converter
+                   when true then nil # We'll try to find the proper converter later
                    when false, nil then null_converter
                    else converter
                    end
@@ -18,12 +18,22 @@ module Alba
     # @return [String, Integer, Boolean] type-checked or type-converted object
     def value(object)
       value, result = check(object)
-      result ? value : @converter.call(value)
+      result ? value : converter_for(value).call(value)
     rescue TypeError
       raise TypeError, "Attribute #{@name} is expected to be #{@type} but actually #{display_value_for(value)}."
     end
 
     private
+
+    def converter_for(value)
+      if @converter.nil?
+        Alba.type_converters&.find do |type_converter|
+          type_converter.from == value.class && type_converter.to == @type
+        end || default_converter
+      else
+        @converter
+      end
+    end
 
     def check(object)
       value = object.public_send(@name)
