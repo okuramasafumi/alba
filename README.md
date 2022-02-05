@@ -19,15 +19,15 @@ If you have feature requests or interesting ideas, join us with [Ideas](https://
 
 ## Why Alba?
 
-Because it's fast, flexible and extensible!
+Because it's fast, easy-to-use and extensible!
 
 ### Fast
 
 Alba is faster than most of the alternatives. We have a [benchmark](https://github.com/okuramasafumi/alba/tree/master/benchmark).
 
-### Flexible
+### Easy to use
 
-Alba provides a small set of DSL to define your serialization logic. It also provides methods you can override to alter and filter serialized hash so that you have full control over the result.
+Alba provides four DSLs, `attributes` to fetch attribute with its name, `attribute` to execute block for the attribute, `one` to seriaize single attribute with another resource, and `many` to serialize collection attribute with another resource. When you want to do something complex, there are many examples in this README so you can mimic them to get started.
 
 ### Extensible
 
