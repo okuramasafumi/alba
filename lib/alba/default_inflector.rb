@@ -32,5 +32,13 @@ module Alba
     def dasherize(key)
       ActiveSupport::Inflector.dasherize(key)
     end
+
+    # Classify a key
+    #
+    # @param key [String] key to be classified
+    # @return [String] classified key
+    def classify(key)
+      ActiveSupport::Inflector.classify(key)
+    end
   end
 end
