@@ -19,7 +19,7 @@ If you have feature requests or interesting ideas, join us with [Ideas](https://
 
 ## Why Alba?
 
-Because it's fast, flexible and well-maintained!
+Because it's fast, flexible and extensible!
 
 ### Fast
 
@@ -29,9 +29,9 @@ Alba is faster than most of the alternatives. We have a [benchmark](https://gith
 
 Alba provides a small set of DSL to define your serialization logic. It also provides methods you can override to alter and filter serialized hash so that you have full control over the result.
 
-### Maintained
+### Extensible
 
-Alba is well-maintained and adds features quickly. [Coverage Status](https://coveralls.io/github/okuramasafumi/alba?branch=master) and [CodeClimate Maintainability](https://codeclimate.com/github/okuramasafumi/alba/maintainability) show the code base is quite healthy.
+Alba embraces extensibility through common techniques such as class inheritance and module inclusion. Alba provides its capacity with one module so you can still have your own class hierarchy.
 
 ## Installation
 
@@ -870,6 +870,108 @@ Also note that we use percentage notation here to use double quotes. Using singl
 ### Caching
 
 Currently, Alba doesn't support caching, primarily due to the behavior of `ActiveRecord::Relation`'s cache. See [the issue](https://github.com/rails/rails/issues/41784).
+
+### Extend Alba
+
+Sometimes we have shared behaviors across resources. In such cases we can have a module for common logic.
+
+In `attribute` block we can call instance method so we can improve the code below:
+
+```ruby
+class FooResource
+  include Alba::Resource
+  # other attributes
+  attribute :created_at do |foo|
+    foo.created_at.strftime('%m/%d/%Y')
+  end
+
+  attribute :updated_at do |foo|
+    foo.updated_at.strftime('%m/%d/%Y')
+  end
+end
+
+class BarResource
+  include Alba::Resource
+  # other attributes
+  attribute :created_at do |bar|
+    bar.created_at.strftime('%m/%d/%Y')
+  end
+
+  attribute :updated_at do |bar|
+    bar.updated_at.strftime('%m/%d/%Y')
+  end
+end
+```
+
+to:
+
+```ruby
+module SharedLogic
+  def format_time(time)
+    time.strftime('%m/%d/%Y')
+  end
+end
+
+class FooResource
+  include Alba::Resource
+  include SharedLogic
+  # other attributes
+  attribute :created_at do |foo|
+    format_time(foo.created_at)
+  end
+
+  attribute :updated_at do |foo|
+    format_time(foo.updated_at)
+  end
+end
+
+class BarResource
+  include Alba::Resource
+  include SharedLogic
+  # other attributes
+  attribute :created_at do |bar|
+    format_time(bar.created_at)
+  end
+
+  attribute :updated_at do |bar|
+    format_time(bar.updated_at)
+  end
+end
+```
+
+We can even add our own DSL to serialize attributes for readability and removing code duplications.
+
+To do so, we need to `extend` our module. Let's see how we can achieve the same goal with this approach.
+
+```ruby
+module AlbaExtension
+  # Here attrs are an Array of Symbol
+  def formatted_time_attributes(*attrs)
+    attrs.each do |attr|
+      attribute attr do |object|
+        time = object.send(attr)
+        time.strftime('%m/%d/%Y')
+      end
+    end
+  end
+end
+
+class FooResource
+  include Alba::Resource
+  extend AlbaExtension
+  # other attributes
+  formatted_time_attributes :created_at, :updated_at
+end
+
+class BarResource
+  include Alba::Resource
+  extend AlbaExtension
+  # other attributes
+  formatted_time_attributes :created_at, :updated_at
+end
+```
+
+In this way we have shorter and cleaner code. Note that we need to use `send` or `public_send` in `attribute` block to get attribute data.
 
 ## Rails
 
