@@ -60,12 +60,16 @@ module Alba
     end
 
     # Enable inference for key and resource name
-    def enable_inference!
-      begin
-        require 'active_support/inflector'
-      rescue LoadError
-        raise ::Alba::Error, 'To enable inference, please install `ActiveSupport` gem.'
+    #
+    # @param with [Symbol, Class, Module] inflector
+    #   When it's a Symbol, it sets inflector with given name
+    #   When it's a Class or a Module, it sets given object to inflector
+    def enable_inference!(with: :default)
+      if with == :default
+        Alba::Deprecation.warn 'Calling `enable_inference!` without `with` keyword argument is deprecated. Pass `:active_support` to keep current behavior.'
       end
+
+      @inflector = inflector_from(with)
       @inferring = true
     end
 
@@ -134,6 +138,19 @@ module Alba
 
     private
 
+    def inflector_from(name_or_module)
+      case name_or_module
+      when :default, :active_support
+        require_relative 'alba/default_inflector'
+        Alba::DefaultInflector
+      when :dry
+        require 'dry/inflector'
+        Dry::Inflector.new
+      else
+        validate_inflector(name_or_module)
+      end
+    end
+
     def set_encoder_from_backend
       @encoder = case @backend
                  when :oj, :oj_strict then try_oj
@@ -165,6 +182,14 @@ module Alba
       lambda do |hash|
         JSON.dump(hash)
       end
+    end
+
+    def validate_inflector(inflector)
+      unless %i[camelize camelize_lower dasherize classify].all? { |m| inflector.respond_to?(m) }
+        raise Alba::Error, "Given inflector, #{inflector.inspect} is not valid. It must implement `camelize`, `camelize_lower`, `dasherize` and `classify`."
+      end
+
+      inflector
     end
   end
 

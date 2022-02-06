@@ -106,10 +106,14 @@ You can consider setting a backend with Symbol as a shortcut to set encoder.
 You can enable inference feature using `enable_inference!` method.
 
 ```ruby
-Alba.enable_inference!
+Alba.enable_inference!(with: :active_support)
 ```
 
-You must install `ActiveSupport` to enable inference.
+You can choose which inflector Alba uses for inference. Possible value for `with` option are:
+
+- `:active_support` for `ActiveSupport::Inflector`
+- `:dry` for `Dry::Inflector`
+- any object which responds to some methods (see [below](#custom-inflector))
 
 #### Error handling configuration
 
@@ -378,7 +382,7 @@ You can also transform root key when:
 * `root` option of `transform_keys` is set to true or `Alba.enable_root_key_transformation!` is called.
 
 ```ruby
-Alba.enable_inference!
+Alba.enable_inference!(with: :active_support) # with :dry also works
 
 class BankAccount
   attr_reader :account_number
@@ -408,30 +412,26 @@ Supported transformation types are :camel, :lower_camel and :dash.
 
 #### Custom inflector
 
-A custom inflector can be plugged in as follows...
+A custom inflector can be plugged in as follows.
+
 ```ruby
-Alba.inflector = MyCustomInflector
-```
-...and has to implement following interface (the parameter `key` is of type `String`):
-```ruby
-module InflectorInterface
-  def camelize(key)
-    raise "Not implemented"
+module CustomInflector
+  module_function
+
+  def camelize(string)
   end
 
-  def camelize_lower(key)
-    raise "Not implemented"
+  def camelize_lower(string)
   end
 
-  def dasherize(key)
-    raise "Not implemented"
+  def dasherize(string)
+  end
+
+  def classify(string)
   end
 end
 
-```
-For example you could use `Dry::Inflector`, which implements exactly the above interface. If you are developing a `Hanami`-Application `Dry::Inflector` is around. In this case the following would be sufficient:
-```ruby
-Alba.inflector = Dry::Inflector.new
+Alba.enable_inference!(with: CustomInflector)
 ```
 
 ### Filtering attributes
@@ -516,7 +516,7 @@ We believe this is clearer than using some (not implemented yet) DSL such as `de
 After `Alba.enable_inference!` called, Alba tries to infer root key and association resource name.
 
 ```ruby
-Alba.enable_inference!
+Alba.enable_inference!(with: :active_support) # with :dry also works
 
 class User
   attr_reader :id
@@ -563,8 +563,6 @@ UserResource.new([user]).serialize # => '{"users":[{"id":1,"articles":[{"title":
 This resource automatically sets its root key to either "users" or "user", depending on the given object is collection or not.
 
 Also, you don't have to specify which resource class to use with `many`. Alba infers it from association name.
-
-Note that to enable this feature you must install `ActiveSupport` gem.
 
 ### Error handling
 

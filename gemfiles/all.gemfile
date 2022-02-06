@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'activesupport', require: false # For backend
+gem 'dry-inflector', require: false # For inflector
 gem 'ffaker', require: false # For testing
 gem 'minitest', '~> 5.14' # For test
 gem 'rake', '~> 13.0' # For test and automation

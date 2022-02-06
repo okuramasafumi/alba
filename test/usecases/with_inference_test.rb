@@ -53,7 +53,7 @@ class WithInferenceTest < Minitest::Test
   end
 
   class UserInferringResource
-    Alba.enable_inference! # Need this here instead of initializer
+    Alba.enable_inference!(with: :active_support) # Need this here instead of initializer
     include Alba::Resource
 
     attributes :id
@@ -62,7 +62,7 @@ class WithInferenceTest < Minitest::Test
   end
 
   def setup
-    Alba.enable_inference!
+    Alba.enable_inference!(with: :active_support)
     @user = User.new(1)
     @user.articles << Article.new(1, 'The title')
     @bank_account = BankAccount.new(123_456_789)
@@ -126,5 +126,35 @@ class WithInferenceTest < Minitest::Test
         end
       end
     )
+  end
+end
+
+# Test inference with `dry-inflector`
+class InferenceTestWithDry < WithInferenceTest
+  def setup
+    super
+    Alba.enable_inference!(with: :dry)
+  end
+end
+
+# Test inference with custom inflector
+class InferenceTestWithCustomInflector < WithInferenceTest
+  def setup
+    super
+    inflector = Object.new.tap do |i|
+      def i.camelize; end
+      def i.camelize_lower; end
+      def i.dasherize; end
+      def i.classify; end
+    end
+    Alba.enable_inference!(with: inflector)
+  end
+end
+
+class InferenceTestWithInvalidInflector < Minitest::Test
+  def test_it_raises_an_error_with_invalid_custom_inflector
+    assert_raises(Alba::Error) do
+      Alba.enable_inference!(with: Object.new)
+    end
   end
 end

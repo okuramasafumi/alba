@@ -1,5 +1,7 @@
 module Alba
-  # This module represents the inflector, which is used by default
+  # This module has two purposes.
+  # One is that we require `active_support/inflector` in this module so that we don't do that all over the place.
+  # Another is that `ActiveSupport::Inflector` doesn't have `camelize_lower` method that we want it to have, so this module works as an adapter.
   module DefaultInflector
     begin
       require 'active_support/inflector'

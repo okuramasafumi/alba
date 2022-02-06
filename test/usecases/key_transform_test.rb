@@ -61,7 +61,7 @@ class KeyTransformTest < Minitest::Test
   end
 
   def setup
-    Alba.enable_inference!
+    Alba.enable_inference!(with: :active_support)
 
     @user = User.new(1, 'Masafumi', 'Okura')
     @bank_account = BankAccount.new(123_456_789)

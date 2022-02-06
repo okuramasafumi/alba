@@ -85,7 +85,7 @@ class CircularAssociationTest < Minitest::Test
   end
 
   def setup
-    Alba.enable_inference!
+    Alba.enable_inference!(with: :active_support)
 
     @authors = Array.new(100) do
       Author.new(
