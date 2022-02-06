@@ -119,9 +119,8 @@ module Alba
     # @param nesting [String, nil] namespace Alba tries to find resource class in
     # @return [Class<Alba::Resource>] resource class
     def infer_resource_class(name, nesting: nil)
-      enable_inference!
       const_parent = nesting.nil? ? Object : Object.const_get(nesting)
-      const_parent.const_get("#{ActiveSupport::Inflector.classify(name)}Resource")
+      const_parent.const_get("#{inflector.classify(name)}Resource")
     end
 
     # Reset config variables
