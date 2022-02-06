@@ -2,7 +2,6 @@ require_relative 'one'
 require_relative 'many'
 require_relative 'typed_attribute'
 require_relative 'deprecation'
-require_relative 'default_inflector'
 
 module Alba
   # This module represents what should be serialized
@@ -191,6 +190,7 @@ module Alba
         end
       end
 
+      # rubocop:disable Metrics/MethodLength
       # @return [Symbol]
       def transform_key(key)
         return key if @_transform_type.nil?
@@ -198,13 +198,17 @@ module Alba
         key = key.to_s
         # TODO: Using default inflector here is for backward compatibility
         # From 2.0 it'll raise error when inflector is nil
-        inflector = Alba.inflector || Alba::DefaultInflector
+        inflector = Alba.inflector || begin
+          require_relative 'default_inflector'
+          Alba::DefaultInflector
+        end
         case @_transform_type # rubocop:disable Style/MissingElse
         when :camel then inflector.camelize(key)
         when :lower_camel then inflector.camelize_lower(key)
         when :dash then inflector.dasherize(key)
         end.to_sym
       end
+      # rubocop:enable Metrics/MethodLength
 
       def fetch_attribute(object, key, attribute)
         value = case attribute
