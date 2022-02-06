@@ -193,7 +193,8 @@ class AlbaTest < Minitest::Test
     many :articles, resource: ArticleResource
   end
 
-  def test_it_serializes_object_with_inferred_resource
+  def test_it_serializes_object_with_inferred_resource_when_inference_is_enabled
+    Alba.enable_inference!(with: :active_support)
     assert_equal(
       '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}',
       Alba.serialize(@user)
@@ -202,12 +203,20 @@ class AlbaTest < Minitest::Test
       '{"user":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
       Alba.serialize(@user, root_key: :user)
     )
+    Alba.disable_inference!
+  end
+
+  def test_it_raises_error_when_trying_to_infer_resource_when_inference_is_disabled
+    Alba.disable_inference!
+    assert_raises(Alba::Error) { Alba.serialize(@user) }
   end
 
   class Foo # rubocop:disable Lint/EmptyClass
   end
 
-  def test_it_raises_error_when_inferred_resource_does_not_exist
+  def test_it_raises_error_when_inferred_resource_does_not_exist_even_when_infernce_is_enabled
+    Alba.enable_inference!(with: :active_support)
     assert_raises(NameError) { Alba.serialize(Foo.new) }
+    Alba.disable_inference!
   end
 end
