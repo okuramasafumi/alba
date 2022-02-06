@@ -1,19 +1,11 @@
 require 'json'
 require_relative 'alba/version'
+require_relative 'alba/errors'
 require_relative 'alba/resource'
 require_relative 'alba/deprecation'
 
 # Core module
 module Alba
-  # Base class for Errors
-  class Error < StandardError; end
-
-  # Error class for backend which is not supported
-  class UnsupportedBackend < Error; end
-
-  # Error class for type which is not supported
-  class UnsupportedType < Error; end
-
   class << self
     attr_reader :backend, :encoder, :inferring, :_on_error, :_on_nil, :transforming_root_key
 
