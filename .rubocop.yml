@@ -46,9 +46,11 @@ Metrics:
     - 'test/**/*.rb'
 
 # `Resource` module is a core module and its length tends to be long...
+# `Alba` main module is also long because it has all parts of configuration
 Metrics/ModuleLength:
   Exclude:
     - 'lib/alba/resource.rb'
+    - 'lib/alba.rb'
 
 # Resource class includes DSLs, which tend to accept long list of parameters
 Metrics/ParameterLists:
