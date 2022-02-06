@@ -80,7 +80,7 @@ class KeyTransformTest < Minitest::Test
       end
     end
     assert_equal(
-      'Unknown transform_type: unknown. Supported transform_type are :camel, :lower_camel and :dash.',
+      'Unknown transform type: unknown. Supported type are :camel, :lower_camel and :dash.',
       err.message
     )
   end
@@ -140,6 +140,24 @@ class KeyTransformTest < Minitest::Test
     Alba.inflector = CustomInflector.new
     assert_equal(
       '{"camelized_id":1,"camelized_first_name":"Masafumi","camelized_last_name":"Okura"}',
+      UserResourceCamel.new(@user).serialize
+    )
+  end
+
+  class UserResourceCamelChild < UserResourceCamel
+  end
+
+  def test_transform_key_in_child_class
+    assert_equal(
+      '{"Id":1,"FirstName":"Masafumi","LastName":"Okura"}',
+      UserResourceCamelChild.new(@user).serialize
+    )
+  end
+
+  def test_default_inflector_is_used_when_inflector_is_nil
+    Alba.inflector = nil
+    assert_equal(
+      '{"Id":1,"FirstName":"Masafumi","LastName":"Okura"}',
       UserResourceCamel.new(@user).serialize
     )
   end

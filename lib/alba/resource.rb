@@ -1,15 +1,15 @@
 require_relative 'one'
 require_relative 'many'
-require_relative 'key_transform_factory'
 require_relative 'typed_attribute'
 require_relative 'deprecation'
+require_relative 'default_inflector'
 
 module Alba
   # This module represents what should be serialized
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_key_function: nil, _transforming_root_key: false, _on_error: nil, _on_nil: nil, _layout: nil}.freeze # rubocop:disable Layout/LineLength
+    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: nil, _transforming_root_key: false, _on_error: nil, _on_nil: nil, _layout: nil}.freeze # rubocop:disable Layout/LineLength
     private_constant :DSLS
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -191,11 +191,19 @@ module Alba
         end
       end
 
-      # Override this method to supply custom key transform method
+      # @return [Symbol]
       def transform_key(key)
-        return key if @_transform_key_function.nil?
+        return key if @_transform_type.nil?
 
-        @_transform_key_function.call(key.to_s)
+        key = key.to_s
+        # TODO: Using default inflector here is for backward compatibility
+        # From 2.0 it'll raise error when inflector is nil
+        inflector = Alba.inflector || Alba::DefaultInflector
+        case @_transform_type # rubocop:disable Style/MissingElse
+        when :camel then inflector.camelize(key)
+        when :lower_camel then inflector.camelize_lower(key)
+        when :dash then inflector.dasherize(key)
+        end.to_sym
       end
 
       def fetch_attribute(object, key, attribute)
@@ -391,10 +399,17 @@ module Alba
 
       # Transform keys as specified type
       #
-      # @param type [String, Symbol]
+      # @param type [String, Symbol] one of `:camel`, `:lower_camel`, `:dash`
       # @param root [Boolean] decides if root key also should be transformed
+      # @raise [Alba::Error] when type is not supported
       def transform_keys(type, root: nil)
-        @_transform_key_function = KeyTransformFactory.create(type.to_sym)
+        type = type.to_sym
+        unless %i[camel lower_camel dash].include?(type)
+          # This should be `ArgumentError` but for backward compatibility it raises `Alba::Error`
+          raise ::Alba::Error, "Unknown transform type: #{type}. Supported type are :camel, :lower_camel and :dash."
+        end
+
+        @_transform_type = type
         @_transforming_root_key = root
       end
 
