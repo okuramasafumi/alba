@@ -121,6 +121,10 @@ class CircularAssociationTest < Minitest::Test
     end
   end
 
+  def teardown
+    Alba.disable_inference!
+  end
+
   def test_within_option_works_for_serialize
     book = @books.sample
     result = JSON.parse(BookResource.new(book, within: {authors: :books, genre: :books}).serialize)
