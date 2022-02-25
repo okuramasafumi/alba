@@ -1,5 +1,7 @@
 module Alba
-  # This module represents the inflector, which is used by default
+  # This module has two purposes.
+  # One is that we require `active_support/inflector` in this module so that we don't do that all over the place.
+  # Another is that `ActiveSupport::Inflector` doesn't have `camelize_lower` method that we want it to have, so this module works as an adapter.
   module DefaultInflector
     begin
       require 'active_support/inflector'
@@ -31,6 +33,14 @@ module Alba
     # @return [String] dasherized key
     def dasherize(key)
       ActiveSupport::Inflector.dasherize(key)
+    end
+
+    # Classify a key
+    #
+    # @param key [String] key to be classified
+    # @return [String] classified key
+    def classify(key)
+      ActiveSupport::Inflector.classify(key)
     end
   end
 end

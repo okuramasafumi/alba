@@ -1,19 +1,11 @@
 require 'json'
 require_relative 'alba/version'
+require_relative 'alba/errors'
 require_relative 'alba/resource'
 require_relative 'alba/deprecation'
 
 # Core module
 module Alba
-  # Base class for Errors
-  class Error < StandardError; end
-
-  # Error class for backend which is not supported
-  class UnsupportedBackend < Error; end
-
-  # Error class for type which is not supported
-  class UnsupportedType < Error; end
-
   class << self
     attr_reader :backend, :encoder, :inferring, :_on_error, :_on_nil, :transforming_root_key
 
@@ -60,12 +52,16 @@ module Alba
     end
 
     # Enable inference for key and resource name
-    def enable_inference!
-      begin
-        require 'active_support/inflector'
-      rescue LoadError
-        raise ::Alba::Error, 'To enable inference, please install `ActiveSupport` gem.'
+    #
+    # @param with [Symbol, Class, Module] inflector
+    #   When it's a Symbol, it sets inflector with given name
+    #   When it's a Class or a Module, it sets given object to inflector
+    def enable_inference!(with: :default)
+      if with == :default
+        Alba::Deprecation.warn 'Calling `enable_inference!` without `with` keyword argument is deprecated. Pass `:active_support` to keep current behavior.'
       end
+
+      @inflector = inflector_from(with)
       @inferring = true
     end
 
@@ -119,9 +115,10 @@ module Alba
     # @param nesting [String, nil] namespace Alba tries to find resource class in
     # @return [Class<Alba::Resource>] resource class
     def infer_resource_class(name, nesting: nil)
-      enable_inference!
+      raise Alba::Error, 'Inference is disabled so Alba cannot infer resource name. Use `Alba.enable_inference!` before use.' unless Alba.inferring
+
       const_parent = nesting.nil? ? Object : Object.const_get(nesting)
-      const_parent.const_get("#{ActiveSupport::Inflector.classify(name)}Resource")
+      const_parent.const_get("#{inflector.classify(name)}Resource")
     end
 
     # Reset config variables
@@ -134,6 +131,19 @@ module Alba
     end
 
     private
+
+    def inflector_from(name_or_module)
+      case name_or_module
+      when :default, :active_support
+        require_relative 'alba/default_inflector'
+        Alba::DefaultInflector
+      when :dry
+        require 'dry/inflector'
+        Dry::Inflector.new
+      else
+        validate_inflector(name_or_module)
+      end
+    end
 
     def set_encoder_from_backend
       @encoder = case @backend
@@ -166,6 +176,14 @@ module Alba
       lambda do |hash|
         JSON.dump(hash)
       end
+    end
+
+    def validate_inflector(inflector)
+      unless %i[camelize camelize_lower dasherize classify].all? { |m| inflector.respond_to?(m) }
+        raise Alba::Error, "Given inflector, #{inflector.inspect} is not valid. It must implement `camelize`, `camelize_lower`, `dasherize` and `classify`."
+      end
+
+      inflector
     end
   end
 

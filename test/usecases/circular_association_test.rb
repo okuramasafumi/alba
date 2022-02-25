@@ -85,7 +85,7 @@ class CircularAssociationTest < Minitest::Test
   end
 
   def setup
-    Alba.enable_inference!
+    Alba.enable_inference!(with: :active_support)
 
     @authors = Array.new(100) do
       Author.new(
@@ -119,6 +119,10 @@ class CircularAssociationTest < Minitest::Test
         nil
       ).sync
     end
+  end
+
+  def teardown
+    Alba.disable_inference!
   end
 
   def test_within_option_works_for_serialize
