@@ -278,7 +278,7 @@ class PankoPostSerializer < Panko::Serializer
   has_many :comments, serializer: PankoCommentSerializer
 
   def commenter_names
-    object.comments.pluck(:name)
+    object.commenters.pluck(:name)
   end
 end
 
@@ -392,7 +392,7 @@ end
   end
 end
 
-posts = Post.all.to_a
+posts = Post.all.includes(:comments, :commenters)
 
 # --- Store the serializers in procs ---
 
@@ -408,9 +408,9 @@ alba_inline = Proc.new do
     end
   end
 end
-ams = Proc.new { ActiveModelSerializers::SerializableResource.new(posts, {}).as_json }
+ams = Proc.new { ActiveModelSerializers::SerializableResource.new(posts, {each_serializer: AMSPostSerializer}).to_json }
 blueprinter = Proc.new { PostBlueprint.render(posts) }
-fast_serializer = Proc.new { FastSerializerPostResource.new(posts).serializable_hash }
+fast_serializer = Proc.new { FastSerializerPostResource.new(posts).to_json }
 jbuilder = Proc.new do
   Jbuilder.new do |json|
     json.array!(posts) do |post|
