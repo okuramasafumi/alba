@@ -82,8 +82,12 @@ module Alba
         Alba.encoder.call(hash)
       end
 
+      # rubocop:disable Metrics/MethodLength
       def serialize_with(hash)
-        @serialized_json = encode(hash)
+        serialized_json = encode(hash)
+        return serialized_json unless @_layout
+
+        @serialized_json = serialized_json
         case @_layout
         when String # file
           ERB.new(File.read(@_layout)).result(binding)
@@ -94,11 +98,13 @@ module Alba
           @serialized_json
         end
       end
+      # rubocop:enable Metrics/MethodLength
 
       def hash_with_metadata(hash, meta)
-        base = @_meta ? instance_eval(&@_meta) : {}
-        metadata = base.merge(meta)
-        hash[:meta] = metadata unless metadata.empty?
+        return hash if meta.empty? && @_meta.nil?
+
+        metadata = @_meta ? instance_eval(&@_meta).merge(meta) : meta
+        hash[:meta] = metadata
         hash
       end
 
@@ -121,7 +127,7 @@ module Alba
       end
 
       def resource_name
-        self.class.name.demodulize.delete_suffix('Resource').underscore
+        @resource_name ||= self.class.name.demodulize.delete_suffix('Resource').underscore
       end
 
       def transforming_root_key?
@@ -137,7 +143,7 @@ module Alba
           rescue StandardError => e
             handle_error(e, object, key, attribute)
           end
-          arrays.reject(&:empty?).to_h
+          arrays.compact.to_h
         end
       end
 
@@ -163,17 +169,17 @@ module Alba
       def conditional_attribute_with_proc(object, key, attribute, condition)
         arity = condition.arity
         # We can return early to skip fetch_attribute
-        return [] if arity <= 1 && !instance_exec(object, &condition)
+        return if arity <= 1 && !instance_exec(object, &condition)
 
         fetched_attribute = fetch_attribute(object, key, attribute)
         attr = attribute.is_a?(Alba::Association) ? attribute.object : fetched_attribute
-        return [] if arity >= 2 && !instance_exec(object, attr, &condition)
+        return if arity >= 2 && !instance_exec(object, attr, &condition)
 
         [key, fetched_attribute]
       end
 
       def conditional_attribute_with_symbol(object, key, attribute, condition)
-        return [] unless __send__(condition)
+        return unless __send__(condition)
 
         [key, fetch_attribute(object, key, attribute)]
       end
@@ -183,7 +189,7 @@ module Alba
         case on_error
         when :raise, nil then raise
         when :nullify then [key, nil]
-        when :ignore then []
+        when :ignore then nil
         when Proc then on_error.call(error, object, key, attribute, self.class)
         else
           raise ::Alba::Error, "Unknown on_error: #{on_error.inspect}"
