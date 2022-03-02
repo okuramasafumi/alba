@@ -70,4 +70,32 @@ class LayoutTest < MiniTest::Test
       JSON.parse(UserResourceWithInlineLayoutReturningHash.new(@user).serialize)
     )
   end
+
+  def test_it_raises_exception_when_file_layout_is_not_a_string
+    error = assert_raises(ArgumentError) do
+      Class.new(UserResource) do
+        layout file: 42
+      end
+    end
+    assert_equal 'File layout must be a String representing filename', error.message
+  end
+
+  def test_it_raises_exception_when_inline_layout_is_not_a_proc
+    error = assert_raises(ArgumentError) do
+      Class.new(UserResource) do
+        layout inline: 42
+      end
+    end
+    assert_equal 'Inline layout must be a Proc returning a Hash or a String', error.message
+  end
+
+  def test_it_raises_exception_when_inline_layout_is_a_proc_but_returns_wrong_type
+    klass = Class.new(UserResource) do
+      layout inline: proc { 42 }
+    end
+    error = assert_raises(Alba::Error) do
+      klass.new(@user).serialize
+    end
+    assert_equal 'Inline layout must be a Proc returning a Hash or a String', error.message
+  end
 end
