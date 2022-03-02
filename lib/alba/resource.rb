@@ -82,23 +82,19 @@ module Alba
         Alba.encoder.call(hash)
       end
 
-      # rubocop:disable Metrics/MethodLength
       def serialize_with(hash)
         serialized_json = encode(hash)
         return serialized_json unless @_layout
 
         @serialized_json = serialized_json
-        case @_layout
-        when String # file
+        if @_layout.is_a?(String) # file
           ERB.new(File.read(@_layout)).result(binding)
-        when Proc # inline
+
+        else # inline
           inline = instance_eval(&@_layout)
           inline.is_a?(Hash) ? encode(inline) : inline
-        else # no layout
-          @serialized_json
         end
       end
-      # rubocop:enable Metrics/MethodLength
 
       def hash_with_metadata(hash, meta)
         return hash if meta.empty? && @_meta.nil?
@@ -394,8 +390,26 @@ module Alba
       # @params file [String] name of the layout file
       # @params inline [Proc] a proc returning JSON string or a Hash representing JSON
       def layout(file: nil, inline: nil)
-        @_layout = file || inline
+        @_layout = validated_file_layout(file) || validated_inline_layout(inline)
       end
+
+      def validated_file_layout(filename)
+        case filename
+        when String, nil then filename
+        else
+          raise ArgumentError, 'File layout must be a String representing filename'
+        end
+      end
+      private :validated_file_layout
+
+      def validated_inline_layout(inline_layout)
+        case inline_layout
+        when Proc, nil then inline_layout
+        else
+          raise ArgumentError, 'Inline layout must be a Proc returning a Hash or a String'
+        end
+      end
+      private :validated_inline_layout
 
       # Delete attributes
       # Use this DSL in child class to ignore certain attributes
