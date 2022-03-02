@@ -91,8 +91,17 @@ module Alba
           ERB.new(File.read(@_layout)).result(binding)
 
         else # inline
-          inline = instance_eval(&@_layout)
-          inline.is_a?(Hash) ? encode(inline) : inline
+          serialize_within_inline_layout
+        end
+      end
+
+      def serialize_within_inline_layout
+        inline = instance_eval(&@_layout)
+        case inline
+        when Hash then encode(inline)
+        when String then inline
+        else
+          raise Alba::Error, 'Inline layout must be a Proc returning a Hash or a String'
         end
       end
 

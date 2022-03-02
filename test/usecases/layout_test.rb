@@ -88,4 +88,14 @@ class LayoutTest < MiniTest::Test
     end
     assert_equal 'Inline layout must be a Proc returning a Hash or a String', error.message
   end
+
+  def test_it_raises_exception_when_inline_layout_is_a_proc_but_returns_wrong_type
+    klass = Class.new(UserResource) do
+      layout inline: proc { 42 }
+    end
+    error = assert_raises(Alba::Error) do
+      klass.new(@user).serialize
+    end
+    assert_equal 'Inline layout must be a Proc returning a Hash or a String', error.message
+  end
 end
