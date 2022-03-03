@@ -127,6 +127,8 @@ For the details, see [Error handling section](#error-handling)
 
 ### Simple serialization with root key
 
+You can define attributes with (yes) `attributes` macro with attribute names. If your attribute need some calculations, you can use `attribute` with block.
+
 ```ruby
 class User
   attr_accessor :id, :name, :email, :created_at, :updated_at
@@ -154,6 +156,33 @@ end
 user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
 UserResource.new(user).serialize
 # => "{\"user\":{\"id\":1,\"name\":\"Masafumi OKURA\",\"name_with_email\":\"Masafumi OKURA: masafumi@example.com\"}}"
+```
+
+You can define instance methods on resources so that you can use it as attribute name in `attributes`.
+
+```ruby
+# The serialization result is the same as above
+class UserResource
+  include Alba::Resource
+
+  root_key :user, :users # Later is for plural
+
+  attributes :id, :name, :name_with_email
+
+  # Attribute methods must accept one argument for each serialized object
+  def name_with_email(user)
+    "#{user.name}: #{user.email}"
+  end
+end
+```
+
+This even works with users collection.
+
+```ruby
+user1 = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
+user2 = User.new(2, 'Test User', 'test@example.com')
+UserResource.new([user1, user2]).serialize
+# => "{\"users\":[{\"id\":1,\"name\":\"Masafumi OKURA\",\"name_with_email\":\"Masafumi OKURA: masafumi@example.com\"},{\"id\":2,\"name\":\"Test User\",\"name_with_email\":\"Test User: test@example.com\"}]}"
 ```
 
 ### Serialization with associations

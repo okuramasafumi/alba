@@ -59,4 +59,19 @@ class CollectionTest < Minitest::Test
       UserResource.new([@user1, @user2]).serialize
     )
   end
+
+  class UserResourceWithAdditionalAttribute < UserResource
+    attributes :articles_size
+
+    def articles_size(user)
+      user.articles.size
+    end
+  end
+
+  def test_array_using_attribute_methods
+    assert_equal(
+      '[{"id":1,"articles":[{"title":"Hello World!"}],"articles_size":1},{"id":2,"articles":[{"title":"Super nice"}],"articles_size":1}]',
+      UserResourceWithAdditionalAttribute.new([@user1, @user2]).serialize
+    )
+  end
 end
