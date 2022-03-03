@@ -417,7 +417,8 @@ module Alba
       # Transform keys as specified type
       #
       # @param type [String, Symbol] one of `:camel`, `:lower_camel`, `:dash`
-      # @param root [Boolean] decides if root key also should be transformed
+      # @param root [Boolean, nil] decides if root key also should be transformed
+      #   When it's `nil`, Alba's default setting will be applied
       # @raise [Alba::Error] when type is not supported
       def transform_keys(type, root: nil)
         type = type.to_sym
