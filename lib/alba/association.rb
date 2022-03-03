@@ -1,7 +1,11 @@
 module Alba
-  # Base class for `One` and `Many`
-  # Child class should implement `to_h` method
+  # Representing association
   class Association
+    @const_cache = {}
+    class << self
+      attr_reader :const_cache
+    end
+
     attr_reader :object, :name
 
     # @param name [Symbol, String] name of the method to fetch association
@@ -12,11 +16,25 @@ module Alba
     def initialize(name:, condition: nil, resource: nil, nesting: nil, &block)
       @name = name
       @condition = condition
-      @block = block
       @resource = resource
       return if @resource
 
-      assign_resource(nesting)
+      assign_resource(nesting, block)
+    end
+
+    # Recursively converts an object into a Hash
+    #
+    # @param target [Object] the object having an association method
+    # @param within [Hash] determines what associations to be serialized. If not set, it serializes all associations.
+    # @param params [Hash] user-given Hash for arbitrary data
+    # @return [Hash]
+    def to_h(target, within: nil, params: {})
+      @object = target.public_send(@name)
+      @object = @condition.call(object, params) if @condition
+      return if @object.nil?
+
+      @resource = constantize(@resource)
+      @resource.new(object, params: params, within: within).to_h
     end
 
     private
@@ -26,13 +44,15 @@ module Alba
       when Class
         resource
       when Symbol, String
-        Object.const_get(resource)
+        self.class.const_cache.fetch(resource) do
+          self.class.const_cache[resource] = Object.const_get(resource)
+        end
       end
     end
 
-    def assign_resource(nesting)
-      @resource = if @block
-                    Alba.resource_class(&@block)
+    def assign_resource(nesting, block)
+      @resource = if block
+                    Alba.resource_class(&block)
                   elsif Alba.inferring
                     Alba.infer_resource_class(@name, nesting: nesting)
                   else

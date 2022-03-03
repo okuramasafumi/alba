@@ -1,5 +1,4 @@
-require_relative 'one'
-require_relative 'many'
+require_relative 'association'
 require_relative 'typed_attribute'
 require_relative 'deprecation'
 
@@ -225,7 +224,7 @@ module Alba
         value = case attribute
                 when Symbol then object.public_send attribute
                 when Proc then instance_exec(object, &attribute)
-                when Alba::One, Alba::Many then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(object, params: params, within: within) }
+                when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(object, params: params, within: within) }
                 when TypedAttribute then attribute.value(object)
                 else
                   raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
@@ -319,7 +318,7 @@ module Alba
         @_attributes[name.to_sym] = options[:if] ? [block, options[:if]] : block
       end
 
-      # Set One association
+      # Set association
       #
       # @param name [String, Symbol] name of the association, used as key when `key` param doesn't exist
       # @param condition [Proc, nil] a Proc to modify the association
@@ -329,31 +328,16 @@ module Alba
       # @option options [Proc] if a condition to decide if this association should be serialized
       # @param block [Block]
       # @return [void]
-      # @see Alba::One#initialize
-      def one(name, condition = nil, resource: nil, key: nil, **options, &block)
+      # @see Alba::Association#initialize
+      def association(name, condition = nil, resource: nil, key: nil, **options, &block)
         nesting = self.name&.rpartition('::')&.first
-        one = One.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
-        @_attributes[key&.to_sym || name.to_sym] = options[:if] ? [one, options[:if]] : one
+        assoc = Association.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
+        @_attributes[key&.to_sym || name.to_sym] = options[:if] ? [assoc, options[:if]] : assoc
       end
-      alias has_one one
-
-      # Set Many association
-      #
-      # @param name [String, Symbol] name of the association, used as key when `key` param doesn't exist
-      # @param condition [Proc, nil] a Proc to filter the collection
-      # @param resource [Class<Alba::Resource>, String, nil] representing resource for this association
-      # @param key [String, Symbol, nil] used as key when given
-      # @param options [Hash<Symbol, Proc>]
-      # @option options [Proc] if a condition to decide if this association should be serialized
-      # @param block [Block]
-      # @return [void]
-      # @see Alba::Many#initialize
-      def many(name, condition = nil, resource: nil, key: nil, **options, &block)
-        nesting = self.name&.rpartition('::')&.first
-        many = Many.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
-        @_attributes[key&.to_sym || name.to_sym] = options[:if] ? [many, options[:if]] : many
-      end
-      alias has_many many
+      alias one association
+      alias many association
+      alias has_one association
+      alias has_many association
 
       # Set key
       #
