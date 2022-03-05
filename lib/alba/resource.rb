@@ -37,6 +37,7 @@ module Alba
         @object = object
         @params = params.freeze
         @within = within
+        @method_existence = {} # Cache for `respond_to?` result
         DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.public_send(name)) }
       end
 
@@ -222,7 +223,7 @@ module Alba
 
       def fetch_attribute(object, key, attribute)
         value = case attribute
-                when Symbol then object.public_send attribute
+                when Symbol then fetch_attribute_from_object_and_resource(object, attribute)
                 when Proc then instance_exec(object, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(object, params: params, within: within) }
                 when TypedAttribute then attribute.value(object)
@@ -230,6 +231,12 @@ module Alba
                   raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
                 end
         value.nil? && nil_handler ? instance_exec(object, key, attribute, &nil_handler) : value
+      end
+
+      def fetch_attribute_from_object_and_resource(object, attribute)
+        has_method = @method_existence[attribute]
+        has_method = @method_existence[attribute] = object.respond_to?(attribute) if has_method.nil?
+        has_method ? object.public_send(attribute) : __send__(attribute, object)
       end
 
       def nil_handler

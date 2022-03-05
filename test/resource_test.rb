@@ -17,8 +17,12 @@ class ResourceTest < MiniTest::Test
   class FooResource
     include Alba::Resource
     root_key :foo
-    attributes :id
+    attributes :id, :bar_size
     many :bars, resource: BarResource
+
+    def bar_size(foo)
+      foo.bars.size
+    end
   end
 
   def test_serializable_hash
@@ -28,7 +32,7 @@ class ResourceTest < MiniTest::Test
     bar.id = 1
     foo.bars = [bar]
     assert_equal(
-      {id: 1, bars: [{id: 1}]},
+      {id: 1, bar_size: 1, bars: [{id: 1}]},
       FooResource.new(foo).serializable_hash
     )
   end
