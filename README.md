@@ -343,9 +343,11 @@ Alba.serialize(something)
 
 Although this might be useful sometimes, it's generally recommended to define a class for Resource.
 
-### Inheritance and Ignorance
+### Inheritance and attributes filter
 
-You can `exclude` or `ignore` certain attributes using `ignoring`.
+You can filter out certain attributes by overriding `attributes` instance method. This is useful when you want to customize existing resource with inheritance.
+
+You can access raw attributes via `super` call. It returns a Hash whose keys are the name of the attribute and whose values are the body. Usually you need only keys to filter out, like below.
 
 ```ruby
 class Foo
@@ -365,7 +367,9 @@ class GenericFooResource
 end
 
 class RestrictedFooResource < GenericFooResource
-  ignoring :id, :body
+  def attributes
+    super.select { |key, _| key.to_sym == :name }
+  end
 end
 
 RestrictedFooResource.new(foo).serialize

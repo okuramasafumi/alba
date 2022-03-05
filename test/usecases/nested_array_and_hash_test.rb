@@ -34,7 +34,10 @@ class HashAttributeTest < MiniTest::Test
 
   class ExtendedFooResource < FooResource
     many :bars, resource: BarResource
-    ignoring :config
+
+    def attributes
+      @_attributes.reject { |key, _| key == :config }
+    end
   end
 
   def test_it_works_with_hash_attribute
