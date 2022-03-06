@@ -141,7 +141,7 @@ module Alba
 
       def converter
         lambda do |object|
-          arrays = @_attributes.map do |key, attribute|
+          arrays = attributes.map do |key, attribute|
             key_and_attribute_body_from(object, key, attribute)
           rescue ::Alba::Error, FrozenError, TypeError
             raise
@@ -150,6 +150,12 @@ module Alba
           end
           arrays.compact.to_h
         end
+      end
+
+      # This is default behavior for getting attributes for serialization
+      # Override this method to filter certain attributes
+      def attributes
+        @_attributes
       end
 
       def key_and_attribute_body_from(object, key, attribute)
@@ -416,6 +422,7 @@ module Alba
       #
       # @param attributes [Array<String, Symbol>]
       def ignoring(*attributes)
+        Alba::Deprecation.warn '`ignoring` is deprecated now. Instead please use `attributes` instance method to filter out attributes.'
         attributes.each do |attr_name|
           @_attributes.delete(attr_name.to_sym)
         end
