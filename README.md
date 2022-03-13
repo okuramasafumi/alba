@@ -702,43 +702,6 @@ UserResource.new(User.new(1)).serialize
 # => '{"user":{"id":1,"name":"User1","age":20}}'
 ```
 
-You can also set global nil handler.
-
-```ruby
-Alba.on_nil { 'default name' }
-
-class Foo
-  attr_reader :name
-  def initialize(name)
-    @name = name
-  end
-end
-
-class FooResource
-  include Alba::Resource
-
-  key :foo
-
-  attributes :name
-end
-
-FooResource.new(Foo.new).serialize
-# => '{"foo":{"name":"default name"}}'
-
-class FooResource2
-  include Alba::Resource
-
-  key :foo
-
-  on_nil { '' } # This is applied instead of global handler
-
-  attributes :name
-end
-
-FooResource2.new(Foo.new).serialize
-# => '{"foo":{"name":""}}'
-```
-
 ### Metadata
 
 You can set a metadata with `meta` DSL or `meta` option.

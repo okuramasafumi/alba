@@ -88,7 +88,9 @@ module Alba
     #
     # @param block [Block]
     # @return [void]
+    # @deprecated Use `Resource.on_nil` instead
     def on_nil(&block)
+      Alba::Deprecation.warn '`Alba.on_nil` is deprecated, use `on_nil` on resource class instead.'
       @_on_nil = block
     end
 
