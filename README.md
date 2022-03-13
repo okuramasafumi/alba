@@ -115,14 +115,6 @@ You can choose which inflector Alba uses for inference. Possible value for `with
 - `:dry` for `Dry::Inflector`
 - any object which responds to some methods (see [below](#custom-inflector))
 
-#### Error handling configuration
-
-You can configure error handling with `on_error` method.
-
-```ruby
-Alba.on_error :ignore
-```
-
 For the details, see [Error handling section](#error-handling)
 
 ### Simple serialization with root key
@@ -640,12 +632,14 @@ There are four possible arguments `on_error` method accepts.
 The block receives five arguments, `error`, `object`, `key`, `attribute` and `resource class` and must return a two-element array. Below is an example.
 
 ```ruby
-# Global error handling
-Alba.on_error do |error, object, key, attribute, resource_class|
-  if resource_class == MyResource
-    ['error_fallback', object.error_fallback]
-  else
-    [key, error.message]
+class ExampleResource
+  include Alba::Resource
+  on_error do |error, object, key, attribute, resource_class|
+    if resource_class == MyResource
+      ['error_fallback', object.error_fallback]
+    else
+      [key, error.message]
+    end
   end
 end
 ```

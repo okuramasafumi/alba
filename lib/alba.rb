@@ -76,8 +76,10 @@ module Alba
     # @param [Block]
     # @raise [ArgumentError] if both handler and block params exist
     # @raise [ArgumentError] if both handler and block params don't exist
+    # @deprecated Use `Resource.on_error` instead
     # @return [void]
     def on_error(handler = nil, &block)
+      Alba::Deprecation.warn '`Alba.on_error` is deprecated, use `on_error` on resource class instead.'
       raise ArgumentError, 'You cannot specify error handler with both Symbol and block' if handler && block
       raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
 
