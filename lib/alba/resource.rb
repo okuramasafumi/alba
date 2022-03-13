@@ -139,6 +139,7 @@ module Alba
         @_transforming_root_key.nil? ? Alba.transforming_root_key : @_transforming_root_key
       end
 
+      # rubocop:disable Metrics/MethodLength
       def converter
         lambda do |object|
           arrays = attributes.map do |key, attribute|
@@ -148,9 +149,11 @@ module Alba
           rescue StandardError => e
             handle_error(e, object, key, attribute)
           end
-          arrays.compact.to_h
+          arrays.compact!
+          arrays.to_h
         end
       end
+      # rubocop:enable Metrics/MethodLength
 
       # This is default behavior for getting attributes for serialization
       # Override this method to filter certain attributes
