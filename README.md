@@ -452,6 +452,9 @@ module CustomInflector
   def dasherize(string)
   end
 
+  def underscore(string)
+  end
+
   def classify(string)
   end
 end

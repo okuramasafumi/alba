@@ -37,6 +37,15 @@ class KeyTransformTest < Minitest::Test
     transform_keys :dash
   end
 
+  class UserResourceSnake < UserResource
+    transform_keys :snake
+  end
+
+  class UserResourceNone < UserResource
+    transform_keys :dash
+    transform_keys :none # Reset
+  end
+
   class BankAccountResource
     include Alba::Resource
 
@@ -105,6 +114,20 @@ class KeyTransformTest < Minitest::Test
     assert_equal(
       '{"id":1,"first-name":"Masafumi","last-name":"Okura"}',
       UserResourceDash.new(@user).serialize
+    )
+  end
+
+  def test_transform_key_to_snake
+    assert_equal(
+      '{"id":1,"first_name":"Masafumi","last_name":"Okura"}',
+      UserResourceSnake.new(@user).serialize
+    )
+  end
+
+  def test_transform_key_to_none
+    assert_equal(
+      '{"id":1,"first_name":"Masafumi","last_name":"Okura"}',
+      UserResourceNone.new(@user).serialize
     )
   end
 

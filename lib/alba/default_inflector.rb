@@ -35,6 +35,14 @@ module Alba
       ActiveSupport::Inflector.dasherize(key)
     end
 
+    # Underscore a key
+    #
+    # @param key [String] key to be underscore
+    # @return [String] underscored key
+    def underscore(key)
+      ActiveSupport::Inflector.underscore(key)
+    end
+
     # Classify a key
     #
     # @param key [String] key to be classified
