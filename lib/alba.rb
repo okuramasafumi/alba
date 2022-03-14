@@ -97,12 +97,18 @@ module Alba
     end
 
     # Enable root key transformation
+    #
+    # @deprecated Use `Resource.transform_keys` with `root` option instead
     def enable_root_key_transformation!
+      Alba::Deprecation.warn '`Alba.enable_root_key_transformation!` is deprecated, use `transform_keys` on resource class instead.'
       @transforming_root_key = true
     end
 
     # Disable root key transformation
+    #
+    # @deprecated Use `Resource.transform_keys` with `root` option instead
     def disable_root_key_transformation!
+      Alba::Deprecation.warn '`Alba.disable_root_key_transformation!` is deprecated, use `transform_keys` on resource class instead.'
       @transforming_root_key = false
     end
 

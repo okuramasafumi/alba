@@ -404,7 +404,7 @@ You can also transform root key when:
 
 * `Alba.enable_inference!` is called
 * `root_key!` is called in Resource class
-* `root` option of `transform_keys` is set to true or `Alba.enable_root_key_transformation!` is called.
+* `root` option of `transform_keys` is set to true
 
 ```ruby
 Alba.enable_inference!(with: :active_support) # with :dry also works
