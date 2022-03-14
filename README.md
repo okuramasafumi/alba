@@ -400,6 +400,14 @@ UserResourceCamel.new(user).serialize
 # => '{"id":1,"firstName":"Masafumi","lastName":"Okura"}'
 ```
 
+Possible values for `transform_keys` argument are:
+
+* `:camel` for CamelCase
+* `:lower_camel` for lowerCamelCase
+* `:dash` for dash-case
+* `:snake` for snake_case
+* `:none` for not transforming keys
+
 You can also transform root key when:
 
 * `Alba.enable_inference!` is called
