@@ -115,14 +115,6 @@ You can choose which inflector Alba uses for inference. Possible value for `with
 - `:dry` for `Dry::Inflector`
 - any object which responds to some methods (see [below](#custom-inflector))
 
-#### Error handling configuration
-
-You can configure error handling with `on_error` method.
-
-```ruby
-Alba.on_error :ignore
-```
-
 For the details, see [Error handling section](#error-handling)
 
 ### Simple serialization with root key
@@ -408,11 +400,19 @@ UserResourceCamel.new(user).serialize
 # => '{"id":1,"firstName":"Masafumi","lastName":"Okura"}'
 ```
 
+Possible values for `transform_keys` argument are:
+
+* `:camel` for CamelCase
+* `:lower_camel` for lowerCamelCase
+* `:dash` for dash-case
+* `:snake` for snake_case
+* `:none` for not transforming keys
+
 You can also transform root key when:
 
 * `Alba.enable_inference!` is called
 * `root_key!` is called in Resource class
-* `root` option of `transform_keys` is set to true or `Alba.enable_root_key_transformation!` is called.
+* `root` option of `transform_keys` is set to true
 
 ```ruby
 Alba.enable_inference!(with: :active_support) # with :dry also works
@@ -458,6 +458,9 @@ module CustomInflector
   end
 
   def dasherize(string)
+  end
+
+  def underscore(string)
   end
 
   def classify(string)
@@ -640,12 +643,14 @@ There are four possible arguments `on_error` method accepts.
 The block receives five arguments, `error`, `object`, `key`, `attribute` and `resource class` and must return a two-element array. Below is an example.
 
 ```ruby
-# Global error handling
-Alba.on_error do |error, object, key, attribute, resource_class|
-  if resource_class == MyResource
-    ['error_fallback', object.error_fallback]
-  else
-    [key, error.message]
+class ExampleResource
+  include Alba::Resource
+  on_error do |error, object, key, attribute, resource_class|
+    if resource_class == MyResource
+      ['error_fallback', object.error_fallback]
+    else
+      [key, error.message]
+    end
   end
 end
 ```
@@ -700,43 +705,6 @@ end
 
 UserResource.new(User.new(1)).serialize
 # => '{"user":{"id":1,"name":"User1","age":20}}'
-```
-
-You can also set global nil handler.
-
-```ruby
-Alba.on_nil { 'default name' }
-
-class Foo
-  attr_reader :name
-  def initialize(name)
-    @name = name
-  end
-end
-
-class FooResource
-  include Alba::Resource
-
-  key :foo
-
-  attributes :name
-end
-
-FooResource.new(Foo.new).serialize
-# => '{"foo":{"name":"default name"}}'
-
-class FooResource2
-  include Alba::Resource
-
-  key :foo
-
-  on_nil { '' } # This is applied instead of global handler
-
-  attributes :name
-end
-
-FooResource2.new(Foo.new).serialize
-# => '{"foo":{"name":""}}'
 ```
 
 ### Metadata

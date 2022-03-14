@@ -37,6 +37,15 @@ class KeyTransformTest < Minitest::Test
     transform_keys :dash
   end
 
+  class UserResourceSnake < UserResource
+    transform_keys :snake
+  end
+
+  class UserResourceNone < UserResource
+    transform_keys :dash
+    transform_keys :none # Reset
+  end
+
   class BankAccountResource
     include Alba::Resource
 
@@ -69,7 +78,9 @@ class KeyTransformTest < Minitest::Test
 
   def teardown
     Alba.disable_inference!
-    Alba.disable_root_key_transformation!
+    assert_output '', /`Alba.disable_root_key_transformation!` is deprecated, use `transform_keys` on resource class instead./ do # rubocop:disable Minitest/AssertionInLifecycleHook
+      Alba.disable_root_key_transformation!
+    end
     Alba.inflector = nil
   end
 
@@ -106,6 +117,20 @@ class KeyTransformTest < Minitest::Test
     )
   end
 
+  def test_transform_key_to_snake
+    assert_equal(
+      '{"id":1,"first_name":"Masafumi","last_name":"Okura"}',
+      UserResourceSnake.new(@user).serialize
+    )
+  end
+
+  def test_transform_key_to_none
+    assert_equal(
+      '{"id":1,"first_name":"Masafumi","last_name":"Okura"}',
+      UserResourceNone.new(@user).serialize
+    )
+  end
+
   def test_transform_key_to_dash_with_key_inference_does_not_work_on_root_key_when_global_root_key_transformation_disabled
     assert_equal(
       '{"bank_account":{"account-number":123456789}}',
@@ -114,7 +139,9 @@ class KeyTransformTest < Minitest::Test
   end
 
   def test_transform_key_to_dash_with_key_inference_works_on_root_key_when_global_root_key_transformation_enabled
-    Alba.enable_root_key_transformation!
+    assert_output '', /`Alba.enable_root_key_transformation!` is deprecated, use `transform_keys` on resource class instead./ do
+      Alba.enable_root_key_transformation!
+    end
     assert_equal(
       '{"bank-account":{"account-number":123456789}}',
       BankAccountResource.new(@bank_account).serialize
@@ -122,7 +149,9 @@ class KeyTransformTest < Minitest::Test
   end
 
   def test_transform_key_to_dash_with_key_inference_does_not_work_on_root_key_when_global_root_key_transformation_enabled_but_root_option_set_to_false
-    Alba.enable_root_key_transformation!
+    assert_output '', /`Alba.enable_root_key_transformation!` is deprecated, use `transform_keys` on resource class instead./ do
+      Alba.enable_root_key_transformation!
+    end
     assert_equal(
       '{"bank_account_root_false":{"account-number":123456789}}',
       BankAccountRootFalseResource.new(@bank_account).serialize

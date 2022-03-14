@@ -7,7 +7,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: nil, _transforming_root_key: false, _on_error: nil, _on_nil: nil, _layout: nil}.freeze # rubocop:disable Layout/LineLength
+    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _on_error: nil, _on_nil: nil, _layout: nil}.freeze # rubocop:disable Layout/LineLength
     private_constant :DSLS
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -213,7 +213,7 @@ module Alba
       # rubocop:disable Metrics/MethodLength
       # @return [Symbol]
       def transform_key(key)
-        return key if @_transform_type.nil?
+        return key if @_transform_type == :none
 
         key = key.to_s
         # TODO: Using default inflector here is for backward compatibility
@@ -226,6 +226,7 @@ module Alba
         when :camel then inflector.camelize(key)
         when :lower_camel then inflector.camelize_lower(key)
         when :dash then inflector.dasherize(key)
+        when :snake then inflector.underscore(key)
         end.to_sym
       end
       # rubocop:enable Metrics/MethodLength
@@ -433,13 +434,13 @@ module Alba
 
       # Transform keys as specified type
       #
-      # @param type [String, Symbol] one of `:camel`, `:lower_camel`, `:dash`
+      # @param type [String, Symbol] one of `snake`, `:camel`, `:lower_camel`, `:dash` and `none`
       # @param root [Boolean, nil] decides if root key also should be transformed
       #   When it's `nil`, Alba's default setting will be applied
       # @raise [Alba::Error] when type is not supported
       def transform_keys(type, root: nil)
         type = type.to_sym
-        unless %i[camel lower_camel dash].include?(type)
+        unless %i[none snake camel lower_camel dash].include?(type)
           # This should be `ArgumentError` but for backward compatibility it raises `Alba::Error`
           raise ::Alba::Error, "Unknown transform type: #{type}. Supported type are :camel, :lower_camel and :dash."
         end

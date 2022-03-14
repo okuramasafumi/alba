@@ -76,8 +76,10 @@ module Alba
     # @param [Block]
     # @raise [ArgumentError] if both handler and block params exist
     # @raise [ArgumentError] if both handler and block params don't exist
+    # @deprecated Use `Resource.on_error` instead
     # @return [void]
     def on_error(handler = nil, &block)
+      Alba::Deprecation.warn '`Alba.on_error` is deprecated, use `on_error` on resource class instead.'
       raise ArgumentError, 'You cannot specify error handler with both Symbol and block' if handler && block
       raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
 
@@ -88,17 +90,25 @@ module Alba
     #
     # @param block [Block]
     # @return [void]
+    # @deprecated Use `Resource.on_nil` instead
     def on_nil(&block)
+      Alba::Deprecation.warn '`Alba.on_nil` is deprecated, use `on_nil` on resource class instead.'
       @_on_nil = block
     end
 
     # Enable root key transformation
+    #
+    # @deprecated Use `Resource.transform_keys` with `root` option instead
     def enable_root_key_transformation!
+      Alba::Deprecation.warn '`Alba.enable_root_key_transformation!` is deprecated, use `transform_keys` on resource class instead.'
       @transforming_root_key = true
     end
 
     # Disable root key transformation
+    #
+    # @deprecated Use `Resource.transform_keys` with `root` option instead
     def disable_root_key_transformation!
+      Alba::Deprecation.warn '`Alba.disable_root_key_transformation!` is deprecated, use `transform_keys` on resource class instead.'
       @transforming_root_key = false
     end
 
