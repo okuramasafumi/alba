@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] 2022-03-16
+
+- [Feat] Support instance method as an attribute
+- [Fix] Explicitly raise error when inference is disabled
+- [Improve] `enable_inference!` now takes inflector as argument
+- [Improve] `transform_keys` now accepts `:snake` and `:none`
+- [Deprecate] `to_hash` is special method and should not be used
+- [Deprecate] `ignoring` in favor of `attributes` overriding
+- [Deprecate] `Alba.on_nil`, `Alba.on_error` and `Alba.enable_root_key_transformation!`
+
 ## [1.5.0] 2021-11-28
 
 - [Feat] Add nil handler
