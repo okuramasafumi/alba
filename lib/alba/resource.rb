@@ -13,6 +13,9 @@ module Alba
     WITHIN_DEFAULT = Object.new.freeze
     private_constant :WITHIN_DEFAULT
 
+    CONDITION_UMNET = Object.new.freeze
+    private_constant :CONDITION_UMNET
+
     # @private
     def self.included(base)
       super
@@ -64,7 +67,11 @@ module Alba
       #
       # @return [Hash]
       def serializable_hash
-        collection? ? @object.map(&converter) : converter.call(@object)
+        if collection?
+          @object.each_with_object([], &collection_converter)
+        else
+          converter.call(@object)
+        end
       end
       alias to_h serializable_hash
 
@@ -139,21 +146,31 @@ module Alba
         @_transforming_root_key.nil? ? Alba.transforming_root_key : @_transforming_root_key
       end
 
-      # rubocop:disable Metrics/MethodLength
       def converter
         lambda do |object|
-          arrays = attributes.map do |key, attribute|
-            key_and_attribute_body_from(object, key, attribute)
-          rescue ::Alba::Error, FrozenError, TypeError
-            raise
-          rescue StandardError => e
-            handle_error(e, object, key, attribute)
-          end
-          arrays.compact!
-          arrays.to_h
+          attributes_to_hash(object, {})
         end
       end
-      # rubocop:enable Metrics/MethodLength
+
+      def collection_converter
+        lambda do |object, a|
+          a << {}
+          h = a.last
+          attributes_to_hash(object, h)
+          a
+        end
+      end
+
+      def attributes_to_hash(object, hash)
+        attributes.each do |key, attribute|
+          set_key_and_attribute_body_from(object, key, attribute, hash)
+        rescue ::Alba::Error, FrozenError, TypeError
+          raise
+        rescue StandardError => e
+          handle_error(e, object, key, attribute, hash)
+        end
+        hash
+      end
 
       # This is default behavior for getting attributes for serialization
       # Override this method to filter certain attributes
@@ -161,14 +178,14 @@ module Alba
         @_attributes
       end
 
-      def key_and_attribute_body_from(object, key, attribute)
+      def set_key_and_attribute_body_from(object, key, attribute, hash)
         key = transform_key(key)
-        if attribute.is_a?(Array) # Conditional
-          conditional_attribute(object, key, attribute)
-        else
-          fetched_attribute = fetch_attribute(object, key, attribute)
-          [key, fetched_attribute]
-        end
+        value = if attribute.is_a?(Array) # Conditional
+                  conditional_attribute(object, key, attribute)
+                else
+                  fetch_attribute(object, key, attribute)
+                end
+        hash[key] = value unless value == CONDITION_UMNET
       end
 
       def conditional_attribute(object, key, attribute)
@@ -183,28 +200,30 @@ module Alba
       def conditional_attribute_with_proc(object, key, attribute, condition)
         arity = condition.arity
         # We can return early to skip fetch_attribute
-        return if arity <= 1 && !instance_exec(object, &condition)
+        return CONDITION_UMNET if arity <= 1 && !instance_exec(object, &condition)
 
         fetched_attribute = fetch_attribute(object, key, attribute)
         attr = attribute.is_a?(Alba::Association) ? attribute.object : fetched_attribute
-        return if arity >= 2 && !instance_exec(object, attr, &condition)
+        return CONDITION_UMNET if arity >= 2 && !instance_exec(object, attr, &condition)
 
-        [key, fetched_attribute]
+        fetched_attribute
       end
 
       def conditional_attribute_with_symbol(object, key, attribute, condition)
-        return unless __send__(condition)
+        return CONDITION_UMNET unless __send__(condition)
 
-        [key, fetch_attribute(object, key, attribute)]
+        fetch_attribute(object, key, attribute)
       end
 
-      def handle_error(error, object, key, attribute)
+      def handle_error(error, object, key, attribute, hash)
         on_error = @_on_error || Alba._on_error
         case on_error
         when :raise, nil then raise
-        when :nullify then [key, nil]
+        when :nullify then hash[key] = nil
         when :ignore then nil
-        when Proc then on_error.call(error, object, key, attribute, self.class)
+        when Proc
+          key, value = on_error.call(error, object, key, attribute, self.class)
+          hash[key] = value
         else
           raise ::Alba::Error, "Unknown on_error: #{on_error.inspect}"
         end

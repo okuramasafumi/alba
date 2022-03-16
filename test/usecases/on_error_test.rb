@@ -53,6 +53,12 @@ class OnErrorTest < MiniTest::Test
     on_error :invalid
   end
 
+  class UserResourceToChangeErrorKey < UserResource
+    on_error do |error|
+      ['error', error.message]
+    end
+  end
+
   # TODO: We can remove global setup in 2.0
   def setup
     assert_output '', /`Alba.on_error` is deprecated, use `on_error` on resource class instead./ do # rubocop:disable Minitest/AssertionInLifecycleHook
@@ -136,5 +142,12 @@ class OnErrorTest < MiniTest::Test
     assert_raises ArgumentError do
       eval(resource)
     end
+  end
+
+  def test_on_error_block_that_changes_key
+    assert_equal(
+      '{"user":{"id":1,"name":"Masafumi OKURA","error":"Error!"}}',
+      UserResourceToChangeErrorKey.new(@user).serialize
+    )
   end
 end
