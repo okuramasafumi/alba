@@ -217,15 +217,13 @@ module Alba
 
       def handle_error(error, object, key, attribute, hash)
         on_error = @_on_error || Alba._on_error
-        case on_error
+        case on_error # rubocop:disable Style/MissingElse
         when :raise, nil then raise
         when :nullify then hash[key] = nil
         when :ignore then nil
         when Proc
           key, value = on_error.call(error, object, key, attribute, self.class)
           hash[key] = value
-        else
-          raise ::Alba::Error, "Unknown on_error: #{on_error.inspect}"
         end
       end
 
@@ -477,8 +475,19 @@ module Alba
         raise ArgumentError, 'You cannot specify error handler with both Symbol and block' if handler && block
         raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
 
-        @_on_error = handler || block
+        @_on_error = block || validated_error_handler(handler)
       end
+
+      def validated_error_handler(handler)
+        unless %i[raise ignore nullify].include?(handler)
+          # For backward compatibility
+          # TODO: Change this to ArgumentError
+          raise Alba::Error, "Unknown error handler: #{handler}. It must be one of `:raise`, `:ignore` or `:nullify`."
+        end
+
+        handler
+      end
+      private :validated_error_handler
 
       # Set nil handler
       #
