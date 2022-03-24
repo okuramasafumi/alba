@@ -27,10 +27,6 @@ class DependenciesTest < MiniTest::Test
   end
 
   if ENV['BUNDLE_GEMFILE'] == File.expand_path('gemfiles/without_active_support.gemfile')
-    def test_load_error_for_inference
-      assert_raises(Alba::Error) { Alba.enable_inference! }
-    end
-
     def test_alba_error_is_raised_if_keys_should_be_transformed_but_active_support_is_no_dependency
       err = assert_raises(Alba::Error) do
         UserResourceCamel.new(@user).serialize

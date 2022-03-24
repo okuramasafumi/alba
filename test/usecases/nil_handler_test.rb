@@ -150,25 +150,4 @@ class NilHandlerTest < Minitest::Test
       UserResource2.new(@user3).serialize
     )
   end
-
-  # TODO: We can remove this test after releasing 2.0
-  # rubocop:disable Minitest/MultipleAssertions
-  def test_nil_handler_set_globally
-    assert_output '', /`Alba.on_nil` is deprecated, use `on_nil` on resource class instead./ do
-      Alba.on_nil { 'global' }
-    end
-    assert_equal(
-      '{"user":{"id":1,"name":"User1","age":"global","profile":{"email":"test@example.com","full_name":"global"},"articles":[{"title":"Hello World!"}]}}',
-      UserResource.new(@user1).serialize
-    )
-    assert_equal(
-      '{"user":{"id":2,"name":"global","age":"global","profile":{"email":"test2@example.com","full_name":"John Doe"},"articles":[{"title":"Super nice"}]}}',
-      UserResource.new(@user2).serialize
-    )
-    assert_equal(
-      '{"user":{"id":3,"name":"User3","age":19,"profile":"global","articles":[]}}',
-      UserResource.new(@user3).serialize
-    )
-  end
-  # rubocop:enable Minitest/MultipleAssertions
 end

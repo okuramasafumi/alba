@@ -27,14 +27,4 @@ class InheritanceAndIgnoranceTest < MiniTest::Test
     foo = Foo.new(1, 'my foo', 'my body')
     assert_equal '{"name":"my foo"}', RestrictedFooResouce.new(foo).serialize
   end
-
-  if Alba::VERSION <= '2.0'
-    def test_using_ignoring_prints_warning
-      assert_output('', /`ignoring` is deprecated now. Instead please use `attributes` instance method to filter out attributes./) do
-        Class.new(GenericFooResource) do
-          ignoring :id
-        end
-      end
-    end
-  end
 end

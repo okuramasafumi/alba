@@ -38,17 +38,15 @@ module Alba
     # Serialize the object with inline definitions
     #
     # @param object [Object] the object to be serialized
-    # @param key [Symbol, nil, true] DEPRECATED, use root_key instead
     # @param root_key [Symbol, nil, true]
     # @param block [Block] resource block
     # @return [String] serialized JSON string
     # @raise [ArgumentError] if block is absent or `with` argument's type is wrong
-    def serialize(object, key: nil, root_key: nil, &block)
-      Alba::Deprecation.warn '`key` option to `serialize` method is deprecated, use `root_key` instead.' if key
+    def serialize(object, root_key: nil, &block)
       klass = block ? resource_class(&block) : infer_resource_class(object.class.name)
 
       resource = klass.new(object)
-      resource.serialize(root_key: root_key || key)
+      resource.serialize(root_key: root_key)
     end
 
     # Enable inference for key and resource name
@@ -56,11 +54,7 @@ module Alba
     # @param with [Symbol, Class, Module] inflector
     #   When it's a Symbol, it sets inflector with given name
     #   When it's a Class or a Module, it sets given object to inflector
-    def enable_inference!(with: :default)
-      if with == :default
-        Alba::Deprecation.warn 'Calling `enable_inference!` without `with` keyword argument is deprecated. Pass `:active_support` to keep current behavior.'
-      end
-
+    def enable_inference!(with:)
       @inflector = inflector_from(with)
       @inferring = true
     end
@@ -68,48 +62,6 @@ module Alba
     # Disable inference for key and resource name
     def disable_inference!
       @inferring = false
-    end
-
-    # Set error handler
-    #
-    # @param [Symbol] handler
-    # @param [Block]
-    # @raise [ArgumentError] if both handler and block params exist
-    # @raise [ArgumentError] if both handler and block params don't exist
-    # @deprecated Use `Resource.on_error` instead
-    # @return [void]
-    def on_error(handler = nil, &block)
-      Alba::Deprecation.warn '`Alba.on_error` is deprecated, use `on_error` on resource class instead.'
-      raise ArgumentError, 'You cannot specify error handler with both Symbol and block' if handler && block
-      raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
-
-      @_on_error = handler || block
-    end
-
-    # Set nil handler
-    #
-    # @param block [Block]
-    # @return [void]
-    # @deprecated Use `Resource.on_nil` instead
-    def on_nil(&block)
-      Alba::Deprecation.warn '`Alba.on_nil` is deprecated, use `on_nil` on resource class instead.'
-      @_on_nil = block
-    end
-
-    # Enable root key transformation
-    #
-    # @deprecated Use `Resource.transform_keys` with `root` option instead
-    def enable_root_key_transformation!
-      Alba::Deprecation.warn '`Alba.enable_root_key_transformation!` is deprecated, use `transform_keys` on resource class instead.'
-      @transforming_root_key = true
-    end
-
-    # Disable root key transformation
-    #
-    # @deprecated Use `Resource.transform_keys` with `root` option instead
-    def disable_root_key_transformation!
-      Alba::Deprecation.warn '`Alba.disable_root_key_transformation!` is deprecated, use `transform_keys` on resource class instead.'
-      @transforming_root_key = false
     end
 
     # @param block [Block] resource body
