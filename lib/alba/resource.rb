@@ -46,13 +46,11 @@ module Alba
 
       # Serialize object into JSON string
       #
-      # @param key [Symbol, nil, true] DEPRECATED, use root_key instead
       # @param root_key [Symbol, nil, true]
       # @param meta [Hash] metadata for this seialization
       # @return [String] serialized JSON string
-      def serialize(key: nil, root_key: nil, meta: {})
-        Alba::Deprecation.warn '`key` option to `serialize` method is deprecated, use `root_key` instead.' if key
-        key = key.nil? && root_key.nil? ? fetch_key : root_key || key
+      def serialize(root_key: nil, meta: {})
+        key = root_key.nil? ? fetch_key : root_key
         hash = if key && key != ''
                  h = {key.to_s => serializable_hash}
                  hash_with_metadata(h, meta)
@@ -74,12 +72,6 @@ module Alba
         end
       end
       alias to_h serializable_hash
-
-      # @deprecated Use {#serializable_hash} instead
-      def to_hash
-        warn '[DEPRECATION] `to_hash` is deprecated, use `serializable_hash` instead.'
-        serializable_hash
-      end
 
       private
 
@@ -373,15 +365,6 @@ module Alba
       alias has_one association
       alias has_many association
 
-      # Set key
-      #
-      # @param key [String, Symbol]
-      # @deprecated Use {#root_key} instead
-      def key(key)
-        Alba::Deprecation.warn '[DEPRECATION] `key` is deprecated, use `root_key` instead.'
-        @_key = key.respond_to?(:to_sym) ? key.to_sym : key
-      end
-
       # Set root key
       #
       # @param key [String, Symbol]
@@ -390,15 +373,6 @@ module Alba
       def root_key(key, key_for_collection = nil)
         @_key = key.to_sym
         @_key_for_collection = key_for_collection&.to_sym
-      end
-
-      # Set key to true
-      #
-      # @deprecated Use {#root_key!} instead
-      def key!
-        Alba::Deprecation.warn '[DEPRECATION] `key!` is deprecated, use `root_key!` instead.'
-        @_key = true
-        @_key_for_collection = true
       end
 
       # Set root key to true
@@ -437,17 +411,6 @@ module Alba
         end
       end
       private :validated_inline_layout
-
-      # Delete attributes
-      # Use this DSL in child class to ignore certain attributes
-      #
-      # @param attributes [Array<String, Symbol>]
-      def ignoring(*attributes)
-        Alba::Deprecation.warn '`ignoring` is deprecated now. Instead please use `attributes` instance method to filter out attributes.'
-        attributes.each do |attr_name|
-          @_attributes.delete(attr_name.to_sym)
-        end
-      end
 
       # Transform keys as specified type
       #

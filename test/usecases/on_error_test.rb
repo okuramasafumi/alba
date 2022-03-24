@@ -55,11 +55,7 @@ class OnErrorTest < MiniTest::Test
     end
   end
 
-  # TODO: We can remove global setup in 2.0
   def setup
-    assert_output '', /`Alba.on_error` is deprecated, use `on_error` on resource class instead./ do # rubocop:disable Minitest/AssertionInLifecycleHook
-      Alba.on_error :raise
-    end
     @user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
   end
 
@@ -93,18 +89,6 @@ class OnErrorTest < MiniTest::Test
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","email":"Error!"}}',
       UserResource4.new(@user).serialize
-    )
-  end
-
-  def test_on_error_resource_local_wins_against_global
-    assert_output '', /`Alba.on_error` is deprecated, use `on_error` on resource class instead./ do
-      Alba.on_error do |error|
-        ['error', error.message]
-      end
-    end
-    assert_equal(
-      '{"user":{"id":1,"name":"Masafumi OKURA"}}',
-      UserResource5.new(@user).serialize
     )
   end
 
