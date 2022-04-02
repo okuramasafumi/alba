@@ -26,7 +26,7 @@ module Alba
     private
 
     def check(object)
-      value = object.public_send(@name)
+      value = object.__send__(@name)
       type_correct = case @type
                      when :String, ->(klass) { klass == String } then value.is_a?(String)
                      when :Integer, ->(klass) { klass == Integer } then value.is_a?(Integer)

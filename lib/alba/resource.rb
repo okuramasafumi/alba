@@ -41,7 +41,7 @@ module Alba
         @params = params.freeze
         @within = within
         @method_existence = {} # Cache for `respond_to?` result
-        DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.public_send(name)) }
+        DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.__send__(name)) }
       end
 
       # Serialize object into JSON string
@@ -255,7 +255,7 @@ module Alba
       def fetch_attribute_from_object_and_resource(object, attribute)
         has_method = @method_existence[attribute]
         has_method = @method_existence[attribute] = object.respond_to?(attribute) if has_method.nil?
-        has_method ? object.public_send(attribute) : __send__(attribute, object)
+        has_method ? object.__send__(attribute) : __send__(attribute, object)
       end
 
       def nil_handler

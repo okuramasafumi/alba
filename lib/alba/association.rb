@@ -29,7 +29,7 @@ module Alba
     # @param params [Hash] user-given Hash for arbitrary data
     # @return [Hash]
     def to_h(target, within: nil, params: {})
-      @object = target.public_send(@name)
+      @object = target.__send__(@name)
       @object = @condition.call(object, params) if @condition
       return if @object.nil?
 
