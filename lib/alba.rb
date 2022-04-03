@@ -9,7 +9,7 @@ module Alba
   class << self
     attr_reader :backend, :encoder, :inferring, :_on_error, :_on_nil, :transforming_root_key
 
-    # Accessor for inflector, a module responsible for incflecting strings
+    # Accessor for inflector, a module responsible for inflecting strings
     attr_accessor :inflector
 
     # Set the backend, which actually serializes object into JSON
