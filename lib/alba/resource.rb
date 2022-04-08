@@ -16,6 +16,12 @@ module Alba
     CONDITION_UMNET = Object.new.freeze
     private_constant :CONDITION_UMNET
 
+    SUPPORTED_TRANSFORM_KEYS = %i[none snake camel lower_camel dash].each_with_object({}) do |elem, hash|
+      hash[elem] = true
+    end
+    SUPPORTED_TRANSFORM_KEYS.freeze
+    private_constant :SUPPORTED_TRANSFORM_KEYS
+
     # @private
     def self.included(base)
       super
@@ -420,7 +426,7 @@ module Alba
       # @raise [Alba::Error] when type is not supported
       def transform_keys(type, root: nil)
         type = type.to_sym
-        unless %i[none snake camel lower_camel dash].include?(type)
+        unless SUPPORTED_TRANSFORM_KEYS[type]
           # This should be `ArgumentError` but for backward compatibility it raises `Alba::Error`
           raise ::Alba::Error, "Unknown transform type: #{type}. Supported type are :camel, :lower_camel and :dash."
         end
