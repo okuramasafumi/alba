@@ -13,8 +13,8 @@ module Alba
     WITHIN_DEFAULT = Object.new.freeze
     private_constant :WITHIN_DEFAULT
 
-    CONDITION_UMNET = Object.new.freeze
-    private_constant :CONDITION_UMNET
+    CONDITION_UNMET = Object.new.freeze
+    private_constant :CONDITION_UNMET
 
     # @private
     def self.included(base)
@@ -177,7 +177,7 @@ module Alba
                 else
                   fetch_attribute(object, key, attribute)
                 end
-        hash[key] = value unless value == CONDITION_UMNET
+        hash[key] = value unless value == CONDITION_UNMET
       end
 
       def conditional_attribute(object, key, attribute)
@@ -192,17 +192,17 @@ module Alba
       def conditional_attribute_with_proc(object, key, attribute, condition)
         arity = condition.arity
         # We can return early to skip fetch_attribute
-        return CONDITION_UMNET if arity <= 1 && !instance_exec(object, &condition)
+        return CONDITION_UNMET if arity <= 1 && !instance_exec(object, &condition)
 
         fetched_attribute = fetch_attribute(object, key, attribute)
         attr = attribute.is_a?(Alba::Association) ? attribute.object : fetched_attribute
-        return CONDITION_UMNET if arity >= 2 && !instance_exec(object, attr, &condition)
+        return CONDITION_UNMET if arity >= 2 && !instance_exec(object, attr, &condition)
 
         fetched_attribute
       end
 
       def conditional_attribute_with_symbol(object, key, attribute, condition)
-        return CONDITION_UMNET unless __send__(condition)
+        return CONDITION_UNMET unless __send__(condition)
 
         fetch_attribute(object, key, attribute)
       end
