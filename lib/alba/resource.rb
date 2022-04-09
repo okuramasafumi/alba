@@ -208,7 +208,7 @@ module Alba
       end
 
       def handle_error(error, object, key, attribute, hash)
-        on_error = @_on_error || Alba._on_error
+        on_error = @_on_error || :raise
         case on_error # rubocop:disable Style/MissingElse
         when :raise, nil then raise
         when :nullify then hash[key] = nil
@@ -259,7 +259,7 @@ module Alba
       end
 
       def nil_handler
-        @nil_handler ||= (@_on_nil || Alba._on_nil)
+        @_on_nil
       end
 
       def yield_if_within(association_name)

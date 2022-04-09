@@ -7,7 +7,7 @@ require_relative 'alba/deprecation'
 # Core module
 module Alba
   class << self
-    attr_reader :backend, :encoder, :inferring, :_on_error, :_on_nil
+    attr_reader :backend, :encoder, :inferring
 
     # Accessor for inflector, a module responsible for inflecting strings
     attr_accessor :inflector
