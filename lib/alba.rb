@@ -136,7 +136,7 @@ module Alba
 
     def default_encoder
       lambda do |hash|
-        JSON.dump(hash)
+        JSON.generate(hash)
       end
     end
 
