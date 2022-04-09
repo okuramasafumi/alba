@@ -127,9 +127,9 @@ class KeyTransformTest < Minitest::Test
     )
   end
 
-  def test_transform_key_to_dash_with_key_inference_does_not_work_on_root_key_when_global_root_key_transformation_disabled
+  def test_transform_key_to_dash_with_key_inference_does_work_on_root_key_when_root_option_is_not_set
     assert_equal(
-      '{"bank_account":{"account-number":123456789}}',
+      '{"bank-account":{"account-number":123456789}}',
       BankAccountResource.new(@bank_account).serialize
     )
   end

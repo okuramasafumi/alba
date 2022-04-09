@@ -135,7 +135,7 @@ module Alba
       end
 
       def transforming_root_key?
-        @_transforming_root_key.nil? ? Alba.transforming_root_key : @_transforming_root_key
+        @_transforming_root_key
       end
 
       def converter
@@ -415,10 +415,9 @@ module Alba
       # Transform keys as specified type
       #
       # @param type [String, Symbol] one of `snake`, `:camel`, `:lower_camel`, `:dash` and `none`
-      # @param root [Boolean, nil] decides if root key also should be transformed
-      #   When it's `nil`, Alba's default setting will be applied
+      # @param root [Boolean] decides if root key also should be transformed
       # @raise [Alba::Error] when type is not supported
-      def transform_keys(type, root: nil)
+      def transform_keys(type, root: true)
         type = type.to_sym
         unless %i[none snake camel lower_camel dash].include?(type)
           # This should be `ArgumentError` but for backward compatibility it raises `Alba::Error`

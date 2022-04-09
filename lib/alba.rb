@@ -7,7 +7,7 @@ require_relative 'alba/deprecation'
 # Core module
 module Alba
   class << self
-    attr_reader :backend, :encoder, :inferring, :_on_error, :_on_nil, :transforming_root_key
+    attr_reader :backend, :encoder, :inferring, :_on_error, :_on_nil
 
     # Accessor for inflector, a module responsible for inflecting strings
     attr_accessor :inflector
@@ -89,7 +89,6 @@ module Alba
       @encoder = default_encoder
       @_on_error = :raise
       @_on_nil = nil
-      @transforming_root_key = false # TODO: This will be true since 2.0
     end
 
     private
