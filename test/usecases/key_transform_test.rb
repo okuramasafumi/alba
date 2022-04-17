@@ -159,11 +159,10 @@ class KeyTransformTest < Minitest::Test
     )
   end
 
-  def test_default_inflector_is_used_when_inflector_is_nil
+  def test_error_is_raised_when_inflector_is_nil
     Alba.inflector = nil
-    assert_equal(
-      '{"Id":1,"FirstName":"Masafumi","LastName":"Okura"}',
+    assert_raises(Alba::Error) do
       UserResourceCamel.new(@user).serialize
-    )
+    end
   end
 end

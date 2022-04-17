@@ -225,12 +225,9 @@ module Alba
         return key if @_transform_type == :none
 
         key = key.to_s
-        # TODO: Using default inflector here is for backward compatibility
-        # From 2.0 it'll raise error when inflector is nil
-        inflector = Alba.inflector || begin
-          require_relative 'default_inflector'
-          Alba::DefaultInflector
-        end
+        inflector = Alba.inflector
+        raise Alba::Error, 'Inflector is nil. You can set inflector with `Alba.enable_inference!(with: :active_support)` for example.' unless inflector
+
         case @_transform_type # rubocop:disable Style/MissingElse
         when :camel then inflector.camelize(key)
         when :lower_camel then inflector.camelize_lower(key)
