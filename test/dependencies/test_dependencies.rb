@@ -31,7 +31,7 @@ class DependenciesTest < MiniTest::Test
       err = assert_raises(Alba::Error) do
         UserResourceCamel.new(@user).serialize
       end
-      assert_equal('To use transform_keys, please install `ActiveSupport` gem.', err.message)
+      assert_equal('Inflector is nil. You can set inflector with `Alba.enable_inference!(with: :active_support)` for example.', err.message)
     end
 
     def test_it_warns_when_set_backend_as_active_support_but_active_support_is_not_available
