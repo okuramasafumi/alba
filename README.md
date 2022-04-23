@@ -1,3 +1,5 @@
+![alba logo](https://raw.githubusercontent.com/okuramasafumi/alba/main/logo/alba-typography.png)
+----------
 [![Gem Version](https://badge.fury.io/rb/alba.svg)](https://badge.fury.io/rb/alba)
 [![CI](https://github.com/okuramasafumi/alba/actions/workflows/main.yml/badge.svg)](https://github.com/okuramasafumi/alba/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/okuramasafumi/alba/branch/master/graph/badge.svg?token=3D3HEZ5OXT)](https://codecov.io/gh/okuramasafumi/alba)
