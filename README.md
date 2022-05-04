@@ -314,6 +314,22 @@ UserResource.new(user, params: {filter: :even?}).serialize
 # => '{"id":1,"articles":[{"title":"Super nice"}]}'
 ```
 
+You can change a key for association with `key` option.
+
+```ruby
+class UserResource
+  include Alba::Resource
+
+  attributes :id
+
+  many :articles,
+    key: 'my_articles', # Set key here
+    resource: ArticleResource
+end
+UserResource.new(user).serialize
+# => '{"id":1,"my_articles":[{"title":"Hello World!"}]}'
+```
+
 ### Inline definition with `Alba.serialize`
 
 `Alba.serialize` method is a shortcut to define everything inline.
