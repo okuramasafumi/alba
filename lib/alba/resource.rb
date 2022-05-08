@@ -372,6 +372,15 @@ module Alba
         @_key_for_collection = key_for_collection&.to_sym
       end
 
+      # Set root key for collection
+      #
+      # @param key [String, Symbol]
+      # @raise [NoMethodError] when key doesn't respond to `to_sym` method
+      def root_key_for_collection(key)
+        @_key = true
+        @_key_for_collection = key.to_sym
+      end
+
       # Set root key to true
       def root_key!
         @_key = true
