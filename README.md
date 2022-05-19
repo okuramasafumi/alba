@@ -19,6 +19,10 @@ If you've already used Alba, please consider posting your thoughts and feelings 
 
 If you have feature requests or interesting ideas, join us with [Ideas](https://github.com/okuramasafumi/alba/discussions/categories/ideas). Let's make Alba even better, together!
 
+## Resources
+
+If you want to know more about Alba, there's a [screencast](https://hanamimastery.com/episodes/21-serialization-with-alba) created by Sebastian from [Hanami Mastery](https://hanamimastery.com/). It covers basic features of Alba and how to use it in Hanami.
+
 ## Why Alba?
 
 Because it's fast, easy-to-use and extensible!
