@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'activesupport', require: false # For backend
+gem 'dry-inflector', require: false # For inflection
 gem 'ffaker', require: false # For testing
 gem 'inch', require: false # For inline documents
 gem 'minitest', '~> 5.14' # For test
