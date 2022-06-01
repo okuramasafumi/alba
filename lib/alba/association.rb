@@ -30,7 +30,7 @@ module Alba
     # @return [Hash]
     def to_h(target, within: nil, params: {})
       @object = target.__send__(@name)
-      @object = @condition.call(object, params) if @condition
+      @object = @condition.call(object, params, target) if @condition
       return if @object.nil?
 
       @resource = constantize(@resource)

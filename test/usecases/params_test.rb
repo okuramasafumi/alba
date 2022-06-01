@@ -79,7 +79,7 @@ class ParamsTest < MiniTest::Test
   end
 
   class UserResource3 < UserResource2
-    cond = lambda do |articles, params|
+    cond = proc do |articles, params|
       params[:foo] = true
       params[:foo] ? [] : articles
     end
