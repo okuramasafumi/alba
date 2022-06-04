@@ -261,17 +261,18 @@ class AnotherUserResource
 end
 ```
 
-You can "filter" association using second proc argument. This proc takes association object and `params`.
+You can "filter" association using second proc argument. This proc takes association object, `params` and initial object.
 
 This feature is useful when you want to modify association, such as adding `includes` or `order` to ActiveRecord relations.
 
 ```ruby
 class User
-  attr_reader :id
+  attr_reader :id, :banned
   attr_accessor :articles
 
-  def initialize(id)
+  def initialize(id, banned = false)
     @id = id
+    @banned = banned
     @articles = []
   end
 end
@@ -299,9 +300,9 @@ class UserResource
 
   # Second proc works as a filter
   many :articles,
-    proc { |articles, params|
+    proc { |articles, params, user|
       filter = params[:filter] || :odd?
-      articles.select {|a| a.id.send(filter) }
+      articles.select {|a| a.id.send(filter) && !user.banned  }
     },
     resource: ArticleResource
 end

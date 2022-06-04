@@ -164,4 +164,107 @@ class ManyTest < MiniTest::Test
     RUBY
     assert_raises(ArgumentError) { eval(resource) }
   end
+
+  class UserResource6
+    include Alba::Resource
+
+    attributes :id
+
+    many :articles,
+         proc { |articles, _, user| articles.select { user.id == 1 } },
+         resource: ArticleResource
+  end
+
+  def test_it_returns_correct_json_with_filtering_by_user_id
+    user = User.new(1)
+    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
+    user.articles << article1
+    article2 = Article.new(2, 'Super nice', 'Really nice!')
+    user.articles << article2
+    assert_equal(
+      '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}',
+      UserResource6.new(user).serialize
+    )
+  end
+
+  def test_it_returns_empty_json_with_filtering_by_user_id
+    user = User.new(2)
+    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
+    user.articles << article1
+    article2 = Article.new(2, 'Super nice', 'Really nice!')
+    user.articles << article2
+    assert_equal(
+      '{"id":2,"articles":[]}',
+      UserResource6.new(user).serialize
+    )
+  end
+
+  class UserBanned < User
+    attr_reader :banned
+
+    def initialize(id, banned)
+      super(id)
+      @banned = banned
+    end
+  end
+
+  class ArticleWithComments < Article
+    attr_accessor :comments, :show_comments
+
+    def initialize(id, title, body, comments = [], show_comments = true)
+      super(id, title, body)
+
+      @comments = comments
+      @show_comments = show_comments
+    end
+  end
+
+  class Comment
+    attr_accessor :id, :body
+
+    def initialize(id, body)
+      @id = id
+      @body = body
+    end
+  end
+
+  class CommentResource
+    include Alba::Resource
+
+    attributes :body
+  end
+
+  class ArticleWithCommentsResource
+    include Alba::Resource
+
+    attributes :id, :title
+
+    many :comments, proc { |comments, _, article| comments.select { article.show_comments } }, resource: CommentResource
+  end
+
+  class UserResource7
+    include Alba::Resource
+
+    attributes :id
+
+    root_key :user, :users
+
+    many :articles, proc { |articles, _, user| articles.reject { user.banned } }, resource: ArticleWithCommentsResource
+  end
+
+  def test_it_returns_correct_json_with_nested_comments_object
+    user3 = UserBanned.new(3, false)
+    comments = [Comment.new(1, 'Hello Comment!')]
+    article1 = ArticleWithComments.new(1, 'Hello World!', 'Hello World!!!', comments, false)
+    user3.articles << article1
+
+    user5 = UserBanned.new(5, true)
+    article2 = ArticleWithComments.new(2, 'Super nice', 'Really nice!')
+    user5.articles << article2
+
+    assert_equal(
+      '{"users":[{"id":3,"articles":[{"id":1,"title":"Hello World!","comments":[]}]},{"id":5,"articles":[]}]}',
+      UserResource7.new([user3, user5]).serialize
+    )
+  end
 end
