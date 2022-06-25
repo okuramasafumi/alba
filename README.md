@@ -25,19 +25,19 @@ If you want to know more about Alba, there's a [screencast](https://hanamimaster
 
 ## Why Alba?
 
-Because it's fast, easy-to-use and extensible!
+Because it's fast, easy and feature rich!
 
 ### Fast
 
 Alba is faster than most of the alternatives. We have a [benchmark](https://github.com/okuramasafumi/alba/tree/master/benchmark).
 
-### Easy to use
+### Easy
 
-Alba provides four DSLs, `attributes` to fetch attribute with its name, `attribute` to execute block for the attribute, `one` to seriaize single attribute with another resource, and `many` to serialize collection attribute with another resource. When you want to do something complex, there are many examples in this README so you can mimic them to get started.
+Alba is easy to use because there are only a few methods to remember. It's also easy to understand due to clean and short codebase. Finally it's easy to extend since it provides some methods for override to change default behavior of Alba.
 
-### Extensible
+### Feature rich
 
-Alba embraces extensibility through common techniques such as class inheritance and module inclusion. Alba provides its capacity with one module so you can still have your own class hierarchy.
+While Alba's core is simple, it provides additional features when you need them, For example, Alba provides [a way to control circular associations](#circular-associations-control), [inferring resource classes, root key and associations](#inference) and [supports layouts](#layout).
 
 ## Installation
 
