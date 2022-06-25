@@ -9,7 +9,7 @@
 
 # Alba
 
-Alba is the fastest JSON serializer for Ruby, JRuby, and TruffleRuby.
+Alba is a JSON serializer for Ruby, JRuby, and TruffleRuby.
 
 ## Discussions
 
