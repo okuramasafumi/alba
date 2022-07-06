@@ -114,6 +114,26 @@ class AlbaTest < Minitest::Test
         end
       )
     end
+
+    def test_it_works_with_oj_default_backend
+      Alba.backend = :oj_default
+
+      Oj.default_options = { mode: :object }
+      assert_equal(
+        '{"foo":{":id":1}}',
+        Alba.serialize(@user, root_key: :foo) do
+          attributes :id
+        end
+      )
+
+      Oj.default_options = { mode: :compat }
+      assert_equal(
+        '{"foo":{"id":1}}',
+        Alba.serialize(@user, root_key: :foo) do
+          attributes :id
+        end
+      )
+    end
   end
 
   def test_it_serializes_object_with_fully_inlined_definitions_with_active_support
