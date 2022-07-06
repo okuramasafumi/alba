@@ -1,4 +1,4 @@
-![alba logo](https://raw.githubusercontent.com/okuramasafumi/alba/main/logo/alba-typography.png)
+![alba card](https://raw.githubusercontent.com/okuramasafumi/alba/main/logo/alba-card.png)
 ----------
 [![Gem Version](https://badge.fury.io/rb/alba.svg)](https://badge.fury.io/rb/alba)
 [![CI](https://github.com/okuramasafumi/alba/actions/workflows/main.yml/badge.svg)](https://github.com/okuramasafumi/alba/actions/workflows/main.yml)
