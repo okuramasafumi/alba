@@ -1024,8 +1024,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/okuramasafumi/alba. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/okuramasafumi/alba/blob/master/CODE_OF_CONDUCT.md).
-
+Thank you for begin interested in contributing to Alba! Please see [contributors guide](https://github.com/okuramasafumi/alba/blob/main/CONTRIBUTING.md) before start contributing. If you have any questions, please feel free to ask in [Discussions](https://github.com/okuramasafumi/alba/discussions).
 
 ## License
 
