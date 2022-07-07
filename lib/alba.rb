@@ -110,6 +110,7 @@ module Alba
       @encoder = case @backend
                  when :oj, :oj_strict then try_oj
                  when :oj_rails then try_oj(mode: :rails)
+                 when :oj_default then try_oj(mode: :default)
                  when :active_support then try_active_support
                  when nil, :default, :json then default_encoder
                  else
@@ -119,7 +120,12 @@ module Alba
 
     def try_oj(mode: :strict)
       require 'oj'
-      ->(hash) { Oj.dump(hash, mode: mode) }
+      case mode
+      when :default
+        ->(hash) { Oj.dump(hash) }
+      else
+        ->(hash) { Oj.dump(hash, mode: mode) }
+      end
     rescue LoadError
       Kernel.warn '`Oj` is not installed, falling back to default JSON encoder.'
       default_encoder
