@@ -87,9 +87,13 @@ Alba's configuration is fairly simple.
 
 Backend is the actual part serializing an object into JSON. Alba supports these backends.
 
-* `oj`, the fastest. Gem installation required (C extension).
-* `active_support`, mostly for Rails. Gem installation required.
-* `default` or `json`, with no external dependencies.
+|name|description|requires_external_gem|
+|--|--|--|
+|`oj`, `oj_strict`|Using Oj in `strict` mode|Yes(C extension)|
+|`oj_rails`|It's `oj` but in `rails` mode|Yes(C extension)|
+|`oj_default`|It's `oj` but respects mode set by users|Yes(C extension)|
+|`active_support`|For Rails compatibility|Yes|
+|`default`, `json`|Using `json` gem|No|
 
 You can set a backend like this:
 
