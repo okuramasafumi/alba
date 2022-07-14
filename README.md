@@ -823,6 +823,37 @@ UserResource.new(user).serialize
 
 Note that this feature is experimental and interfaces are subject to change.
 
+### Collection serialization into Hash
+
+Sometimes we want to serialize a collection into a Hash, not an Array. It's possible with Alba.
+
+```ruby
+class User
+  attr_reader :id, :name
+  def initialize(id, name)
+    @id, @name = id, name
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  collection_key :id # This line is important
+
+  attributes :id, :name
+end
+
+user1 = User.new(1, 'John')
+user2 = User.new(2, 'Masafumi')
+
+UserResource.new([user1, user2]).serialize
+# => '{"1":{"id":1,"name":"John"},"2":{"id":2,"name":"Masafumi"}}'
+```
+
+In the snippet above, `collection_key :id` specifies the key used for the key of the collection hash. In this example it's `:id`.
+
+Make sure that collection key is unique for the collection.
+
 ### Layout
 
 Sometimes we'd like to serialize JSON into a template. In other words, we need some structure OUTSIDE OF serialized JSON. IN HTML world, we call it a "layout".
