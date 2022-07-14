@@ -267,4 +267,64 @@ class ManyTest < MiniTest::Test
       UserResource7.new([user3, user5]).serialize
     )
   end
+
+  class Node
+    attr_reader :id
+
+    def initialize(id)
+      @id = id
+    end
+  end
+
+  class FolderNode < Node
+    attr_reader :children
+
+    def initialize(id, children = [])
+      super(id)
+      @children = children
+    end
+
+    def size
+      children.size
+    end
+  end
+
+  class FileNode < Node
+    attr_reader :size
+
+    def initialize(id, size)
+      super(id)
+      @size = size
+    end
+  end
+
+  class FolderNodeResource
+    include Alba::Resource
+
+    attributes :id, :size
+
+    attribute :type do
+      'folder'
+    end
+
+    many :children, resource: ->(node) { node.is_a?(FolderNode) ? FolderNodeResource : FileNodeResource }
+  end
+
+  class FileNodeResource
+    include Alba::Resource
+
+    attributes :id, :size
+
+    attribute :type do
+      'file'
+    end
+  end
+
+  def test_polymorphic_association_with_proc_resource
+    folder = FolderNode.new(1, [FolderNode.new(2, [FileNode.new(3, 10)]), FileNode.new(4, 100)])
+    assert_equal(
+      '{"id":1,"size":2,"type":"folder","children":[{"id":2,"size":1,"type":"folder","children":[{"id":3,"size":10,"type":"file"}]},{"id":4,"size":100,"type":"file"}]}',
+      FolderNodeResource.new(folder).serialize
+    )
+  end
 end

@@ -33,8 +33,12 @@ module Alba
       @object = @condition.call(object, params, target) if @condition
       return if @object.nil?
 
-      @resource = constantize(@resource)
-      @resource.new(object, params: params, within: within).to_h
+      if @resource.is_a?(Proc) && @object.is_a?(Enumerable)
+        to_h_with_each_resource(within, params)
+      else
+        @resource = constantize(@resource)
+        @resource.new(object, params: params, within: within).to_h
+      end
     end
 
     private
@@ -58,6 +62,12 @@ module Alba
                   else
                     raise ArgumentError, 'When Alba.inferring is false, either resource or block is required'
                   end
+    end
+
+    def to_h_with_each_resource(within, params)
+      @object.map do |item|
+        @resource.call(item).new(item, within: within, params: params).to_h
+      end
     end
   end
 end

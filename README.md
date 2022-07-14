@@ -339,6 +339,34 @@ UserResource.new(user).serialize
 # => '{"id":1,"my_articles":[{"title":"Hello World!"}]}'
 ```
 
+You can omit resource option if you enable Alba's inference feature.
+
+```ruby
+class UserResource
+  include Alba::Resource
+
+  attributes :id
+
+  many :articles # Using `ArticleResource`
+end
+UserResource.new(user).serialize
+# => '{"id":1,"my_articles":[{"title":"Hello World!"}]}'
+```
+
+If you need complex logic to determine what resource to use for association, you can use a Proc for resource option.
+
+```ruby
+class UserResource
+  include Alba::Resource
+
+  attributes :id
+
+  many :articles, ->(article) { article.with_comment? ? ArticleWithCommentResource : ArticleResource }
+end
+```
+
+Note that using a Proc slows down serialization if there are too `many` associated objects.
+
 ### Inline definition with `Alba.serialize`
 
 `Alba.serialize` method is a shortcut to define everything inline.

@@ -219,7 +219,6 @@ module Alba
         end
       end
 
-      # rubocop:disable Metrics/MethodLength
       # @return [Symbol]
       def transform_key(key)
         return key if @_transform_type == :none
@@ -235,7 +234,6 @@ module Alba
         when :snake then inflector.underscore(key)
         end.to_sym
       end
-      # rubocop:enable Metrics/MethodLength
 
       def fetch_attribute(object, key, attribute)
         value = case attribute
@@ -345,7 +343,7 @@ module Alba
       #
       # @param name [String, Symbol] name of the association, used as key when `key` param doesn't exist
       # @param condition [Proc, nil] a Proc to modify the association
-      # @param resource [Class<Alba::Resource>, String, nil] representing resource for this association
+      # @param resource [Class<Alba::Resource>, String, Proc, nil] representing resource for this association
       # @param key [String, Symbol, nil] used as key when given
       # @param options [Hash<Symbol, Proc>]
       # @option options [Proc] if a condition to decide if this association should be serialized
