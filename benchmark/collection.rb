@@ -19,7 +19,6 @@ gemfile(true) do
   gem "jbuilder"
   gem 'turbostreamer'
   gem "jserializer"
-  gem "jsonapi-serializer" # successor of fast_jsonapi
   gem "multi_json"
   gem "panko_serializer"
   gem "pg"
@@ -201,67 +200,6 @@ class JserializerPostSerializer < Jserializer::Base
   end
 end
 
-# --- JSONAPI:Serializer serializers / (successor of fast_jsonapi) ---
-
-class JsonApiStandardCommentSerializer
-  include JSONAPI::Serializer
-
-  attribute :id
-  attribute :body
-end
-
-class JsonApiStandardPostSerializer
-  include JSONAPI::Serializer
-
-  # set_type :post  # optional
-  attribute :id
-  attribute :body
-  attribute :commenter_names
-
-  attribute :comments do |post|
-    post.comments.map { |comment| JsonApiSameFormatCommentSerializer.new(comment) }
-  end
-end
-
-# --- JSONAPI:Serializer serializers that format the code the same flat way as the other gems here ---
-
-# code to convert from JSON:API output to "flat" JSON, like the other serializers build
-class JsonApiSameFormatSerializer
-  include JSONAPI::Serializer
-
-  def as_json(*_options)
-    hash = serializable_hash
-
-    if hash[:data].is_a? Hash
-      hash[:data][:attributes]
-
-    elsif hash[:data].is_a? Array
-      hash[:data].pluck(:attributes)
-
-    elsif hash[:data].nil?
-      { }
-
-    else
-      raise "unexpected data type #{hash[:data].class}"
-    end
-  end
-end
-
-class JsonApiSameFormatCommentSerializer < JsonApiSameFormatSerializer
-  attribute :id
-  attribute :body
-end
-
-class JsonApiSameFormatPostSerializer < JsonApiSameFormatSerializer
-  attribute :id
-  attribute :body
-  attribute :commenter_names
-
-  attribute :comments do |post|
-    post.comments.map { |comment| JsonApiSameFormatCommentSerializer.new(comment) }
-  end
-end
-
 # --- Panko serializers ---
 #
 
@@ -419,8 +357,6 @@ jbuilder = Proc.new do
   end.target!
 end
 jserializer = Proc.new { JserializerPostSerializer.new(posts, is_collection: true).to_json }
-jsonapi = proc { JsonApiStandardPostSerializer.new(posts).to_json }
-jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(posts).to_json }
 panko = proc { Panko::ArraySerializer.new(posts, each_serializer: PankoPostSerializer).to_json }
 primalize = proc { PrimalizePostsResource.new(posts: posts).to_json }
 rails = Proc.new do
@@ -441,8 +377,6 @@ puts "Serializer outputs ----------------------------------"
   fast_serializer: fast_serializer,
   jbuilder: jbuilder, # different order
   jserializer: jserializer,
-  jsonapi: jsonapi, # nested JSON:API format
-  jsonapi_same_format: jsonapi_same_format,
   panko: panko,
   primalize: primalize,
   rails: rails,
@@ -462,8 +396,6 @@ Benchmark.ips do |x|
   x.report(:fast_serializer, &fast_serializer)
   x.report(:jbuilder, &jbuilder)
   x.report(:jserializer, &jserializer)
-  x.report(:jsonapi, &jsonapi)
-  x.report(:jsonapi_same_format, &jsonapi_same_format)
   x.report(:panko, &panko)
   x.report(:primalize, &primalize)
   x.report(:rails, &rails)
@@ -484,8 +416,6 @@ Benchmark.memory do |x|
   x.report(:fast_serializer, &fast_serializer)
   x.report(:jbuilder, &jbuilder)
   x.report(:jserializer, &jserializer)
-  x.report(:jsonapi, &jsonapi)
-  x.report(:jsonapi_same_format, &jsonapi_same_format)
   x.report(:panko, &panko)
   x.report(:primalize, &primalize)
   x.report(:rails, &rails)
