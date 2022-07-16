@@ -1022,6 +1022,54 @@ end
 
 In this way we have shorter and cleaner code. Note that we need to use `send` or `public_send` in `attribute` block to get attribute data.
 
+### Debugging
+
+Debugging is not easy. If you find Alba not working as you expect, there are a few things to do:
+
+1. Inspect
+
+The typical code looks like this:
+
+```ruby
+class FooResource
+  include Alba::Resource
+  attributes :id
+end
+FooResource.new(foo).serialize
+```
+
+Notice that we instantiate `FooResource` and then call `serialize` method. We can get various information by calling `inspect` method on it.
+
+```ruby
+puts FooResource.new(foo).inspect # or: p class FooResource.new(foo)
+# => "#<FooResource:0x000000010e21f408 @object=[#<Foo:0x000000010e3470d8 @id=1>], @params={}, @within=#<Object:0x000000010df2eac8>, @method_existence={}, @_attributes={:id=>:id}, @_key=nil, @_key_for_collection=nil, @_meta=nil, @_transform_type=:none, @_transforming_root_key=false, @_on_error=nil, @_on_nil=nil, @_layout=nil, @_collection_key=nil>"
+```
+
+The output might be different depending on the version of Alba or the object you give, but the concepts are the same. `@object` represents the object you gave as an argument to `new` method, `@_attributes` represents the attributes you defined in `FooResource` class using `attributes` DSL.
+
+Other things are not so important, but you need to take care of corresponding part when you use additional features such as `root_key`, `transform_keys` and adding params.
+
+2. Logging
+
+Alba currently doesn't support logging directly, but you can add your own logging module to Alba easily.
+
+```ruby
+module Logging
+  def serialize(...) # `...` was added in Ruby 2.7
+    puts serializable_hash
+    super(...)
+  end
+end
+
+FooResource.prepend Logging
+FooResource.new(foo).serialize
+# => "{:id=>1}" is printed
+```
+
+Here, we override `serialize` method with `prepend`. In overridden method we print the result of `serializable_hash` that gives the basic hash for serialization to `serialize` method. Using `...` allows us to override without knowing method signiture of `serialize`.
+
+Don't forget calling `super` in this way.
+
 ## Rails
 
 When you use Alba in Rails, you can create an initializer file with the line below for compatibility with Rails JSON encoder.
