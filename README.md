@@ -187,6 +187,16 @@ UserResource.new([user1, user2]).serialize
 # => "{\"users\":[{\"id\":1,\"name\":\"Masafumi OKURA\",\"name_with_email\":\"Masafumi OKURA: masafumi@example.com\"},{\"id\":2,\"name\":\"Test User\",\"name_with_email\":\"Test User: test@example.com\"}]}"
 ```
 
+If you have a simple case where you want to change only the name, you can use the Symbol to Proc shortcut:
+
+```ruby
+class UserResource
+  include Alba::Resource
+
+  attribute :some_other_name, &:name
+end
+```
+
 ### Serialization with associations
 
 Associations can be defined using the `association` macro, which is also aliased as `one`, `many`, `has_one`, and `has_many` for convenience.
