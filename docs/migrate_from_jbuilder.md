@@ -4,11 +4,12 @@ title: Upgrading from Jbuilder
 
 <!-- @format -->
 
-This guide is aimed at helping Jbuilder users transition to Alba, and it consists of three parts:
+This guide is aimed at helping Jbuilder users transition to Alba, and it consists of four parts:
 
 1. Basic serialization
 2. Complex serialization
-3. Unsupported features
+3. Key transformation
+4. Unsupported features
 
 ## Example class
 
