@@ -402,6 +402,20 @@ Alba.serialize(something)
 
 Although this might be useful sometimes, it's generally recommended to define a class for Resource.
 
+### Serializable Hash
+
+Instead of serializing to JSON, you can also output a Hash by calling `serializable_hash` or the `to_h` alias. Note also that the `serialize` method is aliased as `to_json`.
+
+```ruby
+# These are equivalent and will return serialized JSON
+UserResource.new(user).serialize
+UserResource.new(user).to_json
+
+# These are equivalent and will return a Hash
+UserResource.new(user).serializable_hash
+UserResource.new(user).to_h
+```
+
 ### Inheritance and attributes filter
 
 You can filter out certain attributes by overriding `attributes` instance method. This is useful when you want to customize existing resource with inheritance.
