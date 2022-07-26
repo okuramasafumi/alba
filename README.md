@@ -189,6 +189,8 @@ UserResource.new([user1, user2]).serialize
 
 ### Serialization with associations
 
+Associations can be defined using the `association` macro, which is also aliased as `one`, `many`, `has_one`, and `has_many` for convenience.
+
 ```ruby
 class User
   attr_reader :id, :created_at, :updated_at
