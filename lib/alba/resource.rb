@@ -193,22 +193,22 @@ module Alba
         end
       end
 
-      def conditional_attribute_with_proc(object, key, attribute, condition)
+      def conditional_attribute_with_proc(object, key, attribute, condition, &block)
         arity = condition.arity
         # We can return early to skip fetch_attribute
         return CONDITION_UNMET if arity <= 1 && !instance_exec(object, &condition)
 
-        fetched_attribute = fetch_attribute(object, key, attribute)
+        fetched_attribute = block ? yield(object, key, attribute) : fetch_attribute(object, key, attribute)
         attr = attribute.is_a?(Alba::Association) ? attribute.object : fetched_attribute
         return CONDITION_UNMET if arity >= 2 && !instance_exec(object, attr, &condition)
 
         fetched_attribute
       end
 
-      def conditional_attribute_with_symbol(object, key, attribute, condition)
+      def conditional_attribute_with_symbol(object, key, attribute, condition, &block)
         return CONDITION_UNMET unless __send__(condition)
 
-        fetch_attribute(object, key, attribute)
+        block ? yield(object, key, attribute) : fetch_attribute(object, key, attribute)
       end
 
       def handle_error(error, object, key, attribute, hash)
@@ -243,7 +243,7 @@ module Alba
         value = case attribute
                 when Symbol then fetch_attribute_from_object_and_resource(object, attribute)
                 when Proc then instance_exec(object, &attribute)
-                when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(object, params: params, within: within) }
+                when Alba::Association then fetch_association(object, attribute)
                 when TypedAttribute then attribute.value(object)
                 else
                   raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
@@ -259,6 +259,12 @@ module Alba
 
       def nil_handler
         @_on_nil
+      end
+
+      def fetch_association(object, association)
+        yield_if_within(association.name.to_sym) do |within|
+          association.to_h(object, params: params, within: within)
+        end
       end
 
       def yield_if_within(association_name)
@@ -282,6 +288,16 @@ module Alba
       # When object is a Struct, it's Enumerable but not a collection
       def collection?
         @object.is_a?(Enumerable) && !@object.is_a?(Struct)
+      end
+
+      def condition_unmet?(value)
+        value == CONDITION_UNMET
+      end
+
+      # In the module that include this one, we want to return CONDITION_UNMET constant
+      # We define a method here to return constant without referring it
+      def condition_unmet
+        CONDITION_UNMET
       end
     end
 

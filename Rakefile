@@ -10,4 +10,15 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = file_list
 end
 
-task :default => :test
+begin
+  require 'rspec/core/rake_task'
+  RSpec::Core::RakeTask.new(:spec) do |t|
+    t.verbose = false
+  end
+
+  task 'test:all' => [:test, :spec]
+rescue LoadError
+  task 'test:all' => [:test]
+end
+
+task :default => :'test:all'

@@ -51,6 +51,7 @@ Metrics/ModuleLength:
   Exclude:
     - 'lib/alba/resource.rb'
     - 'lib/alba.rb'
+    - 'lib/alba/jsonapi.rb' # Complex features, cannot make it short
 
 # Resource class includes DSLs, which tend to accept long list of parameters
 Metrics/ParameterLists:
