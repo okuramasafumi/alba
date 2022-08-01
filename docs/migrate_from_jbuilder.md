@@ -4,11 +4,12 @@ title: Upgrading from Jbuilder
 
 <!-- @format -->
 
-This guide is aimed at helping Jbuilder users transition to Alba, and it consists of three parts:
+This guide is aimed at helping Jbuilder users transition to Alba, and it consists of four parts:
 
 1. Basic serialization
 2. Complex serialization
-3. Unsupported features
+3. Key transformation
+4. Unsupported features
 
 ## Example class
 
@@ -216,8 +217,21 @@ UserResource.new(user).serialize
 # => '{"user":{"id":id, "created_at": created_at, "updated_at": updated_at, "profile": {"email": email}, articles: [{"title": title, "body": body}]}'
 ```
 
-## 3. Unsupported features
+## 3. Key transformation
+
+See the README for more information, but it's possible to migrate the `Jbuilder.key_format!` behavior with the `transform_keys` macro.
+
+```rb
+class UserResource
+  include Alba::Resource
+  root_key :user
+  attributes :id, :created_at, :updated_at
+
+  transform_keys :lower_camel
+end
+```
+
+## 4. Unsupported features
 
 - Jbuilder#ignore_nil!
 - Jbuilder#cache!
-- Jbuilder.key_format! and Jbuilder.deep_format_keys!
