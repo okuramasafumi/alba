@@ -100,6 +100,10 @@ class ConditionalAttributesTest < MiniTest::Test
       '{"id":2}',
       UserResource1.new(user).serialize
     )
+    assert_equal(
+      '[{"id":1,"name":"Masafumi OKURA"},{"id":2}]',
+      UserResource1.new([@user, user]).serialize
+    )
   end
 
   def test_conditional_attribute_with_if
@@ -111,6 +115,10 @@ class ConditionalAttributesTest < MiniTest::Test
     assert_equal(
       '{"id":2}',
       UserResource2.new(user).serialize
+    )
+    assert_equal(
+      '[{"id":1,"username":"username"},{"id":2}]',
+      UserResource2.new([@user, user]).serialize
     )
   end
 

@@ -1,4 +1,5 @@
 require_relative 'association'
+require_relative 'conditional_attribute'
 require_relative 'typed_attribute'
 require_relative 'deprecation'
 
@@ -12,9 +13,6 @@ module Alba
 
     WITHIN_DEFAULT = Object.new.freeze
     private_constant :WITHIN_DEFAULT
-
-    CONDITION_UNMET = Object.new.freeze
-    private_constant :CONDITION_UNMET
 
     # @private
     def self.included(base)
@@ -176,39 +174,8 @@ module Alba
 
       def set_key_and_attribute_body_from(object, key, attribute, hash)
         key = transform_key(key)
-        value = if attribute.is_a?(Array) # Conditional
-                  conditional_attribute(object, key, attribute)
-                else
-                  fetch_attribute(object, key, attribute)
-                end
-        hash[key] = value unless value == CONDITION_UNMET
-      end
-
-      def conditional_attribute(object, key, attribute)
-        condition = attribute.last
-        if condition.is_a?(Proc)
-          conditional_attribute_with_proc(object, key, attribute.first, condition)
-        else
-          conditional_attribute_with_symbol(object, key, attribute.first, condition)
-        end
-      end
-
-      def conditional_attribute_with_proc(object, key, attribute, condition)
-        arity = condition.arity
-        # We can return early to skip fetch_attribute
-        return CONDITION_UNMET if arity <= 1 && !instance_exec(object, &condition)
-
-        fetched_attribute = fetch_attribute(object, key, attribute)
-        attr = attribute.is_a?(Alba::Association) ? attribute.object : fetched_attribute
-        return CONDITION_UNMET if arity >= 2 && !instance_exec(object, attr, &condition)
-
-        fetched_attribute
-      end
-
-      def conditional_attribute_with_symbol(object, key, attribute, condition)
-        return CONDITION_UNMET unless __send__(condition)
-
-        fetch_attribute(object, key, attribute)
+        value = fetch_attribute(object, key, attribute)
+        hash[key] = value unless value == ConditionalAttribute::CONDITION_UNMET
       end
 
       def handle_error(error, object, key, attribute, hash)
@@ -239,12 +206,13 @@ module Alba
         end.to_sym
       end
 
-      def fetch_attribute(object, key, attribute)
+      def fetch_attribute(object, key, attribute) # rubocop:disable Metrics/CyclomaticComplexity
         value = case attribute
                 when Symbol then fetch_attribute_from_object_and_resource(object, attribute)
                 when Proc then instance_exec(object, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(object, params: params, within: within) }
                 when TypedAttribute then attribute.value(object)
+                when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: object) { |attr| fetch_attribute(object, key, attr) }
                 else
                   raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
                 end
@@ -312,7 +280,7 @@ module Alba
 
       def assign_attributes(attrs, if_value)
         attrs.each do |attr_name|
-          attr = if_value ? [attr_name.to_sym, if_value] : attr_name.to_sym
+          attr = if_value ? ConditionalAttribute.new(body: attr_name.to_sym, condition: if_value) : attr_name.to_sym
           @_attributes[attr_name.to_sym] = attr
         end
       end
@@ -323,7 +291,7 @@ module Alba
           attr_name = attr_name.to_sym
           type, type_converter = type_and_converter
           typed_attr = TypedAttribute.new(name: attr_name, type: type, converter: type_converter)
-          attr = if_value ? [typed_attr, if_value] : typed_attr
+          attr = if_value ? ConditionalAttribute.new(body: typed_attr, condition: if_value) : typed_attr
           @_attributes[attr_name] = attr
         end
       end
@@ -340,7 +308,7 @@ module Alba
       def attribute(name, **options, &block)
         raise ArgumentError, 'No block given in attribute method' unless block
 
-        @_attributes[name.to_sym] = options[:if] ? [block, options[:if]] : block
+        @_attributes[name.to_sym] = options[:if] ? ConditionalAttribute.new(body: block, condition: options[:if]) : block
       end
 
       # Set association
@@ -357,7 +325,7 @@ module Alba
       def association(name, condition = nil, resource: nil, key: nil, **options, &block)
         nesting = self.name&.rpartition('::')&.first
         assoc = Association.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
-        @_attributes[key&.to_sym || name.to_sym] = options[:if] ? [assoc, options[:if]] : assoc
+        @_attributes[key&.to_sym || name.to_sym] = options[:if] ? ConditionalAttribute.new(body: assoc, condition: options[:if]) : assoc
       end
       alias one association
       alias many association
