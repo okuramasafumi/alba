@@ -37,6 +37,21 @@ class DependenciesTest < MiniTest::Test
     def test_it_warns_when_set_backend_as_active_support_but_active_support_is_not_available
       assert_output('', "`ActiveSupport` is not installed, falling back to default JSON encoder.\n") { Alba.backend = :active_support }
     end
+
+    class UserResourceWithRootKey
+      include Alba::Resource
+
+      root_key!
+
+      attributes :first_name, :last_name
+    end
+
+    def test_alba_error_is_raise_if_root_key_is_set_to_true
+      err = assert_raises(Alba::Error) do
+        UserResourceWithRootKey.new(@user).serialize
+      end
+      assert_equal('You must call Alba.enable_inference! to set root_key to true for inferring root key.', err.message)
+    end
   elsif ENV['BUNDLE_GEMFILE'] == File.expand_path('gemfiles/without_oj.gemfile')
     def test_it_warns_when_set_backend_as_oj_but_oj_is_not_available
       assert_output('', "`Oj` is not installed, falling back to default JSON encoder.\n") { Alba.backend = :oj }

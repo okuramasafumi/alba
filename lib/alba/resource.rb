@@ -49,7 +49,7 @@ module Alba
       # @return [String] serialized JSON string
       def serialize(root_key: nil, meta: {})
         key = root_key.nil? ? fetch_key : root_key
-        hash = if key && key != ''
+        hash = if key && key != :''
                  h = {key.to_s => serializable_hash}
                  hash_with_metadata(h, meta)
                else
@@ -114,26 +114,39 @@ module Alba
         end
       end
 
+      # @return [Symbol]
       def fetch_key
-        collection? ? _key_for_collection : _key
+        k = collection? ? _key_for_collection : _key
+        transforming_root_key? ? transform_key(k) : k.to_sym
       end
 
       def _key_for_collection
-        return @_key_for_collection.to_s unless @_key_for_collection == true && Alba.inferring
-
-        key = resource_name.pluralize
-        transforming_root_key? ? transform_key(key) : key
+        if Alba.inferring
+          @_key_for_collection == true ? resource_name(pluralized: true) : @_key_for_collection.to_s
+        else
+          @_key_for_collection == true ? raise_root_key_inference_error : @_key_for_collection.to_s
+        end
       end
 
       # @return [String]
       def _key
-        return @_key.to_s unless @_key == true && Alba.inferring
-
-        transforming_root_key? ? transform_key(resource_name) : resource_name
+        if Alba.inferring
+          @_key == true ? resource_name(pluralized: false) : @_key.to_s
+        else
+          @_key == true ? raise_root_key_inference_error : @_key.to_s
+        end
       end
 
-      def resource_name
-        @resource_name ||= self.class.name.demodulize.delete_suffix('Resource').underscore
+      def resource_name(pluralized: false)
+        class_name = self.class.name
+        inflector = Alba.inflector
+        name = inflector.demodulize(class_name).delete_suffix('Resource')
+        underscore_name = inflector.underscore(name)
+        pluralized ? inflector.pluralize(underscore_name) : underscore_name
+      end
+
+      def raise_root_key_inference_error
+        raise Alba::Error, 'You must call Alba.enable_inference! to set root_key to true for inferring root key.'
       end
 
       def transforming_root_key?
@@ -191,10 +204,10 @@ module Alba
       end
 
       # @return [Symbol]
-      def transform_key(key)
-        return key if @_transform_type == :none
-
+      def transform_key(key) # rubocop:disable Metrics/CyclomaticComplexity
         key = key.to_s
+        return key.to_sym if @_transform_type == :none || key.empty? # We can skip transformation
+
         inflector = Alba.inflector
         raise Alba::Error, 'Inflector is nil. You can set inflector with `Alba.enable_inference!(with: :active_support)` for example.' unless inflector
 
