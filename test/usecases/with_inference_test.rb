@@ -146,6 +146,18 @@ class InferenceTestWithCustomInflector < WithInferenceTest
       def i.camelize_lower; end
       def i.dasherize; end
       def i.classify; end
+
+      def i.demodulize(str)
+        str.split('::').last
+      end
+
+      def i.underscore(str)
+        str.gsub(/::/, '/').gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2').gsub(/([a-z\d])([A-Z])/, '\1_\2').tr('-', '_').downcase
+      end
+
+      def i.pluralize(str)
+        "#{str}s"
+      end
     end
     Alba.enable_inference!(with: inflector)
   end
