@@ -1,6 +1,10 @@
 require_relative '../test_helper'
 
 class OneTest < MiniTest::Test
+  def teardown
+    Alba.enable_inference!(with: :active_support)
+  end
+
   class User
     attr_reader :id, :created_at, :updated_at
     attr_accessor :profile
@@ -146,17 +150,69 @@ class OneTest < MiniTest::Test
     )
   end
 
-  def test_it_raises_error_when_no_resource_or_block_given_without_inference
-    Alba.disable_inference!
-    resource = <<~RUBY
-      class UserResource6
+  def create_resource_class
+    lambda do
+      klass = Class.new do
         include Alba::Resource
 
         attributes :id
 
         one :profile
       end
-    RUBY
-    assert_raises(ArgumentError) { eval(resource) }
+      OneTest.const_set('UserResource', klass)
+      klass
+    end
+  end
+
+  def test_it_raises_error_when_no_resource_or_block_given_without_inference
+    Alba.disable_inference!
+    assert_raises(ArgumentError) { create_resource_class.call }
+  end
+
+  Alba.enable_inference!(with: :active_support)
+  class UserResource7
+    include Alba::Resource
+
+    attributes :id
+
+    one :profile
+  end
+
+  def test_it_does_not_raise_error_when_no_resource_or_block_given_with_inference
+    user = User.new(1)
+    profile = Profile.new(1, 'test@example.com', 'Masafumi', 'Okura')
+    user.profile = profile
+    assert_equal(
+      '{"id":1,"profile":{"email":"test@example.com","full_name":"Masafumi Okura"}}',
+      UserResource7.new(user).serialize
+    )
+  end
+
+  module Foo
+    module Bar
+      class ProfileResource
+        include Alba::Resource
+
+        attributes :email
+      end
+
+      class UserResource
+        include Alba::Resource
+
+        attributes :id
+
+        one :profile
+      end
+    end
+  end
+
+  def test_it_infers_resource_class_within_deeply_nested_namespace
+    user = User.new(1)
+    profile = Profile.new(1, 'test@example.com', 'Masafumi', 'Okura')
+    user.profile = profile
+    assert_equal(
+      '{"id":1,"profile":{"email":"test@example.com"}}',
+      Foo::Bar::UserResource.new(user).serialize
+    )
   end
 end
