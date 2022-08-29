@@ -336,7 +336,7 @@ module Alba
       # @return [void]
       # @see Alba::Association#initialize
       def association(name, condition = nil, resource: nil, key: nil, **options, &block)
-        nesting = self.name&.rpartition('::')&.first
+        nesting = self.name.nil? ? nil : self.name.rpartition('::').first.tap {|n| n.empty? ? nil : n}
         assoc = Association.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
         @_attributes[key&.to_sym || name.to_sym] = options[:if] ? ConditionalAttribute.new(body: assoc, condition: options[:if]) : assoc
       end
