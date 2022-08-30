@@ -11,12 +11,14 @@ module Alba
     # @param name [Symbol, String] name of the method to fetch association
     # @param condition [Proc, nil] a proc filtering data
     # @param resource [Class<Alba::Resource>, nil] a resource class for the association
+    # @param params [Hash] params override for the association
     # @param nesting [String] a namespace where source class is inferred with
     # @param block [Block] used to define resource when resource arg is absent
-    def initialize(name:, condition: nil, resource: nil, nesting: nil, &block)
+    def initialize(name:, condition: nil, resource: nil, params: {}, nesting: nil, &block)
       @name = name
       @condition = condition
       @resource = resource
+      @params = params
       return if @resource
 
       assign_resource(nesting, block)
@@ -29,6 +31,7 @@ module Alba
     # @param params [Hash] user-given Hash for arbitrary data
     # @return [Hash]
     def to_h(target, within: nil, params: {})
+      params = params.merge(@params) unless @params.empty?
       @object = target.__send__(@name)
       @object = @condition.call(object, params, target) if @condition
       return if @object.nil?

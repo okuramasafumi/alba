@@ -78,16 +78,6 @@ class ParamsTest < MiniTest::Test
          resource: ArticleResource
   end
 
-  class UserResource3 < UserResource2
-    cond = proc do |articles, params|
-      params[:foo] = true
-      params[:foo] ? [] : articles
-    end
-    many :articles,
-         cond,
-         resource: ArticleResource
-  end
-
   def setup
     Alba.backend = nil
 
@@ -119,7 +109,48 @@ class ParamsTest < MiniTest::Test
     )
   end
 
-  def test_params_cannot_be_modified
-    assert_raises(FrozenError) { UserResource3.new(@user).serialize }
+  class BazResource
+    include Alba::Resource
+
+    attributes :data
+    attributes :secret, if: proc { params[:expose_secret] }
+  end
+
+  class BarResource
+    include Alba::Resource
+
+    one :baz, resource: BazResource
+  end
+
+  class FooResource
+    include Alba::Resource
+
+    root_key :foo
+
+    one :bar, resource: BarResource
+  end
+
+  class FooResourceWithParamsOverride
+    include Alba::Resource
+
+    root_key :foo
+
+    one :bar, resource: BarResource, params: { expose_secret: false }
+  end
+
+  Baz = Struct.new(:data, :secret)
+  Bar = Struct.new(:baz)
+  Foo = Struct.new(:bar)
+
+  def test_params_goes_down_to_nested_resources
+    foo = Foo.new(Bar.new(Baz.new(1, 'secret')))
+    assert_equal(
+      '{"foo":{"bar":{"baz":{"data":1,"secret":"secret"}}}}',
+      FooResource.new(foo, params: {expose_secret: true}).serialize
+    )
+    assert_equal(
+      '{"foo":{"bar":{"baz":{"data":1}}}}',
+      FooResourceWithParamsOverride.new(foo, params: {expose_secret: true}).serialize
+    )
   end
 end

@@ -197,6 +197,23 @@ class UserResource
 end
 ```
 
+#### Params
+
+You can pass a Hash to the resource for internal use. It can be used as "flags" to control attribute content.
+
+```ruby
+class UserResource
+  include Alba::Resource
+  attribute :name do |user|
+    params[:upcase] ? user.name.upcase : user.name
+  end
+end
+
+user = User.new(1, 'Masa', 'test@example.com')
+UserResource.new(user).serialize # => "{\"name\":\"foo\"}"
+UserResource.new(user, params: {upcase: true}).serialize # => "{\"name\":\"FOO\"}"
+```
+
 ### Serialization with associations
 
 Associations can be defined using the `association` macro, which is also aliased as `one`, `many`, `has_one`, and `has_many` for convenience.
@@ -378,6 +395,49 @@ end
 ```
 
 Note that using a Proc slows down serialization if there are too `many` associated objects.
+
+#### Params override
+
+Associations can override params. This is useful when associations are deeply nested.
+
+```ruby
+class BazResource
+  include Alba::Resource
+
+  attributes :data
+  attributes :secret, if: proc { params[:expose_secret] }
+end
+
+class BarResource
+  include Alba::Resource
+
+  one :baz, resource: BazResource
+end
+
+class FooResource
+  include Alba::Resource
+
+  root_key :foo
+
+  one :bar, resource: BarResource
+end
+
+class FooResourceWithParamsOverride
+  include Alba::Resource
+
+  root_key :foo
+
+  one :bar, resource: BarResource, params: { expose_secret: false }
+end
+
+Baz = Struct.new(:data, :secret)
+Bar = Struct.new(:baz)
+Foo = Struct.new(:bar)
+
+foo = Foo.new(Bar.new(Baz.new(1, 'secret')))
+FooResource.new(foo, params: {expose_secret: true}).serialize # => '{"foo":{"bar":{"baz":{"data":1,"secret":"secret"}}}}'
+FooResourceWithParamsOverride.new(foo, params: {expose_secret: true}).serialize # => '{"foo":{"bar":{"baz":{"data":1}}}}'
+```
 
 ### Inline definition with `Alba.serialize`
 
