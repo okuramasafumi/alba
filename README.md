@@ -549,6 +549,8 @@ Possible values for `transform_keys` argument are:
 * `:snake` for snake_case
 * `:none` for not transforming keys
 
+#### Root key transformation
+
 You can also transform root key when:
 
 * `Alba.enable_inference!` is called
@@ -582,7 +584,50 @@ BankAccountResource.new(bank_account).serialize
 
 This behavior to transform root key will become default at version 2.
 
-Supported transformation types are :camel, :lower_camel and :dash.
+#### Key transformation cascading
+
+When you use `transform_keys` with inline association, it automatically applies the same transformation type to those inline association.
+
+This is the default behavior from version 2, but you can do the same thing with adding `transform_keys` to each association.
+
+You can also turn it off by setting `cascade: false` option to `transform_keys`.
+
+```ruby
+class User
+  attr_reader :id, :first_name, :last_name
+
+  def initialize(id, first_name, last_name)
+    @id = id
+    @first_name = first_name
+    @last_name = last_name
+    @bank_account = BankAccount.new(1234)
+  end
+end
+
+class BankAccount
+  attr_reader :account_number
+
+  def initialize(account_number)
+    @account_number = account_number
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  attributes :id, :first_name, :last_name
+
+  transform_keys :lower_camel # Default is cascade: true
+
+  one :bank_account do
+    attributes :account_number
+  end
+end
+
+user = User.new(1, 'Masafumi', 'Okura')
+UserResource.new(user).serialize
+# => '{"id":1,"firstName":"Masafumi","lastName":"Okura","bankAccount":{"accountNumber":1234}}'
+```
 
 #### Custom inflector
 
