@@ -36,7 +36,7 @@ module Alba
       # @param within [Object, nil, false, true] determines what associations to be serialized. If not set, it serializes all associations.
       def initialize(object, params: {}, within: WITHIN_DEFAULT)
         @object = object
-        @params = params.freeze
+        @params = params
         @within = within
         @method_existence = {} # Cache for `respond_to?` result
         DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.__send__(name)) }
@@ -330,14 +330,15 @@ module Alba
       # @param condition [Proc, nil] a Proc to modify the association
       # @param resource [Class<Alba::Resource>, String, Proc, nil] representing resource for this association
       # @param key [String, Symbol, nil] used as key when given
+      # @param params [Hash] params override for the association
       # @param options [Hash<Symbol, Proc>]
       # @option options [Proc] if a condition to decide if this association should be serialized
       # @param block [Block]
       # @return [void]
       # @see Alba::Association#initialize
-      def association(name, condition = nil, resource: nil, key: nil, **options, &block)
+      def association(name, condition = nil, resource: nil, key: nil, params: {}, **options, &block)
         nesting = self.name.nil? ? nil : self.name.rpartition('::').first.tap {|n| n.empty? ? nil : n}
-        assoc = Association.new(name: name, condition: condition, resource: resource, nesting: nesting, &block)
+        assoc = Association.new(name: name, condition: condition, resource: resource, params: params, nesting: nesting, &block)
         @_attributes[key&.to_sym || name.to_sym] = options[:if] ? ConditionalAttribute.new(body: assoc, condition: options[:if]) : assoc
       end
       alias one association
