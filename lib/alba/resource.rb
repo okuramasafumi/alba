@@ -2,6 +2,7 @@ require_relative 'association'
 require_relative 'conditional_attribute'
 require_relative 'typed_attribute'
 require_relative 'deprecation'
+require_relative 'layout'
 
 module Alba
   # This module represents what should be serialized
@@ -69,8 +70,6 @@ module Alba
 
       private
 
-      attr_reader :serialized_json # Mainly for layout
-
       def encode(hash)
         Alba.encoder.call(hash)
       end
@@ -79,23 +78,7 @@ module Alba
         serialized_json = encode(hash)
         return serialized_json unless @_layout
 
-        @serialized_json = serialized_json
-        if @_layout.is_a?(String) # file
-          ERB.new(File.read(@_layout)).result(binding)
-
-        else # inline
-          serialize_within_inline_layout
-        end
-      end
-
-      def serialize_within_inline_layout
-        inline = instance_eval(&@_layout)
-        case inline
-        when Hash then encode(inline)
-        when String then inline
-        else
-          raise Alba::Error, 'Inline layout must be a Proc returning a Hash or a String'
-        end
+        @_layout.serialize(resource: self, serialized_json: serialized_json, binding: binding)
       end
 
       def hash_with_metadata(hash, meta)
@@ -337,7 +320,11 @@ module Alba
       # @return [void]
       # @see Alba::Association#initialize
       def association(name, condition = nil, resource: nil, key: nil, params: {}, **options, &block)
-        nesting = self.name.nil? ? nil : self.name.rpartition('::').first.tap {|n| n.empty? ? nil : n}
+        nesting = if self.name.nil?
+                    nil
+                  else
+                    self.name.rpartition('::').first.tap { |n| n.empty? ? nil : n }
+                  end
         assoc = Association.new(name: name, condition: condition, resource: resource, params: params, nesting: nesting, &block)
         @_attributes[key&.to_sym || name.to_sym] = options[:if] ? ConditionalAttribute.new(body: assoc, condition: options[:if]) : assoc
       end
@@ -381,26 +368,8 @@ module Alba
       # @params file [String] name of the layout file
       # @params inline [Proc] a proc returning JSON string or a Hash representing JSON
       def layout(file: nil, inline: nil)
-        @_layout = validated_file_layout(file) || validated_inline_layout(inline)
+        @_layout = Layout.new(file: file, inline: inline)
       end
-
-      def validated_file_layout(filename)
-        case filename
-        when String, nil then filename
-        else
-          raise ArgumentError, 'File layout must be a String representing filename'
-        end
-      end
-      private :validated_file_layout
-
-      def validated_inline_layout(inline_layout)
-        case inline_layout
-        when Proc, nil then inline_layout
-        else
-          raise ArgumentError, 'Inline layout must be a Proc returning a Hash or a String'
-        end
-      end
-      private :validated_inline_layout
 
       # Transform keys as specified type
       #

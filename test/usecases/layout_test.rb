@@ -98,4 +98,13 @@ class LayoutTest < MiniTest::Test
     end
     assert_equal 'Inline layout must be a Proc returning a Hash or a String', error.message
   end
+
+  def test_it_raises_exception_when_layout_has_no_arguments
+    error = assert_raises(ArgumentError) do
+      Class.new(UserResource) do
+        layout
+      end
+    end
+    assert_equal 'Layout must be either String or Proc', error.message
+  end
 end
