@@ -1,6 +1,10 @@
 module Alba
   # Representing association
   class Association
+    NESTED_HASH_NAME = Object.new.tap do |obj|
+      def obj.to_sym ; :__nested_hash__ ; end
+    end
+
     @const_cache = {}
     class << self
       attr_reader :const_cache
@@ -32,7 +36,7 @@ module Alba
     # @return [Hash]
     def to_h(target, within: nil, params: {})
       params = params.merge(@params) unless @params.empty?
-      @object = target.__send__(@name)
+      @object = @name != NESTED_HASH_NAME ? target.__send__(@name) : target
       @object = @condition.call(object, params, target) if @condition
       return if @object.nil?
 

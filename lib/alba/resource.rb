@@ -307,6 +307,12 @@ module Alba
         @_attributes[name.to_sym] = options[:if] ? ConditionalAttribute.new(body: block, condition: options[:if]) : block
       end
 
+      def nested_hash(name, **options, &block)
+        assoc = Association.new(name: Association::NESTED_HASH_NAME, &block)
+        @_attributes[name.to_sym] = options[:if] ? [assoc, options[:if]] : assoc
+      end
+
+
       # Set association
       #
       # @param name [String, Symbol] name of the association, used as key when `key` param doesn't exist
