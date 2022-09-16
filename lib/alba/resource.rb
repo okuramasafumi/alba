@@ -1,6 +1,7 @@
 require_relative 'association'
 require_relative 'conditional_attribute'
 require_relative 'typed_attribute'
+require_relative 'nested_attribute'
 require_relative 'deprecation'
 require_relative 'layout'
 
@@ -207,7 +208,7 @@ module Alba
                 when Symbol then fetch_attribute_from_object_and_resource(object, attribute)
                 when Proc then instance_exec(object, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(object, params: params, within: within) }
-                when TypedAttribute then attribute.value(object)
+                when TypedAttribute, NestedAttribute then attribute.value(object)
                 when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: object) { |attr| fetch_attribute(object, key, attr) }
                 else
                   raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
@@ -336,6 +337,22 @@ module Alba
       alias many association
       alias has_one association
       alias has_many association
+
+      # Set a nested attribute with the given block
+      #
+      # @param name [String, Symbol] key name
+      # @param options [Hash<Symbol, Proc>]
+      # @option options [Proc] if a condition to decide if this attribute should be serialized
+      # @param block [Block] the block called during serialization
+      # @raise [ArgumentError] if block is absent
+      # @return [void]
+      def nested_attribute(name, **options, &block)
+        raise ArgumentError, 'No block given in attribute method' unless block
+
+        attribute = NestedAttribute.new(&block)
+        @_attributes[name.to_sym] = options[:if] ? ConditionalAttribute.new(body: attribute, condition: options[:if]) : attribute
+      end
+      alias nested nested_attribute
 
       # Set root key
       #
