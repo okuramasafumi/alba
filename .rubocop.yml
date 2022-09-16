@@ -54,6 +54,7 @@ Metrics/ModuleLength:
 
 # Resource class includes DSLs, which tend to accept long list of parameters
 Metrics/ParameterLists:
+  Max: 7
   Exclude:
     - 'test/**/*.rb'
 
@@ -65,6 +66,7 @@ Security/Eval:
 Style/ConstantVisibility:
   Exclude:
     - 'lib/alba/version.rb'
+    - 'test/**/*.rb'
 
 Style/Copyright:
   Enabled: false

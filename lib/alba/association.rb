@@ -13,12 +13,14 @@ module Alba
     # @param resource [Class<Alba::Resource>, nil] a resource class for the association
     # @param params [Hash] params override for the association
     # @param nesting [String] a namespace where source class is inferred with
+    # @param key_transformation [Symbol] key transformation type
     # @param block [Block] used to define resource when resource arg is absent
-    def initialize(name:, condition: nil, resource: nil, params: {}, nesting: nil, &block)
+    def initialize(name:, condition: nil, resource: nil, params: {}, nesting: nil, key_transformation: :none, &block)
       @name = name
       @condition = condition
       @resource = resource
       @params = params
+      @key_transformation = key_transformation
       return if @resource
 
       assign_resource(nesting, block)
@@ -40,6 +42,7 @@ module Alba
         to_h_with_each_resource(within, params)
       else
         @resource = constantize(@resource)
+        @resource.transform_keys(@key_transformation)
         @resource.new(object, params: params, within: within).to_h
       end
     end

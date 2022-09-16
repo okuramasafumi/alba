@@ -2,12 +2,13 @@ require_relative '../test_helper'
 
 class KeyTransformTest < Minitest::Test
   class User
-    attr_reader :id, :first_name, :last_name
+    attr_reader :id, :first_name, :last_name, :bank_account
 
-    def initialize(id, first_name, last_name)
+    def initialize(id, first_name, last_name, bank_account)
       @id = id
       @first_name = first_name
       @last_name = last_name
+      @bank_account = bank_account
     end
   end
 
@@ -72,8 +73,8 @@ class KeyTransformTest < Minitest::Test
   def setup
     Alba.enable_inference!(with: :active_support)
 
-    @user = User.new(1, 'Masafumi', 'Okura')
     @bank_account = BankAccount.new(123_456_789)
+    @user = User.new(1, 'Masafumi', 'Okura', @bank_account)
   end
 
   def teardown
@@ -164,5 +165,35 @@ class KeyTransformTest < Minitest::Test
     assert_raises(Alba::Error) do
       UserResourceCamel.new(@user).serialize
     end
+  end
+
+  class UserResourceWithInlineAssociation < UserResource
+    transform_keys :lower_camel
+
+    one :bank_account do
+      attributes :account_number
+    end
+  end
+
+  def test_key_transformation_cascades
+    assert_equal(
+      '{"id":1,"firstName":"Masafumi","lastName":"Okura","bankAccount":{"accountNumber":123456789}}',
+      UserResourceWithInlineAssociation.new(@user).serialize
+    )
+  end
+
+  class UserResourceWithInlineAssociationNoCascade < UserResource
+    transform_keys :lower_camel, cascade: false
+
+    one :bank_account do
+      attributes :account_number
+    end
+  end
+
+  def test_key_transformation_no_cascade
+    assert_equal(
+      '{"id":1,"firstName":"Masafumi","lastName":"Okura","bankAccount":{"account_number":123456789}}',
+      UserResourceWithInlineAssociationNoCascade.new(@user).serialize
+    )
   end
 end

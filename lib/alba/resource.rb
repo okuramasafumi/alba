@@ -325,7 +325,11 @@ module Alba
                   else
                     self.name.rpartition('::').first.tap { |n| n.empty? ? nil : n }
                   end
-        assoc = Association.new(name: name, condition: condition, resource: resource, params: params, nesting: nesting, &block)
+        key_transformation = @_key_transformation_cascade ? @_transform_type : :none
+        assoc = Association.new(
+          name: name, condition: condition, resource: resource, params: params, nesting: nesting, key_transformation: key_transformation,
+&block
+        )
         @_attributes[key&.to_sym || name.to_sym] = options[:if] ? ConditionalAttribute.new(body: assoc, condition: options[:if]) : assoc
       end
       alias one association
@@ -375,8 +379,10 @@ module Alba
       #
       # @param type [String, Symbol] one of `snake`, `:camel`, `:lower_camel`, `:dash` and `none`
       # @param root [Boolean] decides if root key also should be transformed
+      # @param cascade [Boolean] decides if key transformation cascades into inline association
+      #   Default is true but can be set false for old (v1) behavior
       # @raise [Alba::Error] when type is not supported
-      def transform_keys(type, root: true)
+      def transform_keys(type, root: true, cascade: true)
         type = type.to_sym
         unless %i[none snake camel lower_camel dash].include?(type)
           # This should be `ArgumentError` but for backward compatibility it raises `Alba::Error`
@@ -385,6 +391,7 @@ module Alba
 
         @_transform_type = type
         @_transforming_root_key = root
+        @_key_transformation_cascade = cascade
       end
 
       # Sets key for collection serialization
