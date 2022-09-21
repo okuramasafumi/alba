@@ -439,6 +439,63 @@ FooResource.new(foo, params: {expose_secret: true}).serialize # => '{"foo":{"bar
 FooResourceWithParamsOverride.new(foo, params: {expose_secret: true}).serialize # => '{"foo":{"bar":{"baz":{"data":1}}}}'
 ```
 
+### Nested Attribute
+
+Alba supports nested attributes that makes it easy to build complex data structure from single object.
+
+In order to define nested attributes, you can use `nested` or `nested_attribute` (alias of `nested`).
+
+```ruby
+class User
+  attr_accessor :id, :name, :email, :city, :zipcode
+
+  def initialize(id, name, email, city, zipcode)
+    @id = id
+    @name = name
+    @email = email
+    @city = city
+    @zipcode = zipcode
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  root_key :user
+
+  attributes :id
+
+  nested_attribute :address do
+    attributes :city, :zipcode
+  end
+end
+
+user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com', 'Tokyo', '0000000')
+UserResource.new(user).serialize
+# => '{"user":{"id":1,"address":{"city":"Tokyo","zipcode":"0000000"}}}'
+```
+
+Nested attributes can be nested deeply.
+
+```ruby
+class FooResource
+  include Alba::Resource
+
+  root_key :foo
+
+  nested :bar do
+    nested :baz do
+      attribute :deep do
+        42
+      end
+    end
+  end
+end
+
+FooResource.new(nil).serialize
+# => '{"foo":{"bar":{"baz":{"deep":42}}}}'
+```
+
 ### Inline definition with `Alba.serialize`
 
 `Alba.serialize` method is a shortcut to define everything inline.
