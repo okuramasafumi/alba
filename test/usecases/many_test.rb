@@ -268,6 +268,38 @@ class ManyTest < MiniTest::Test
     )
   end
 
+  class ArticleResource2
+    include Alba::Resource
+
+    attributes :id, if: proc { params.dig(:articles, :include_id) != false }
+    attributes :title
+  end
+
+  class UserResource8
+    include Alba::Resource
+
+    attributes :id
+
+    many :articles, resource: ArticleResource2
+  end
+
+  def test_it_can_select_attributes_of_association
+    user = User.new(1)
+    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
+    user.articles << article1
+    article2 = Article.new(2, 'Super nice', 'Really nice!')
+    user.articles << article2
+
+    assert_equal(
+      '{"id":1,"articles":[{"id":1,"title":"Hello World!"},{"id":2,"title":"Super nice"}]}',
+      UserResource8.new(user).serialize
+    )
+    assert_equal(
+      '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}',
+      UserResource8.new(user, params: {articles: {include_id: false}}).serialize
+    )
+  end
+
   class Node
     attr_reader :id
 
