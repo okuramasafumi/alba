@@ -321,11 +321,6 @@ module Alba
       # @return [void]
       # @see Alba::Association#initialize
       def association(name, condition = nil, resource: nil, key: nil, params: {}, **options, &block)
-        nesting = if self.name.nil?
-                    nil
-                  else
-                    self.name.rpartition('::').first.tap { |n| n.empty? ? nil : n }
-                  end
         key_transformation = @_key_transformation_cascade ? @_transform_type : :none
         assoc = Association.new(
           name: name, condition: condition, resource: resource, params: params, nesting: nesting, key_transformation: key_transformation,
@@ -337,6 +332,15 @@ module Alba
       alias many association
       alias has_one association
       alias has_many association
+
+      def nesting
+        if name.nil?
+          nil
+        else
+          name.rpartition('::').first.tap { |n| n.empty? ? nil : n }
+        end
+      end
+      private :nesting
 
       # Set a nested attribute with the given block
       #
