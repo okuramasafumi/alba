@@ -20,10 +20,10 @@ module Alba
       return CONDITION_UNMET unless condition_passes?(resource, object)
 
       fetched_attribute = yield(@body)
-      if !fetched_attribute.nil? && @condition.is_a?(Proc) && @condition.arity >= 2
-        attr = @body.is_a?(Alba::Association) ? @body.object : fetched_attribute
-        return CONDITION_UNMET unless resource.instance_exec(object, attr, &@condition)
-      end
+      return fetched_attribute if fetched_attribute.nil? || !with_two_arity_proc_condition
+
+      return CONDITION_UNMET unless resource.instance_exec(object, attribute_from_association_body_or(fetched_attribute), &@condition)
+
       fetched_attribute
     end
 
@@ -41,6 +41,14 @@ module Alba
       else # Symbol
         resource.__send__(@condition)
       end
+    end
+
+    def with_two_arity_proc_condition
+      @condition.is_a?(Proc) && @condition.arity >= 2
+    end
+
+    def attribute_from_association_body_or(fetched_attribute)
+      @body.is_a?(Alba::Association) ? @body.object : fetched_attribute
     end
   end
 end
