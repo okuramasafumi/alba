@@ -41,9 +41,7 @@ module Alba
       if @resource.is_a?(Proc) && @object.is_a?(Enumerable)
         to_h_with_each_resource(within, params)
       else
-        @resource = constantize(@resource)
-        @resource.transform_keys(@key_transformation)
-        @resource.new(object, params: params, within: within).to_h
+        to_h_with_constantize_resource(within, params)
       end
     end
 
@@ -74,6 +72,12 @@ module Alba
       @object.map do |item|
         @resource.call(item).new(item, within: within, params: params).to_h
       end
+    end
+
+    def to_h_with_constantize_resource(within, params)
+      @resource = constantize(@resource)
+      @resource.transform_keys(@key_transformation)
+      @resource.new(object, params: params, within: within).to_h
     end
   end
 end
