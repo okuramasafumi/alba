@@ -185,7 +185,7 @@ class ManyTest < MiniTest::Test
   class ArticleWithComments < Article
     attr_accessor :comments, :show_comments
 
-    def initialize(id, title, body, comments = [], show_comments = true)
+    def initialize(id, title, body, comments = [], show_comments: true)
       super(id, title, body)
 
       @comments = comments
@@ -229,7 +229,7 @@ class ManyTest < MiniTest::Test
   def test_it_returns_correct_json_with_nested_comments_object
     user3 = UserBanned.new(3, false)
     comments = [Comment.new(1, 'Hello Comment!')]
-    article1 = ArticleWithComments.new(1, 'Hello World!', 'Hello World!!!', comments, false)
+    article1 = ArticleWithComments.new(1, 'Hello World!', 'Hello World!!!', comments, show_comments: false)
     user3.articles << article1
 
     user5 = UserBanned.new(5, true)
