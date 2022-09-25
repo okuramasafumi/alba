@@ -5,3 +5,7 @@ checks:
     enabled: true
     config:
       threshold: 7
+
+exclude_patterns:
+  - "benchmark/**/*"
+  - "script/**/*"
