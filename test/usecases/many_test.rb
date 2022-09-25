@@ -2,8 +2,7 @@ require_relative '../test_helper'
 
 class ManyTest < MiniTest::Test
   class User
-    attr_reader :id, :created_at, :updated_at
-    attr_accessor :articles
+    attr_accessor :id, :created_at, :updated_at, :articles
 
     def initialize(id)
       @id = id
@@ -37,15 +36,18 @@ class ManyTest < MiniTest::Test
     many :articles, resource: ArticleResource
   end
 
-  def test_it_returns_correct_json_with_resource_option
-    user = User.new(1)
+  def setup
+    @user = User.new(1)
     article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
+    @user.articles << article1
     article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
+    @user.articles << article2
+  end
+
+  def test_it_returns_correct_json_with_resource_option
     assert_equal(
       '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}',
-      UserResource1.new(user).serialize
+      UserResource1.new(@user).serialize
     )
   end
 
@@ -60,14 +62,9 @@ class ManyTest < MiniTest::Test
   end
 
   def test_it_returns_correct_json_with_block
-    user = User.new(1)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
     assert_equal(
       '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"},{"title":"Super nice","body":"Really nice!"}]}',
-      UserResource2.new(user).serialize
+      UserResource2.new(@user).serialize
     )
   end
 
@@ -80,14 +77,9 @@ class ManyTest < MiniTest::Test
   end
 
   def test_it_returns_correct_json_with_given_key
-    user = User.new(1)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
     assert_equal(
       '{"id":1,"posts":[{"title":"Hello World!"},{"title":"Super nice"}]}',
-      UserResource3.new(user).serialize
+      UserResource3.new(@user).serialize
     )
   end
 
@@ -102,14 +94,9 @@ class ManyTest < MiniTest::Test
   end
 
   def test_it_returns_correct_json_with_given_condition
-    user = User.new(1)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
     assert_equal(
       '{"id":1,"articles":[{"title":"Super nice"}]}',
-      UserResource4.new(user).serialize
+      UserResource4.new(@user).serialize
     )
   end
 
@@ -140,14 +127,9 @@ class ManyTest < MiniTest::Test
   end
 
   def test_it_returns_correct_json_with_resource_option_string
-    user = User.new(1)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
     assert_equal(
       '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}',
-      UserResource5.new(user).serialize
+      UserResource5.new(@user).serialize
     )
   end
 
@@ -176,23 +158,15 @@ class ManyTest < MiniTest::Test
   end
 
   def test_it_returns_correct_json_with_filtering_by_user_id
-    user = User.new(1)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
     assert_equal(
       '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}',
-      UserResource6.new(user).serialize
+      UserResource6.new(@user).serialize
     )
   end
 
   def test_it_returns_empty_json_with_filtering_by_user_id
-    user = User.new(2)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
+    user = @user.dup
+    user.id = 2
     assert_equal(
       '{"id":2,"articles":[]}',
       UserResource6.new(user).serialize
@@ -284,19 +258,13 @@ class ManyTest < MiniTest::Test
   end
 
   def test_it_can_select_attributes_of_association
-    user = User.new(1)
-    article1 = Article.new(1, 'Hello World!', 'Hello World!!!')
-    user.articles << article1
-    article2 = Article.new(2, 'Super nice', 'Really nice!')
-    user.articles << article2
-
     assert_equal(
       '{"id":1,"articles":[{"id":1,"title":"Hello World!"},{"id":2,"title":"Super nice"}]}',
-      UserResource8.new(user).serialize
+      UserResource8.new(@user).serialize
     )
     assert_equal(
       '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}',
-      UserResource8.new(user, params: {articles: {include_id: false}}).serialize
+      UserResource8.new(@user, params: {articles: {include_id: false}}).serialize
     )
   end
 
