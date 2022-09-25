@@ -323,7 +323,7 @@ class ManyTest < MiniTest::Test
   def test_polymorphic_association_with_proc_resource
     folder = FolderNode.new(1, [FolderNode.new(2, [FileNode.new(3, 10)]), FileNode.new(4, 100)])
     assert_equal(
-      '{"id":1,"size":2,"type":"folder","children":[{"id":2,"size":1,"type":"folder","children":[{"id":3,"size":10,"type":"file"}]},{"id":4,"size":100,"type":"file"}]}',
+      '{"id":1,"size":2,"type":"folder","children":[{"id":2,"size":1,"type":"folder","children":[{"id":3,"size":10,"type":"file"}]},{"id":4,"size":100,"type":"file"}]}', # rubocop: disable Layout/LineLength
       FolderNodeResource.new(folder).serialize
     )
   end
