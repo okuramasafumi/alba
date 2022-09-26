@@ -178,7 +178,7 @@ module Alba
       def handle_error(error, object, key, attribute, hash)
         on_error = @_on_error || :raise
         case on_error # rubocop:disable Style/MissingElse
-        when :raise, nil then raise
+        when :raise, nil then raise(error)
         when :nullify then hash[key] = nil
         when :ignore then nil
         when Proc
