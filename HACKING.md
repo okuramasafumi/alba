@@ -6,7 +6,7 @@ This document is intended to provide detailed information about the internal des
 
 The design of Alba is simple. `Alba::Resource` module is the only interface end users use by `include`ing it. Other classes and modules are referenced by `Alba::Resource`.
 
-`included` hook 
+When a class `include`s `Alba::Resource` module it defines `ClassMethods` such as `attributes` and `InstanceMethods` such as `serialize`. Instance methods work with information collected by class methods.
 
 ## Methods
 
