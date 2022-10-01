@@ -533,7 +533,34 @@ UserResource.new(user).serializable_hash
 UserResource.new(user).to_h
 ```
 
-### Inheritance and attributes filter
+### Inheritance
+
+When you include `Alba::Resource` in your class, it's just a class so you can define any class that inherits from it. You can add new attributes to inherited class like below:
+
+```ruby
+class FooResource
+  include Alba::Resource
+
+  root_key :foo
+
+  attributes :bar
+end
+
+class ExtendedFooResource < FooResource
+  root_key :foofoo
+
+  attributes :baz
+end
+
+Foo = Struct.new(:bar, :baz)
+foo = Foo.new(1, 2)
+FooResource.new(foo).serialize # => '{"foo":{"bar":1}}'
+ExtendedFooResource.new(foo).serialize # => '{"foo":{"bar":1,"baz":2}}'
+```
+
+In this example we add `baz` attribute and change `root_key`. This way, you can extend existing resource classes just like normal OOP. Don't forget that when your inheritance structure is too deep it'll become difficult to modify existing classes.
+
+### Filtering attributes
 
 You can filter out certain attributes by overriding `attributes` instance method. This is useful when you want to customize existing resource with inheritance.
 
@@ -715,7 +742,7 @@ Alba.enable_inference!(with: CustomInflector)
 
 ### Conditional attributes
 
-Filtering attributes with overriding `convert` works well for simple cases. However, It's cumbersome when we want to filter various attributes based on different conditions for keys.
+Filtering attributes with overriding `attributes` works well for simple cases. However, It's cumbersome when we want to filter various attributes based on different conditions for keys.
 
 In these cases, conditional attributes works well. We can pass `if` option to `attributes`, `attribute`, `one` and `many`. Below is an example for the same effect as [filtering attributes section](#filtering-attributes).
 
