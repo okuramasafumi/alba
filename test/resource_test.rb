@@ -33,7 +33,7 @@ class ResourceTest < MiniTest::Test
     foo.bars = [bar]
     assert_equal(
       {id: 1, bar_size: 1, bars: [{id: 1}]},
-      FooResource.new(foo).serializable_hash
+      FooResource.new(foo).serializable_hash(root_key: false)
     )
   end
 end

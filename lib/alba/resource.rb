@@ -16,6 +16,9 @@ module Alba
     WITHIN_DEFAULT = Object.new.freeze
     private_constant :WITHIN_DEFAULT
 
+    DEFAULT_ROOT_KEY = Object.new.freeze
+    private_constant :DEFAULT_ROOT_KEY
+
     # @private
     def self.included(base)
       super
@@ -50,26 +53,42 @@ module Alba
       # @param meta [Hash] metadata for this seialization
       # @return [String] serialized JSON string
       def serialize(root_key: nil, meta: {})
-        key = root_key.nil? ? fetch_key : root_key
-        hash = if key && key != :''
-                 h = {key.to_s => serializable_hash}
-                 hash_with_metadata(h, meta)
-               else
-                 serializable_hash
-               end
-        serialize_with(hash)
+        root_key = 'true' if root_key == true # Backward compatibility
+        h = serializable_hash(root_key: root_key, meta: meta)
+        serialize_with(h)
       end
       alias to_json serialize
 
       # A Hash for serialization
       #
+      # @param root_key [Symbol, nil, true, DEFAULT_ROOT_KEY]
+      # @param meta [Hash] metadata for this seialization
       # @return [Hash]
-      def serializable_hash
-        collection? ? serializable_hash_for_collection : converter.call(@object)
+      def serializable_hash(root_key: DEFAULT_ROOT_KEY, meta: {})
+        key = case root_key
+              when DEFAULT_ROOT_KEY then default_root_key
+              when true, nil then fetch_key
+              else root_key
+              end
+        if key && key != :''
+          hash_with_metadata({key.to_s => _serializable_hash}, meta)
+        else
+          _serializable_hash
+        end
       end
       alias to_h serializable_hash
 
       private
+
+      def _serializable_hash
+        collection? ? serializable_hash_for_collection : converter.call(@object)
+      end
+
+      # The dafault for "default" root key
+      # We can override this method to change root key such as `false`
+      def default_root_key
+        fetch_key
+      end
 
       def encode(hash)
         Alba.encoder.call(hash)

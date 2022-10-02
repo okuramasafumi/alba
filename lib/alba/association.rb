@@ -70,14 +70,14 @@ module Alba
 
     def to_h_with_each_resource(within, params)
       @object.map do |item|
-        @resource.call(item).new(item, within: within, params: params).to_h
+        @resource.call(item).new(item, within: within, params: params).to_h(root_key: false)
       end
     end
 
     def to_h_with_constantize_resource(within, params)
       @resource = constantize(@resource)
       @resource.transform_keys(@key_transformation)
-      @resource.new(object, params: params, within: within).to_h
+      @resource.new(object, params: params, within: within).to_h(root_key: false)
     end
   end
 end

@@ -60,7 +60,7 @@ class LayoutTest < MiniTest::Test
 
   class UserResourceWithInlineLayoutReturningHash < UserResource
     layout inline: proc {
-      {header: 'my header', body: serializable_hash}
+      {header: 'my header', body: serializable_hash(root_key: false)}
     }
   end
 
