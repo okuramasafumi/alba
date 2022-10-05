@@ -38,6 +38,10 @@ class NoAssociationTest < MiniTest::Test
       '{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}',
       UserResource.new(@user).serialize
     )
+    assert_equal(
+      {id: 1, name: 'Masafumi OKURA', name_with_email: 'Masafumi OKURA: masafumi@example.com'},
+      UserResource.new(@user).serialized_hash
+    )
   end
 
   def test_it_returns_correct_json_with_serializer_opt
