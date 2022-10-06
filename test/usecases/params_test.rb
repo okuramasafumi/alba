@@ -135,7 +135,7 @@ class ParamsTest < MiniTest::Test
 
     root_key :foo
 
-    one :bar, resource: BarResource, params: { expose_secret: false }
+    one :bar, resource: BarResource, params: {expose_secret: false}
   end
 
   Baz = Struct.new(:data, :secret)
@@ -151,6 +151,27 @@ class ParamsTest < MiniTest::Test
     assert_equal(
       '{"foo":{"bar":{"baz":{"data":1}}}}',
       FooResourceWithParamsOverride.new(foo, params: {expose_secret: true}).serialize
+    )
+  end
+
+  class AnotherUserResource
+    include Alba::Resource
+
+    root_key :user
+
+    attributes :id, if: proc { !params[:exclude]&.include?(:id) }
+    attributes :name, :email
+  end
+
+  def test_params_filters_group_of_attributes
+    user = User.new(1, 'Masafumi OKURA', 'test@example.org')
+    assert_equal(
+      '{"user":{"name":"Masafumi OKURA","email":"test@example.org"}}',
+      AnotherUserResource.new(user, params: {exclude: [:id]}).serialize
+    )
+    assert_equal(
+      '{"user":{"id":1,"name":"Masafumi OKURA","email":"test@example.org"}}',
+      AnotherUserResource.new(user).serialize
     )
   end
 end
