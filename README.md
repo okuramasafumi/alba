@@ -581,7 +581,7 @@ class BarResource < ApplicationResource
 end
 
 FooResource.new(foo).serialize # => '{"my_root_key":{"foo":1}}'
-BarResource.new(foo).serialize # => '{"my_root_key":{"bar":1}}'
+BarResource.new(bar).serialize # => '{"my_root_key":{"bar":1}}'
 ```
 
 This pattern is not required, but sometimes useful to make your resource classes DRY.
