@@ -6,6 +6,99 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- [Breaking change] `serializable_hash` now respects the `root_key` option
+
+`serializable_hash` now has the same options and defaults as the `serialize` method. This means it now respects the `root_key` configuration on your resource, which may be a breaking change for applications using `root_key` in conjunction with `serializable_hash`.
+
+Note that `serializable_hash` is aliased as `to_h`, and `serialize` is aliased as `to_json`.
+
+To illustrate and provide a workaround if you wish to maintain the old behavior:
+
+```ruby
+class User
+  attr_accessor :id
+
+  def initialize(id)
+    @id = id
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  root_key :user
+
+  attributes :id
+end
+
+user = User.new(1)
+```
+
+```ruby
+# Alba v1:
+UserResource.new(user).serialize # => "{"user":{"id":1}}"
+UserResource.new(user).serializable_hash # => {:id=>1}
+
+# Alba v2:
+UserResource.new(user).serialize # => "{"user":{"id":1}}"
+UserResource.new(user).serializable_hash # => {"user"=>{:id=>1}}
+```
+
+Note that v2 is now more consistent between the JSON and Ruby Hash implementations, but if you'd like to maintain the v1 behavior, you have two options.
+
+Option 1 is to pass `root_key: false` anywhere you want the old behavior:
+
+```ruby
+UserResource.new(user).serializable_hash(root_key: false) # => {:id=>1}
+UserResource.new(user).to_h(root_key: false) # => {:id=>1}
+```
+
+Option 2 is to define a `default_root_key` on your resource which returns `false`:
+
+```ruby
+class UserResource
+  include Alba::Resource
+
+  root_key :user
+
+  attributes :id
+
+  def default_root_key
+    false
+  end
+end
+
+UserResource.new(user).serialize # => # => "{"user":{"id":1}}"
+UserResource.new(user).serializable_hash # => {:id=>1}
+```
+
+If you'd to maintain the old behavior throughout your application, consider using class inheritance with a base `ApplicationResource`, for example:
+
+```ruby
+class ApplicationResource
+  include Alba::Resource
+
+  def default_root_key
+    false
+  end
+end
+
+class UserResource < ApplicationResource
+  include Alba::Resource
+
+  root_key :user
+
+  attributes :id
+end
+
+class OtherResource < ApplicationResource
+  # This resource will also maintain the old behavior
+end
+
+UserResource.new(user).serialize # => # => "{"user":{"id":1}}"
+UserResource.new(user).serializable_hash # => {:id=>1}
+```
+
 ## [1.6.0] 2022-03-16
 
 - [Feat] Support instance method as an attribute

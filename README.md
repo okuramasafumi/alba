@@ -533,51 +533,6 @@ UserResource.new(user).serializable_hash
 UserResource.new(user).to_h
 ```
 
-#### BREAKING CHANGE FOR V2: serializable_hash
-
-From V2, `serializable_hash` method has the same option and defaults as `serialize` method. This means that now it can respect `root_key` configuration on your resource like below:
-
-```ruby
-class UserResource
-  include Alba::Resource
-
-  root_key :user
-
-  attributes :id
-end
-
-user = User.new(1)
-# `serializable_hash` now includes root key
-user.serializable_hash # => {'user' => {id: 1}}
-```
-
-By Default, calling `serializable_hash` without `root_key` option returns a hash with root key. If you wish to change this default behavior, there are two ways to do so.
-
-One simple way is to add `root_key: false` to `serializable_hash` method. If there are only a few place for explicit `serializable_hash` or `to_h` call, this would be a better choise.
-
-Another way is to define `default_root_key` method like below:
-
-```ruby
-class UserResource
-  include Alba::Resource
-
-  root_key :user
-
-  attributes :id
-
-  def default_root_key
-    false
-  end
-end
-
-user = User.new(1)
-user.serializable_hash # => {'user' => {id: 1}}
-```
-
-`default_root_key` is called when you don't pass `root_key` argument to `serializable_hash` method. If it's `false` it skips root key. This way is better when you have so many places calling `serializable_hash` or `to_h`.
-
-Practically, you'll want to override `default_root_key` method in your `ApplicationResource` and inherits all resource classes from it (see the [application resource section](#application-resource)).
-
 ### Inheritance
 
 When you include `Alba::Resource` in your class, it's just a class so you can define any class that inherits from it. You can add new attributes to inherited class like below:
@@ -607,19 +562,26 @@ In this example we add `baz` attribute and change `root_key`. This way, you can 
 
 #### Application resource
 
-The most common usage of inheritance would be a class that all other resource classes inherits from. This could be called "ApplicationResource" class.
+To share behavior between all of your resources, consider using class inheritance. For example, you could define an `ApplicationResource` class like so:
 
 ```ruby
 class ApplicationResource
   include Alba::Resource
 
-  # Configuration goes here
-  root_key!
+  # Shared configuration goes here, for example, to give all resources the same root_key:
+  root_key :my_root_key
 end
 
 class FooResource < ApplicationResource
+  attributes :foo
+end
+
+class BarResource < ApplicationResource
   attributes :bar
 end
+
+FooResource.new(foo).serialize # => '{"my_root_key":{"foo":1}}'
+BarResource.new(foo).serialize # => '{"my_root_key":{"bar":1}}'
 ```
 
 This pattern is not required, but sometimes useful to make your resource classes DRY.
