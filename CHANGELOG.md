@@ -44,7 +44,7 @@ UserResource.new(user).serialize # => "{"user":{"id":1}}"
 UserResource.new(user).serializable_hash # => {"user"=>{:id=>1}}
 ```
 
-Note that v2 is now more consistent between the JSON and Ruby Hash implementations, but if you'd like to maintain the v1 behavior, you have two options.
+Note that v2 is now more consistent between the JSON and Ruby Hash outputs, but if you'd like to maintain the v1 behavior, you have two options.
 
 Option 1 is to pass `root_key: false` anywhere you want the old behavior:
 
