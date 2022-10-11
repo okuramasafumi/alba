@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0]
+
+### Breaking changes
+
+-  When using `Oj` with `object` mode, serialized root key is now something like ":foo" instead of "foo"
+
 ## [1.6.0] 2022-03-16
 
 - [Feat] Support instance method as an attribute

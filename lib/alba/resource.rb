@@ -50,16 +50,26 @@ module Alba
       # @param meta [Hash] metadata for this seialization
       # @return [String] serialized JSON string
       def serialize(root_key: nil, meta: {})
-        key = root_key.nil? ? fetch_key : root_key
-        hash = if key && key != :''
-                 h = {key.to_s => serializable_hash}
-                 hash_with_metadata(h, meta)
-               else
-                 serializable_hash
-               end
-        serialize_with(hash)
+        serialize_with(as_json(root_key: root_key, meta: meta))
       end
       alias to_json serialize
+
+      # Returns a Hash correspondng {Resource#serialize}
+      #
+      # @param root_key [Symbol, nil, true]
+      # @param meta [Hash] metadata for this seialization
+      # @param symbolize_root_key [Boolean] determines if root key should be symbolized
+      # @return [Hash]
+      def as_json(root_key: nil, meta: {})
+        key = root_key.nil? ? fetch_key : root_key
+        if key && key != :''
+          k = key.to_s.to_sym
+          h = {k => serializable_hash}
+          hash_with_metadata(h, meta)
+        else
+          serializable_hash
+        end
+      end
 
       # A Hash for serialization
       #
