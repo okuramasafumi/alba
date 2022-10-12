@@ -25,15 +25,25 @@ class ResourceTest < MiniTest::Test
     end
   end
 
-  def test_serializable_hash
-    foo = Foo.new
-    foo.id = 1
-    bar = Bar.new
-    bar.id = 1
-    foo.bars = [bar]
+  def setup
+    @foo = Foo.new
+    @foo.id = 1
+    @bar = Bar.new
+    @bar.id = 1
+    @foo.bars = [@bar]
+  end
+
+  def test_as_json
     assert_equal(
-      {id: 1, bar_size: 1, bars: [{id: 1}]},
-      FooResource.new(foo).serializable_hash
+      {'foo' => {'id' => 1, 'bar_size' => 1, 'bars' => [{'id' => 1}]}},
+      FooResource.new(@foo).as_json
+    )
+  end
+
+  def test_serializable_hash
+    assert_equal(
+      {'id' => 1, 'bar_size' => 1, 'bars' => [{'id' => 1}]},
+      FooResource.new(@foo).serializable_hash
     )
   end
 end

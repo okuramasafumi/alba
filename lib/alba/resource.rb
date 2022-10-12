@@ -50,16 +50,25 @@ module Alba
       # @param meta [Hash] metadata for this seialization
       # @return [String] serialized JSON string
       def serialize(root_key: nil, meta: {})
-        key = root_key.nil? ? fetch_key : root_key
-        hash = if key && key != :''
-                 h = {key.to_s => serializable_hash}
-                 hash_with_metadata(h, meta)
-               else
-                 serializable_hash
-               end
-        serialize_with(hash)
+        serialize_with(as_json(root_key: root_key, meta: meta))
       end
       alias to_json serialize
+
+      # Returns a Hash correspondng {Resource#serialize}
+      #
+      # @param root_key [Symbol, nil, true]
+      # @param meta [Hash] metadata for this seialization
+      # @param symbolize_root_key [Boolean] determines if root key should be symbolized
+      # @return [Hash]
+      def as_json(root_key: nil, meta: {})
+        key = root_key.nil? ? fetch_key : root_key.to_s
+        if key && !key.empty?
+          h = {key => serializable_hash}
+          hash_with_metadata(h, meta)
+        else
+          serializable_hash
+        end
+      end
 
       # A Hash for serialization
       #
@@ -98,10 +107,10 @@ module Alba
         end
       end
 
-      # @return [Symbol]
+      # @return [String]
       def fetch_key
         k = collection? ? _key_for_collection : _key
-        transforming_root_key? ? transform_key(k) : k.to_sym
+        transforming_root_key? ? transform_key(k) : k
       end
 
       def _key_for_collection
@@ -190,7 +199,7 @@ module Alba
       # @return [Symbol]
       def transform_key(key) # rubocop:disable Metrics/CyclomaticComplexity
         key = key.to_s
-        return key.to_sym if @_transform_type == :none || key.empty? # We can skip transformation
+        return key if @_transform_type == :none || key.empty? # We can skip transformation
 
         inflector = Alba.inflector
         raise Alba::Error, 'Inflector is nil. You can set inflector with `Alba.enable_inference!(with: :active_support)` for example.' unless inflector
@@ -200,7 +209,7 @@ module Alba
         when :lower_camel then inflector.camelize_lower(key)
         when :dash then inflector.dasherize(key)
         when :snake then inflector.underscore(key)
-        end.to_sym
+        end
       end
 
       def fetch_attribute(object, key, attribute) # rubocop:disable Metrics/CyclomaticComplexity

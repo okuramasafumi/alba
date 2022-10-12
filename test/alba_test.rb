@@ -118,15 +118,15 @@ class AlbaTest < Minitest::Test
     def test_it_works_with_oj_default_backend
       Alba.backend = :oj_default
 
-      Oj.default_options = { mode: :object }
+      Oj.default_options = {mode: :object}
       assert_equal(
-        '{"foo":{":id":1}}',
+        '{"foo":{"id":1}}',
         Alba.serialize(@user, root_key: :foo) do
           attributes :id
         end
       )
 
-      Oj.default_options = { mode: :compat }
+      Oj.default_options = {mode: :compat}
       assert_equal(
         '{"foo":{"id":1}}',
         Alba.serialize(@user, root_key: :foo) do

@@ -113,7 +113,7 @@ class NilHandlerTest < Minitest::Test
 
   class ProfileResource2 < ProfileResource
     on_nil do |_object, key, _attribute|
-      if key == :full_name
+      if key == 'full_name'
         'Unknown'
       else
         ''
@@ -123,7 +123,7 @@ class NilHandlerTest < Minitest::Test
 
   class UserResource2 < UserResource
     on_nil do |object, key, _attribute|
-      case key
+      case key.to_sym
       when :age
         20
       when :profile

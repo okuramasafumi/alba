@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0]
+
+### Breaking changes
+
+- All Hash-related methods now return String key instead of Symbol key  
+    This affects all users, but you can use `deep_symbolize_keys` in Rails environment if you prefer Symbol keys
+    Some DSLs that take key argument such as `on_nil` and `on_error`, are also affected
+
 ## [1.6.0] 2022-03-16
 
 - [Feat] Support instance method as an attribute

@@ -533,6 +533,15 @@ UserResource.new(user).serializable_hash
 UserResource.new(user).to_h
 ```
 
+If you want a Hash that corresponds to a JSON String returned by `serialize` method, you can use `as_json`.
+
+```ruby
+# These are equivalent and will return the same result
+UserResource.new(user).serialize
+UserResource.new(user).to_json
+JSON.generate(UserResource.new(user).as_json)
+```
+
 ### Inheritance
 
 When you include `Alba::Resource` in your class, it's just a class so you can define any class that inherits from it. You can add new attributes to inherited class like below:
