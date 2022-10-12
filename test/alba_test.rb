@@ -120,7 +120,7 @@ class AlbaTest < Minitest::Test
 
       Oj.default_options = {mode: :object}
       assert_equal(
-        '{":foo":{":id":1}}',
+        '{"foo":{"id":1}}',
         Alba.serialize(@user, root_key: :foo) do
           attributes :id
         end

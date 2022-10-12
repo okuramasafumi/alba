@@ -35,14 +35,14 @@ class ResourceTest < MiniTest::Test
 
   def test_as_json
     assert_equal(
-      {foo: {id: 1, bar_size: 1, bars: [{id: 1}]}},
+      {'foo' => {'id' => 1, 'bar_size' => 1, 'bars' => [{'id' => 1}]}},
       FooResource.new(@foo).as_json
     )
   end
 
   def test_serializable_hash
     assert_equal(
-      {id: 1, bar_size: 1, bars: [{id: 1}]},
+      {'id' => 1, 'bar_size' => 1, 'bars' => [{'id' => 1}]},
       FooResource.new(@foo).serializable_hash
     )
   end

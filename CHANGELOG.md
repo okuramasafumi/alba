@@ -10,7 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking changes
 
--  When using `Oj` with `object` mode, serialized root key is now something like ":foo" instead of "foo"
+- All Hash-related methods now return String key instead of Symbol key  
+    This affects all users, but you can use `deep_symbolize_keys` in Rails environment if you prefer Symbol keys
+    Some DSLs that take key argument such as `on_nil` and `on_error`, are also affected
 
 ## [1.6.0] 2022-03-16
 
