@@ -40,6 +40,21 @@ class ResourceTest < MiniTest::Test
     )
   end
 
+  def test_to_json
+    assert_equal(
+      '{"foo":{"id":1,"bar_size":1,"bars":[{"id":1}]}}',
+      FooResource.new(@foo).to_json
+    )
+    assert_equal(
+      '{"foo":{"id":1,"bar_size":1,"bars":[{"id":1}]}}',
+      FooResource.new(@foo).to_json({})
+    )
+    assert_equal(
+      '{"foo":{"id":1,"bar_size":1,"bars":[{"id":1}]}}',
+      FooResource.new(@foo).to_json({only: :id}) # Passed by Rails
+    )
+  end
+
   def test_serializable_hash
     assert_equal(
       {'id' => 1, 'bar_size' => 1, 'bars' => [{'id' => 1}]},

@@ -52,7 +52,15 @@ module Alba
       def serialize(root_key: nil, meta: {})
         serialize_with(as_json(root_key: root_key, meta: meta))
       end
-      alias to_json serialize
+
+      # For Rails compatibility
+      # The first _options is a dummy parameter
+      #
+      # @see #serialize
+      # @see https://github.com/rails/rails/blob/7-0-stable/actionpack/lib/action_controller/metal/renderers.rb#L156
+      def to_json(_options = nil, root_key: nil, meta: {})
+        serialize(root_key: root_key, meta: meta)
+      end
 
       # Returns a Hash correspondng {Resource#serialize}
       #

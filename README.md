@@ -1304,6 +1304,20 @@ Alba.backend = :active_support
 Alba.backend = :oj_rails
 ```
 
+### Rendering JSON
+
+You can render JSON with Rails in two ways. One way is to pass JSON String.
+
+```ruby
+render json: FooResource.new(foo).serialize
+```
+
+But you can also render JSON passing `Alba::Resource` object. Rails automatically calls `to_json` on a resource.
+
+```ruby
+render json: FooResource.new(foo)
+```
+
 ## Why named "Alba"?
 
 The name "Alba" comes from "albatross", a kind of birds. In Japanese, this bird is called "Aho-dori", which means "stupid bird". I find it funny because in fact albatrosses fly really fast. I hope Alba looks stupid but in fact it does its job quick.
