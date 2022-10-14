@@ -2,7 +2,7 @@
 ----------
 [![Gem Version](https://badge.fury.io/rb/alba.svg)](https://badge.fury.io/rb/alba)
 [![CI](https://github.com/okuramasafumi/alba/actions/workflows/main.yml/badge.svg)](https://github.com/okuramasafumi/alba/actions/workflows/main.yml)
-[![codecov](https://codecov.io/gh/okuramasafumi/alba/branch/master/graph/badge.svg?token=3D3HEZ5OXT)](https://codecov.io/gh/okuramasafumi/alba)
+[![codecov](https://codecov.io/gh/okuramasafumi/alba/branch/main/graph/badge.svg?token=3D3HEZ5OXT)](https://codecov.io/gh/okuramasafumi/alba)
 [![Maintainability](https://api.codeclimate.com/v1/badges/fdab4cc0de0b9addcfe8/maintainability)](https://codeclimate.com/github/okuramasafumi/alba/maintainability)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/okuramasafumi/alba)
 ![GitHub](https://img.shields.io/github/license/okuramasafumi/alba)
@@ -29,7 +29,7 @@ Because it's fast, easy and feature rich!
 
 ### Fast
 
-Alba is faster than most of the alternatives. We have a [benchmark](https://github.com/okuramasafumi/alba/tree/master/benchmark).
+Alba is faster than most of the alternatives. We have a [benchmark](https://github.com/okuramasafumi/alba/tree/main/benchmark).
 
 ### Easy
 
@@ -1004,7 +1004,7 @@ Note that setting root key is required when setting a metadata.
 
 You can control circular associations with `within` option. `within` option is a nested Hash such as `{book: {authors: books}}`. In this example, Alba serializes a book's authors' books. This means you can reference `BookResource` from `AuthorResource` and vice versa. This is really powerful when you have a complex data structure and serialize certain parts of it.
 
-For more details, please refer to [test code](https://github.com/okuramasafumi/alba/blob/master/test/usecases/circular_association_test.rb)
+For more details, please refer to [test code](https://github.com/okuramasafumi/alba/blob/main/test/usecases/circular_association_test.rb)
 
 ### Experimental support of types
 
@@ -1331,4 +1331,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Alba project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/okuramasafumi/alba/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Alba project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/okuramasafumi/alba/blob/main/CODE_OF_CONDUCT.md).
