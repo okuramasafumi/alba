@@ -53,13 +53,25 @@ module Alba
         serialize_with(as_json(root_key: root_key, meta: meta))
       end
 
-      # For Rails compatibility
-      # The first _options is a dummy parameter
-      #
-      # @see #serialize
-      # @see https://github.com/rails/rails/blob/7-0-stable/actionpack/lib/action_controller/metal/renderers.rb#L156
-      def to_json(_options = nil, root_key: nil, meta: {})
-        serialize(root_key: root_key, meta: meta)
+      if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.0')
+        # For Rails compatibility
+        # The first options is a dummy parameter but required
+        # You can pass empty Hash if you don't want to pass any arguments
+        #
+        # @see #serialize
+        # @see https://github.com/rails/rails/blob/7-0-stable/actionpack/lib/action_controller/metal/renderers.rb#L156
+        def to_json(options, root_key: nil, meta: {})
+          _to_json(root_key, meta, options)
+        end
+      else
+        # For Rails compatibility
+        # The first options is a dummy parameter
+        #
+        # @see #serialize
+        # @see https://github.com/rails/rails/blob/7-0-stable/actionpack/lib/action_controller/metal/renderers.rb#L156
+        def to_json(options = {}, root_key: nil, meta: {})
+          _to_json(root_key, meta, options)
+        end
       end
 
       # Returns a Hash correspondng {Resource#serialize}
@@ -90,6 +102,20 @@ module Alba
 
       def encode(hash)
         Alba.encoder.call(hash)
+      end
+
+      def _to_json(root_key, meta, options)
+        options.reject! { |k, _| %i[layout prefixes template status].include?(k) } # Rails specific guard
+        # TODO: use `filter_map` after dropping support of Ruby 2.6
+        names = options.map { |k, v| k unless v.nil? }
+        names.compact!
+        unless names.empty?
+          names.sort!
+          names.map! { |s| "\"#{s}\"" }
+          message = "You passed #{names.join(', ')} options but ignored. Please refer to the document: https://github.com/okuramasafumi/alba/blob/main/docs/rails.md"
+          Kernel.warn(message)
+        end
+        serialize(root_key: root_key, meta: meta)
       end
 
       def serialize_with(hash)
