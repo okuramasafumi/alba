@@ -362,7 +362,8 @@ module Alba
       def nested_attribute(name, **options, &block)
         raise ArgumentError, 'No block given in attribute method' unless block
 
-        attribute = NestedAttribute.new(&block)
+        key_transformation = @_key_transformation_cascade ? @_transform_type : :none
+        attribute = NestedAttribute.new(key_transformation: key_transformation, &block)
         @_attributes[name.to_sym] = options[:if] ? ConditionalAttribute.new(body: attribute, condition: options[:if]) : attribute
       end
       alias nested nested_attribute
