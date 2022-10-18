@@ -1304,19 +1304,7 @@ Alba.backend = :active_support
 Alba.backend = :oj_rails
 ```
 
-### Rendering JSON
-
-You can render JSON with Rails in two ways. One way is to pass JSON String.
-
-```ruby
-render json: FooResource.new(foo).serialize
-```
-
-But you can also render JSON passing `Alba::Resource` object. Rails automatically calls `to_json` on a resource.
-
-```ruby
-render json: FooResource.new(foo)
-```
+To find out more details, please see https://github.com/okuramasafumi/alba/blob/main/docs/rails.md
 
 ## Why named "Alba"?
 
