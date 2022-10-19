@@ -1304,6 +1304,8 @@ Alba.backend = :active_support
 Alba.backend = :oj_rails
 ```
 
+To find out more details, please see https://github.com/okuramasafumi/alba/blob/main/docs/rails.md
+
 ## Why named "Alba"?
 
 The name "Alba" comes from "albatross", a kind of birds. In Japanese, this bird is called "Aho-dori", which means "stupid bird". I find it funny because in fact albatrosses fly really fast. I hope Alba looks stupid but in fact it does its job quick.
