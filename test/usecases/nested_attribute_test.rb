@@ -27,19 +27,17 @@ class NestedAttributeTest < MiniTest::Test
 
   def setup
     Alba.backend = nil
+    Alba.enable_inference!(with: :active_support)
 
     @user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com', 'Tokyo', '0000000')
   end
 
-  def test_nested_attribute_becomes_nested_hash
-    assert_equal '{"user":{"id":1,"address":{"city":"Tokyo","zipcode":"0000000"}}}', UserResource.new(@user).serialize
+  def teardown
+    Alba.disable_inference!
   end
 
-  class Foo
-    def initialize(bar, baz)
-      @bar = bar
-      @baz = baz
-    end
+  def test_nested_attribute_becomes_nested_hash
+    assert_equal '{"user":{"id":1,"address":{"city":"Tokyo","zipcode":"0000000"}}}', UserResource.new(@user).serialize
   end
 
   class FooResource
@@ -60,6 +58,25 @@ class NestedAttributeTest < MiniTest::Test
     assert_equal(
       '{"foo":{"bar":{"baz":{"deep":42}}}}',
       FooResource.new(nil).serialize
+    )
+  end
+
+  Bar = Struct.new(:some_value)
+
+  class BarResource
+    include Alba::Resource
+
+    transform_keys :camel
+
+    nested_attribute :na do
+      attributes :some_value
+    end
+  end
+
+  def test_key_transformation_cascades_with_nested_attribute
+    assert_equal(
+      '{"Na":{"SomeValue":"foo"}}',
+      BarResource.new(Bar.new('foo')).serialize
     )
   end
 end
