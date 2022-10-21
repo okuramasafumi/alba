@@ -6,13 +6,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0]
+## [2.0.0] 2022-10-21
 
 ### Breaking changes
 
 - All Hash-related methods now return String key instead of Symbol key  
     This affects all users, but you can use `deep_symbolize_keys` in Rails environment if you prefer Symbol keys
     Some DSLs that take key argument such as `on_nil` and `on_error`, are also affected
+
+### New features
+
+- Passing an initial object to proc function in associations
+- Allow association resource to be Proc
+- `collection_key` to serialize collection into a Hash
+- params is now overridable
+- Key transformation now cascades
+- nested attribute
+- Implement `as_json`
+
+### Bugfix
+
+- fix the bug where nesting is empty string and invalid
+- `handle_error` now raises the same error
+- let Rails implicitly call `to_json`
 
 ## [1.6.0] 2022-03-16
 
