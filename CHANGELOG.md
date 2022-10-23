@@ -13,16 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All Hash-related methods now return String key instead of Symbol key  
     This affects all users, but you can use `deep_symbolize_keys` in Rails environment if you prefer Symbol keys
     Some DSLs that take key argument such as `on_nil` and `on_error`, are also affected
+- Remove deprecated methods: `Resource#to_hash`, `Resource.ignoring`, `Alba.on_nil`, `Alba.on_error`, `Alba.enable_root_key_transformation!` and `Alba.disable_root_key_transformation!`
 
 ### New features
 
-- Passing an initial object to proc function in associations
-- Allow association resource to be Proc
-- `collection_key` to serialize collection into a Hash
-- params is now overridable
-- Key transformation now cascades
-- nested attribute
-- Implement `as_json`
+- Passing an initial object to proc function in associations [#209](https://github.com/okuramasafumi/alba/pull/209)
+- Allow association resource to be Proc [#213](https://github.com/okuramasafumi/alba/pull/213)
+- `collection_key` to serialize collection into a Hash [#119](https://github.com/okuramasafumi/alba/pull/119)
+- params is now overridable [#227](https://github.com/okuramasafumi/alba/pull/227)
+- Key transformation now cascades [#232](https://github.com/okuramasafumi/alba/pull/232)
+- nested attribute [#237](https://github.com/okuramasafumi/alba/pull/237)
+- Implement `as_json` [#249](https://github.com/okuramasafumi/alba/pull/249)
 
 ### Bugfix
 
