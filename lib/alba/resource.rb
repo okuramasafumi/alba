@@ -1,5 +1,6 @@
 require_relative 'association'
 require_relative 'conditional_attribute'
+require_relative 'constants'
 require_relative 'typed_attribute'
 require_relative 'nested_attribute'
 require_relative 'deprecation'
@@ -215,7 +216,7 @@ module Alba
       def set_key_and_attribute_body_from(object, key, attribute, hash)
         key = transform_key(key)
         value = fetch_attribute(object, key, attribute)
-        hash[key] = value unless value == ConditionalAttribute::CONDITION_UNMET
+        hash[key] = value unless value == Alba::REMOVE_KEY
       end
 
       def handle_error(error, object, key, attribute, hash)
@@ -271,7 +272,7 @@ module Alba
 
       def yield_if_within(association_name)
         within = check_within(association_name)
-        within ? yield(within) : ConditionalAttribute::CONDITION_UNMET
+        within ? yield(within) : Alba::REMOVE_KEY
       end
 
       def check_within(association_name)
