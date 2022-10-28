@@ -137,6 +137,8 @@ class CircularAssociationTest < Minitest::Test
     book = @books.sample
     result = JSON.parse(BookResource.new(book, within: {authors: {books: {authors: :books}}, genre: :books}).serialize)
     assert result['book']['authors'][0]['books'][0]['authors'][0]['books']
+    obj = result['book']['authors'][0]['books'][0]['authors'][0]['books'][0]
+    refute obj.key?('authors')
     refute result['book']['authors'][0]['books'][0]['authors'][0]['books'][0]['authors']
   end
 
@@ -152,6 +154,7 @@ class CircularAssociationTest < Minitest::Test
     book = @books.sample
     result = JSON.parse(BookResource.new(book, within: nil).serialize)
     assert result['book']
+    refute result['book'].key?('authors')
     refute result.dig('book', 'authors')
   end
 

@@ -271,7 +271,7 @@ module Alba
 
       def yield_if_within(association_name)
         within = check_within(association_name)
-        yield(within) if within
+        within ? yield(within) : ConditionalAttribute::CONDITION_UNMET
       end
 
       def check_within(association_name)
