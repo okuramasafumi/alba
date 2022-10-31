@@ -173,11 +173,19 @@ class KeyTransformTest < Minitest::Test
     one :bank_account do
       attributes :account_number
     end
+
+    nested_attribute :fake_attribute do
+      nested_attribute :some_attribute do
+        attribute :real_attribute do
+          42
+        end
+      end
+    end
   end
 
   def test_key_transformation_cascades
     assert_equal(
-      '{"id":1,"firstName":"Masafumi","lastName":"Okura","bankAccount":{"accountNumber":123456789}}',
+      '{"id":1,"firstName":"Masafumi","lastName":"Okura","bankAccount":{"accountNumber":123456789},"fakeAttribute":{"someAttribute":{"realAttribute":42}}}',
       UserResourceWithInlineAssociation.new(@user).serialize
     )
   end

@@ -20,10 +20,9 @@ module Alba
       @condition = condition
       @resource = resource
       @params = params
-      @key_transformation = key_transformation
       return if @resource
 
-      assign_resource(nesting, block)
+      assign_resource(nesting, key_transformation, block)
     end
 
     # Recursively converts an object into a Hash
@@ -58,9 +57,12 @@ module Alba
       end
     end
 
-    def assign_resource(nesting, block)
+    def assign_resource(nesting, key_transformation, block)
       @resource = if block
-                    Alba.resource_class(&block)
+                    klass = Alba.resource_class
+                    klass.transform_keys(key_transformation)
+                    klass.class_eval(&block)
+                    klass
                   elsif Alba.inferring
                     Alba.infer_resource_class(@name, nesting: nesting)
                   else
@@ -76,7 +78,6 @@ module Alba
 
     def to_h_with_constantize_resource(within, params)
       @resource = constantize(@resource)
-      @resource.transform_keys(@key_transformation)
       @resource.new(object, params: params, within: within).to_h
     end
   end

@@ -10,8 +10,9 @@ module Alba
 
     # @return [Hash]
     def value(object)
-      resource_class = Alba.resource_class(&@block)
+      resource_class = Alba.resource_class
       resource_class.transform_keys(@key_transformation)
+      resource_class.class_eval(&@block)
       resource_class.new(object).serializable_hash
     end
   end

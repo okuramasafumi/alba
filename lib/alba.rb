@@ -69,7 +69,7 @@ module Alba
     def resource_class(&block)
       klass = Class.new
       klass.include(Alba::Resource)
-      klass.class_eval(&block)
+      klass.class_eval(&block) if block
       klass
     end
 
