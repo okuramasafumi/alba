@@ -149,7 +149,7 @@ module Alba
       end
 
       def _key_for_collection
-        if Alba.inferring
+        if Alba.inflector
           @_key_for_collection == true ? resource_name(pluralized: true) : @_key_for_collection.to_s
         else
           @_key_for_collection == true ? raise_root_key_inference_error : @_key_for_collection.to_s
@@ -158,7 +158,7 @@ module Alba
 
       # @return [String]
       def _key
-        if Alba.inferring
+        if Alba.inflector
           @_key == true ? resource_name(pluralized: false) : @_key.to_s
         else
           @_key == true ? raise_root_key_inference_error : @_key.to_s
@@ -174,7 +174,7 @@ module Alba
       end
 
       def raise_root_key_inference_error
-        raise Alba::Error, 'You must call Alba.enable_inference! to set root_key to true for inferring root key.'
+        raise Alba::Error, 'You must set inflector when setting root key as true.'
       end
 
       def transforming_root_key?
@@ -237,7 +237,7 @@ module Alba
         return key if @_transform_type == :none || key.empty? # We can skip transformation
 
         inflector = Alba.inflector
-        raise Alba::Error, 'Inflector is nil. You can set inflector with `Alba.enable_inference!(with: :active_support)` for example.' unless inflector
+        raise Alba::Error, 'Inflector is nil. You must set inflector before transforming keys.' unless inflector
 
         case @_transform_type # rubocop:disable Style/MissingElse
         when :camel then inflector.camelize(key)

@@ -214,7 +214,7 @@ class AlbaTest < Minitest::Test
   end
 
   def test_it_serializes_object_with_inferred_resource_when_inference_is_enabled
-    Alba.enable_inference!(with: :active_support)
+    Alba.inflector = :active_support
     assert_equal(
       '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}',
       Alba.serialize(@user)
@@ -223,11 +223,11 @@ class AlbaTest < Minitest::Test
       '{"user":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
       Alba.serialize(@user, root_key: :user)
     )
-    Alba.disable_inference!
+    Alba.inflector = nil
   end
 
   def test_it_raises_error_when_trying_to_infer_resource_when_inference_is_disabled
-    Alba.disable_inference!
+    Alba.inflector = nil
     assert_raises(Alba::Error) { Alba.serialize(@user) }
   end
 
@@ -235,8 +235,28 @@ class AlbaTest < Minitest::Test
   end
 
   def test_it_raises_error_when_inferred_resource_does_not_exist_even_when_infernce_is_enabled
-    Alba.enable_inference!(with: :active_support)
+    Alba.inflector = :active_support
     assert_raises(NameError) { Alba.serialize(Foo.new) }
-    Alba.disable_inference!
+    Alba.inflector = nil
+  end
+
+  # Deprecated methods
+
+  def test_enable_inference_is_deprecated
+    assert_output(nil, /Alba.enable_inference! is deprecated. Use `Alba.inflector=` instead.\n/) do
+      Alba.enable_inference!(with: :active_support)
+    end
+  end
+
+  def test_disable_inference_is_deprecated
+    assert_output(nil, /Alba.disable_inference! is deprecated. Use `Alba.inflector = nil` instead.\n/) do
+      Alba.disable_inference!
+    end
+  end
+
+  def test_inferring_is_deprecated
+    assert_output(nil, /Alba.inferring is deprecated. Use `Alba.inflector` instead.\n/) do
+      Alba.inferring
+    end
   end
 end
