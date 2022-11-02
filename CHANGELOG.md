@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] 2022-11-02
+
+### Fix
+
+- the bug including key not in `within` [#262](https://github.com/okuramasafumi/alba/pull/262)
+- key transformation now cascades multiple levels [#263](https://github.com/okuramasafumi/alba/pull/263)
+
 ## [2.0.0] 2022-10-21
 
 ### Breaking changes
