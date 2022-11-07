@@ -1,4 +1,5 @@
 require_relative '../test_helper'
+require_relative '../support/custom_inflector'
 
 class WithInferenceTest < Minitest::Test
   class User
@@ -53,7 +54,7 @@ class WithInferenceTest < Minitest::Test
   end
 
   class UserInferringResource
-    Alba.enable_inference!(with: :active_support) # Need this here instead of initializer
+    Alba.inflector = :active_support
     include Alba::Resource
 
     attributes :id
@@ -62,14 +63,14 @@ class WithInferenceTest < Minitest::Test
   end
 
   def setup
-    Alba.enable_inference!(with: :active_support)
+    Alba.inflector = :active_support
     @user = User.new(1)
     @user.articles << Article.new(1, 'The title')
     @bank_account = BankAccount.new(123_456_789)
   end
 
   def teardown
-    Alba.disable_inference!
+    Alba.inflector = nil
   end
 
   def test_it_infers_resource_name
@@ -133,7 +134,7 @@ end
 class InferenceTestWithDry < WithInferenceTest
   def setup
     super
-    Alba.enable_inference!(with: :dry)
+    Alba.inflector = :dry
   end
 end
 
@@ -141,32 +142,14 @@ end
 class InferenceTestWithCustomInflector < WithInferenceTest
   def setup
     super
-    inflector = Object.new.tap do |i|
-      def i.camelize; end
-      def i.camelize_lower; end
-      def i.dasherize; end
-      def i.classify; end
-
-      def i.demodulize(str)
-        str.split('::').last
-      end
-
-      def i.underscore(str)
-        str.gsub(/::/, '/').gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2').gsub(/([a-z\d])([A-Z])/, '\1_\2').tr('-', '_').downcase
-      end
-
-      def i.pluralize(str)
-        "#{str}s"
-      end
-    end
-    Alba.enable_inference!(with: inflector)
+    Alba.inflector = CustomInflector
   end
 end
 
 class InferenceTestWithInvalidInflector < Minitest::Test
   def test_it_raises_an_error_with_invalid_custom_inflector
     assert_raises(Alba::Error) do
-      Alba.enable_inference!(with: Object.new)
+      Alba.inflector = Object.new
     end
   end
 end

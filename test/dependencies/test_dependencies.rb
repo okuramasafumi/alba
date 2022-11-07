@@ -22,7 +22,7 @@ class DependenciesTest < MiniTest::Test
   end
 
   def teardown
-    Alba.disable_inference!
+    Alba.inflector = nil
     Alba.backend = nil
   end
 
@@ -31,7 +31,7 @@ class DependenciesTest < MiniTest::Test
       err = assert_raises(Alba::Error) do
         UserResourceCamel.new(@user).serialize
       end
-      assert_equal('Inflector is nil. You can set inflector with `Alba.enable_inference!(with: :active_support)` for example.', err.message)
+      assert_equal('Inflector is nil. You must set inflector before transforming keys.', err.message)
     end
 
     def test_it_warns_when_set_backend_as_active_support_but_active_support_is_not_available
@@ -50,7 +50,7 @@ class DependenciesTest < MiniTest::Test
       err = assert_raises(Alba::Error) do
         UserResourceWithRootKey.new(@user).serialize
       end
-      assert_equal('You must call Alba.enable_inference! to set root_key to true for inferring root key.', err.message)
+      assert_equal('You must set inflector when setting root key as true.', err.message)
     end
   elsif ENV['BUNDLE_GEMFILE'] == File.expand_path('gemfiles/without_oj.gemfile')
     def test_it_warns_when_set_backend_as_oj_but_oj_is_not_available

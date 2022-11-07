@@ -7,10 +7,10 @@ require_relative 'alba/deprecation'
 # Core module
 module Alba
   class << self
-    attr_reader :backend, :encoder, :inferring
+    attr_reader :backend, :encoder
 
-    # Accessor for inflector, a module responsible for inflecting strings
-    attr_accessor :inflector
+    # Getter for inflector, a module responsible for inflecting strings
+    attr_reader :inflector
 
     # Set the backend, which actually serializes object into JSON
     #
@@ -54,14 +54,36 @@ module Alba
     # @param with [Symbol, Class, Module] inflector
     #   When it's a Symbol, it sets inflector with given name
     #   When it's a Class or a Module, it sets given object to inflector
+    # @deprecated Use {#inflector=} instead
     def enable_inference!(with:)
+      Alba::Deprecation.warn('Alba.enable_inference! is deprecated. Use `Alba.inflector=` instead.')
       @inflector = inflector_from(with)
       @inferring = true
     end
 
     # Disable inference for key and resource name
+    #
+    # @deprecated Use {#inflector=} instead
     def disable_inference!
+      Alba::Deprecation.warn('Alba.disable_inference! is deprecated. Use `Alba.inflector = nil` instead.')
       @inferring = false
+      @inflector = nil
+    end
+
+    # @deprecated Use {#inflector} instead
+    # @return [Boolean] whether inference is enabled or not
+    def inferring
+      Alba::Deprecation.warn('Alba.inferring is deprecated. Use `Alba.inflector` instead.')
+      @inferring
+    end
+
+    # Set an inflector
+    #
+    # @param inflector [Symbol, Class, Module] inflector
+    #   When it's a Symbol, it accepts `:default`, `:active_support` or `:dry`
+    #   When it's a Class or a Module, it should have some methods, see {Alba::DefaultInflector}
+    def inflector=(inflector)
+      @inflector = inflector_from(inflector)
     end
 
     # @param block [Block] resource body
@@ -77,7 +99,7 @@ module Alba
     # @param nesting [String, nil] namespace Alba tries to find resource class in
     # @return [Class<Alba::Resource>] resource class
     def infer_resource_class(name, nesting: nil)
-      raise Alba::Error, 'Inference is disabled so Alba cannot infer resource name. Use `Alba.enable_inference!` before use.' unless Alba.inferring
+      raise Alba::Error, 'Inference is disabled so Alba cannot infer resource name. Set inflector before use.' unless Alba.inflector
 
       const_parent = nesting.nil? ? Object : Object.const_get(nesting)
       const_parent.const_get("#{inflector.classify(name)}Resource")
@@ -95,6 +117,7 @@ module Alba
 
     def inflector_from(name_or_module)
       case name_or_module
+      when nil then nil
       when :default, :active_support
         require_relative 'alba/default_inflector'
         Alba::DefaultInflector

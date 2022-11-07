@@ -63,10 +63,10 @@ module Alba
                     klass.transform_keys(key_transformation)
                     klass.class_eval(&block)
                     klass
-                  elsif Alba.inferring
+                  elsif Alba.inflector
                     Alba.infer_resource_class(@name, nesting: nesting)
                   else
-                    raise ArgumentError, 'When Alba.inferring is false, either resource or block is required'
+                    raise ArgumentError, 'When Alba.inflector is nil, either resource or block is required'
                   end
     end
 

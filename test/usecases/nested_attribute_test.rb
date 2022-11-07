@@ -27,13 +27,13 @@ class NestedAttributeTest < MiniTest::Test
 
   def setup
     Alba.backend = nil
-    Alba.enable_inference!(with: :active_support)
+    Alba.inflector = :active_support
 
     @user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com', 'Tokyo', '0000000')
   end
 
   def teardown
-    Alba.disable_inference!
+    Alba.inflector = nil
   end
 
   def test_nested_attribute_becomes_nested_hash
