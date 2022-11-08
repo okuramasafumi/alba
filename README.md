@@ -571,6 +571,12 @@ In this example we add `baz` attribute and change `root_key`. This way, you can 
 
 ### Filtering attributes
 
+Filtering attributes can be done in two ways - with `attributes` and `select`. They have different semantics and usage.
+
+`select` is a new and more intuitive API, so generally it's recommended to use `select`.
+
+#### Filtering attributes with `attributes`
+
 You can filter out certain attributes by overriding `attributes` instance method. This is useful when you want to customize existing resource with inheritance.
 
 You can access raw attributes via `super` call. It returns a Hash whose keys are the name of the attribute and whose values are the body. Usually you need only keys to filter out, like below.
@@ -598,8 +604,43 @@ class RestrictedFooResource < GenericFooResource
   end
 end
 
+foo = Foo.new(1, 'my foo', 'body')
+
 RestrictedFooResource.new(foo).serialize
 # => '{"name":"my foo"}'
+```
+
+#### Filtering attributes with `select`
+
+When you want to filter attributes based on more complex logic, you can use `select` instance method. `select` takes two parameters, the name of an attribute and the value of an attribute. If it returns false that attribute is rejected.
+
+```ruby
+class Foo
+  attr_accessor :id, :name, :body
+
+  def initialize(id, name, body)
+    @id = id
+    @name = name
+    @body = body
+  end
+end
+
+class GenericFooResource
+  include Alba::Resource
+
+  attributes :id, :name, :body
+end
+
+class RestrictedFooResource < GenericFooResource
+  def select(_key, value)
+    !value.nil?
+  end
+end
+
+foo = Foo.new(1, nil, 'body')
+
+RestrictedFooResource.new(foo).serialize
+# => '{"id":1,"body":"body"}'
 ```
 
 ### Key transformation

@@ -213,9 +213,17 @@ module Alba
         @_attributes
       end
 
+      # Default implementation for selecting attributes
+      # Override this method to filter attributes based on key and value
+      def select(_key, _value)
+        true
+      end
+
       def set_key_and_attribute_body_from(object, key, attribute, hash)
         key = transform_key(key)
         value = fetch_attribute(object, key, attribute)
+        return unless select(key, value)
+
         hash[key] = value unless value == Alba::REMOVE_KEY
       end
 
