@@ -37,7 +37,7 @@ Alba is easy to use because there are only a few methods to remember. It's also 
 
 ### Feature rich
 
-While Alba's core is simple, it provides additional features when you need them, For example, Alba provides [a way to control circular associations](#circular-associations-control), [inferring resource classes, root key and associations](#inference) and [supports layouts](#layout).
+While Alba's core is simple, it provides additional features when you need them, For example, Alba provides [a way to control circular associations](#circular-associations-control), [root key and association resource name inference](#root-key-and-association-resource-name-inference) and [supports layouts](#layout).
 
 ## Installation
 
@@ -68,10 +68,9 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Conditional attributes and associations
 * Selectable backend
 * Key transformation
-* Root key inference
+* Root key and association resource name inference
 * Error handling
 * Nil handling
-* Resource name inflection based on association name
 * Circular associations control
 * [Experimental] Types for validation and conversion
 * Layout
@@ -113,19 +112,33 @@ You can consider setting a backend with Symbol as a shortcut to set encoder.
 
 #### Inference configuration
 
-You can enable inference feature using `enable_inference!` method.
+You can enable the inference feature using the `Alba.inflector = SomeInflector` API. For example, in a Rails initializer:
 
 ```ruby
-Alba.enable_inference!(with: :active_support)
+Alba.inflector = :active_support
 ```
 
-You can choose which inflector Alba uses for inference. Possible value for `with` option are:
+You can choose which inflector Alba uses for inference. Possible options are:
 
 - `:active_support` for `ActiveSupport::Inflector`
 - `:dry` for `Dry::Inflector`
-- any object which responds to some methods (see [below](#custom-inflector))
+- any object which conforms to the protocol (see [below](#custom-inflector))
 
-For the details, see [Error handling section](#error-handling)
+To disable inference, set the `inflector` to `nil`:
+
+```ruby
+Alba.inflector = nil
+```
+
+To check if inference is enabled etc, inspect the return value of `inflector`:
+
+```ruby
+if Alba.inflector == nil
+  puts "inflector not set"
+else
+  puts "inflector is set to #{Alba.inflector}"
+end
+```
 
 ### Simple serialization with root key
 
@@ -368,9 +381,11 @@ UserResource.new(user).serialize
 # => '{"id":1,"my_articles":[{"title":"Hello World!"}]}'
 ```
 
-You can omit resource option if you enable Alba's inference feature.
+You can omit the resource option if you enable Alba's [inference](#inference-configuration) feature.
 
 ```ruby
+Alba.inflector = :active_support
+
 class UserResource
   include Alba::Resource
 
@@ -604,13 +619,11 @@ RestrictedFooResource.new(foo).serialize
 
 ### Key transformation
 
-If you want to use `transform_keys` DSL and you already have `active_support` installed, key transformation will work out of the box, using `ActiveSupport::Inflector`. If `active_support` is not around, you have 2 possibilities:
-* install it
-* use a [custom inflector](#custom-inflector)
-
-With `transform_keys` DSL, you can transform attribute keys.
+If you have [inference](#inference-configuration) enabled, you can use the `transform_keys` DSL to transform attribute keys.
 
 ```ruby
+Alba.inflector = :active_support
+
 class User
   attr_reader :id, :first_name, :last_name
 
@@ -646,12 +659,12 @@ Possible values for `transform_keys` argument are:
 
 You can also transform root key when:
 
-* `Alba.enable_inference!` is called
+* `Alba.inflector` is set
 * `root_key!` is called in Resource class
 * `root` option of `transform_keys` is set to true
 
 ```ruby
-Alba.enable_inference!(with: :active_support) # with :dry also works
+Alba.inflector = :active_support
 
 class BankAccount
   attr_reader :account_number
@@ -675,7 +688,9 @@ BankAccountResource.new(bank_account).serialize
 # => '{"bank-account":{"account-number":123456789}}'
 ```
 
-This behavior to transform root key will become default at version 2.
+This is the default behavior from version 2.
+
+Find more details in the [Inference configuration](#inference-configuration) section.
 
 #### Key transformation cascading
 
@@ -746,7 +761,7 @@ module CustomInflector
   end
 end
 
-Alba.enable_inference!(with: CustomInflector)
+Alba.inflector = CustomInflector
 ```
 
 ### Conditional attributes
@@ -790,12 +805,12 @@ end
 
 We believe this is clearer than using some (not implemented yet) DSL such as `default` because there are some conditions where default values should be applied (`nil`, `blank?`, `empty?` etc.)
 
-### Inference
+### Root key and association resource name inference
 
-After `Alba.enable_inference!` called, Alba tries to infer root key and association resource name.
+If [inference](#inference-configuration) is enabled, Alba tries to infer the root key and association resource names.
 
 ```ruby
-Alba.enable_inference!(with: :active_support) # with :dry also works
+Alba.inflector = :active_support
 
 class User
   attr_reader :id
@@ -842,6 +857,8 @@ UserResource.new([user]).serialize # => '{"users":[{"id":1,"articles":[{"title":
 This resource automatically sets its root key to either "users" or "user", depending on the given object is collection or not.
 
 Also, you don't have to specify which resource class to use with `many`. Alba infers it from association name.
+
+Find more details in the [Inference configuration](#inference-configuration) section.
 
 ### Error handling
 
