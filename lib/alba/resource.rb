@@ -41,7 +41,7 @@ module Alba
         @object = object
         @params = params
         @within = within
-        @method_existence = {} # Cache for `respond_to?` result
+        @_method_existence = {} # Cache for `respond_to?` result
         DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.__send__(name)) }
       end
 
@@ -269,8 +269,8 @@ module Alba
       end
 
       def fetch_attribute_from_object_and_resource(obj, attribute)
-        has_method = @method_existence[attribute]
-        has_method = @method_existence[attribute] = obj.respond_to?(attribute) if has_method.nil?
+        has_method = @_method_existence[attribute]
+        has_method = @_method_existence[attribute] = obj.respond_to?(attribute) if has_method.nil?
         has_method ? obj.__send__(attribute) : __send__(attribute, obj)
       end
 
