@@ -798,7 +798,7 @@ In these cases, conditional attributes works well. We can pass `if` option to `a
 
 ```ruby
 class User
-  attr_accessor :id, :name, :email, :created_at, :updated_at
+  attr_accessor :id, :name, :email
 
   def initialize(id, name, email)
     @id = id

@@ -215,4 +215,19 @@ class ConditionalAttributesTest < MiniTest::Test
       UserResource11.new(@user).serialize
     )
   end
+
+  class UserResource12
+    include Alba::Resource
+
+    attributes :id, :name, if: proc { |_user, attribute| !attribute.nil? }
+  end
+
+  def test_conditional_attributes_with_if_for_nil_attributes
+    @user = User.new(1, nil)
+
+    assert_equal(
+      '{"id":1}',
+      UserResource12.new(@user).serialize
+    )
+  end
 end
