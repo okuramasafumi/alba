@@ -157,7 +157,7 @@ end
 
 user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
 UserResource.new(user).serialize
-# => "{\"user\":{\"id\":1,\"name\":\"Masafumi OKURA\",\"name_with_email\":\"Masafumi OKURA: masafumi@example.com\"}}"
+# => '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}'
 ```
 
 You can define instance methods on resources so that you can use it as attribute name in `attributes`.
@@ -184,7 +184,7 @@ This even works with users collection.
 user1 = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
 user2 = User.new(2, 'Test User', 'test@example.com')
 UserResource.new([user1, user2]).serialize
-# => "{\"users\":[{\"id\":1,\"name\":\"Masafumi OKURA\",\"name_with_email\":\"Masafumi OKURA: masafumi@example.com\"},{\"id\":2,\"name\":\"Test User\",\"name_with_email\":\"Test User: test@example.com\"}]}"
+# => '{"users":[{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"},{"id":2,"name":"Test User","name_with_email":"Test User: test@example.com"}]}'
 ```
 
 If you have a simple case where you want to change only the name, you can use the Symbol to Proc shortcut:
@@ -210,8 +210,8 @@ class UserResource
 end
 
 user = User.new(1, 'Masa', 'test@example.com')
-UserResource.new(user).serialize # => "{\"name\":\"foo\"}"
-UserResource.new(user, params: {upcase: true}).serialize # => "{\"name\":\"FOO\"}"
+UserResource.new(user).serialize # => '{"name":"Masa"}'
+UserResource.new(user, params: {upcase: true}).serialize # => '{"name":"MASA"}'
 ```
 
 ### Serialization with associations
@@ -564,7 +564,7 @@ end
 Foo = Struct.new(:bar, :baz)
 foo = Foo.new(1, 2)
 FooResource.new(foo).serialize # => '{"foo":{"bar":1}}'
-ExtendedFooResource.new(foo).serialize # => '{"foo":{"bar":1,"baz":2}}'
+ExtendedFooResource.new(foo).serialize # => '{"foofoo":{"bar":1,"baz":2}}'
 ```
 
 In this example we add `baz` attribute and change `root_key`. This way, you can extend existing resource classes just like normal OOP. Don't forget that when your inheritance structure is too deep it'll become difficult to modify existing classes.
@@ -728,7 +728,7 @@ You can also turn it off by setting `cascade: false` option to `transform_keys`.
 
 ```ruby
 class User
-  attr_reader :id, :first_name, :last_name
+  attr_reader :id, :first_name, :last_name, :bank_account
 
   def initialize(id, first_name, last_name)
     @id = id
@@ -866,7 +866,7 @@ end
 class UserResource
   include Alba::Resource
 
-  key!
+  root_key!
 
   attributes :id
 
@@ -975,7 +975,7 @@ class UserResource
   include Alba::Resource
 
   on_nil do |object, key|
-    if key == age
+    if key == 'age'
       20
     else
       "User#{object.id}"
@@ -1031,7 +1031,7 @@ class UserResourceWithoutMeta
   attributes :id, :name
 end
 
-UserResource.new([user]).serialize(meta: {foo: :bar})
+UserResourceWithoutMeta.new([user]).serialize(meta: {foo: :bar})
 # => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"meta":{"foo":"bar"}}'
 ```
 
