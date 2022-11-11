@@ -137,4 +137,25 @@ class NoAssociationTest < MiniTest::Test
     RUBY
     assert_raises(ArgumentError) { eval(resource) }
   end
+
+  class UserFilteringResource
+    include Alba::Resource
+
+    root_key :user
+
+    attributes :id, :name
+
+    def select(_key, value)
+      !value.nil?
+    end
+  end
+
+  def test_it_filters_attributes
+    user = User.new(1, nil, 'test@example.com')
+
+    assert_equal(
+      '{"user":{"id":1}}',
+      UserFilteringResource.new(user).serialize
+    )
+  end
 end

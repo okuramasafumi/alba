@@ -6,20 +6,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Deprecations
+
 - Deprecate `inference` related methods in favor of a unified `inflector` interface.
-  Deprecated methods are `Alba.enable_inference!`, `Alba.disable_inference!`, and `Alba.inferring`.
+  Deprecated methods are: `Alba.enable_inference!`, `Alba.disable_inference!`, and `Alba.inferring`.
   Use `Alba.inflector = :active_support/:dry` or `Alba.inflector = SomeInflector` to enable.
   Use `Alba.inflector = nil` to disable.
   Use `Alba.inflector` to check if enabled.
+
+## [2.0.1] 2022-11-02
+
+### Fix
+
+- the bug including key not in `within` [#262](https://github.com/okuramasafumi/alba/pull/262)
+- key transformation now cascades multiple levels [#263](https://github.com/okuramasafumi/alba/pull/263)
 
 ## [2.0.0] 2022-10-21
 
 ### Breaking changes
 
-- All Hash-related methods now return String key instead of Symbol key  
-    This affects all users, but you can use `deep_symbolize_keys` in Rails environment if you prefer Symbol keys
-    Some DSLs that take key argument such as `on_nil` and `on_error`, are also affected
+- All Hash-related methods now return String keys instead of Symbol keys.
+    This affects all users, but you can use `deep_symbolize_keys` in Rails environment if you prefer Symbol keys, or `with_indifferent_access` to support both String and Symbol keys.
+    Some DSLs that take key argument such as `on_nil` and `on_error`, are also affected.
 - Remove deprecated methods: `Resource#to_hash`, `Resource.ignoring`, `Alba.on_nil`, `Alba.on_error`, `Alba.enable_root_key_transformation!` and `Alba.disable_root_key_transformation!`
+- If using `transform_keys`, the default inflector is no longer set by default [d02245c8](https://github.com/okuramasafumi/alba/commit/d02245c87e9df303cb20e354a81e5457ea460bdd#diff-ecd8c835d2390b8cb89e7ff75e599f0c15cdbe18c30981d6090f4a515566686f)
+    To retain this functionality in Rails, add an initializer with the following:
+    `Alba.enable_inference!(with: :active_support)`
 
 ### New features
 

@@ -134,7 +134,7 @@ class ManyTest < MiniTest::Test
   end
 
   def test_it_raises_error_when_no_resource_or_block_given_without_inference
-    Alba.disable_inference!
+    Alba.inflector = nil
     resource = <<~RUBY
       class UserResource6
         include Alba::Resource

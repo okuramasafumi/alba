@@ -1,4 +1,5 @@
 require_relative '../test_helper'
+require_relative '../support/custom_inflector'
 
 class KeyTransformTest < Minitest::Test
   class User
@@ -64,14 +65,8 @@ class KeyTransformTest < Minitest::Test
     transform_keys :dash, root: false
   end
 
-  class CustomInflector
-    def camelize(key)
-      "camelized_#{key}"
-    end
-  end
-
   def setup
-    Alba.enable_inference!(with: :active_support)
+    Alba.inflector = :active_support
 
     @bank_account = BankAccount.new(123_456_789)
     @user = User.new(1, 'Masafumi', 'Okura', @bank_account)
@@ -143,7 +138,7 @@ class KeyTransformTest < Minitest::Test
   end
 
   def test_custom_inflector_is_used_if_defined
-    Alba.inflector = CustomInflector.new
+    Alba.inflector = CustomInflector
     assert_equal(
       '{"camelized_id":1,"camelized_first_name":"Masafumi","camelized_last_name":"Okura"}',
       UserResourceCamel.new(@user).serialize
@@ -173,11 +168,19 @@ class KeyTransformTest < Minitest::Test
     one :bank_account do
       attributes :account_number
     end
+
+    nested_attribute :fake_attribute do
+      nested_attribute :some_attribute do
+        attribute :real_attribute do
+          42
+        end
+      end
+    end
   end
 
   def test_key_transformation_cascades
     assert_equal(
-      '{"id":1,"firstName":"Masafumi","lastName":"Okura","bankAccount":{"accountNumber":123456789}}',
+      '{"id":1,"firstName":"Masafumi","lastName":"Okura","bankAccount":{"accountNumber":123456789},"fakeAttribute":{"someAttribute":{"realAttribute":42}}}',
       UserResourceWithInlineAssociation.new(@user).serialize
     )
   end

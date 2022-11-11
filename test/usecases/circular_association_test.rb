@@ -85,7 +85,7 @@ class CircularAssociationTest < Minitest::Test
   end
 
   def setup
-    Alba.enable_inference!(with: :active_support)
+    Alba.inflector = :active_support
 
     @authors = Array.new(100) do
       Author.new(
@@ -122,7 +122,7 @@ class CircularAssociationTest < Minitest::Test
   end
 
   def teardown
-    Alba.disable_inference!
+    Alba.inflector = nil
   end
 
   def test_within_option_works_for_serialize
@@ -137,6 +137,8 @@ class CircularAssociationTest < Minitest::Test
     book = @books.sample
     result = JSON.parse(BookResource.new(book, within: {authors: {books: {authors: :books}}, genre: :books}).serialize)
     assert result['book']['authors'][0]['books'][0]['authors'][0]['books']
+    obj = result['book']['authors'][0]['books'][0]['authors'][0]['books'][0]
+    refute obj.key?('authors')
     refute result['book']['authors'][0]['books'][0]['authors'][0]['books'][0]['authors']
   end
 
@@ -152,6 +154,7 @@ class CircularAssociationTest < Minitest::Test
     book = @books.sample
     result = JSON.parse(BookResource.new(book, within: nil).serialize)
     assert result['book']
+    refute result['book'].key?('authors')
     refute result.dig('book', 'authors')
   end
 

@@ -14,7 +14,7 @@ You might want to add some configurations to initializer file such as `alba.rb` 
 ```ruby
 # alba.rb
 Alba.backend = :active_support
-Alba.enable_inference!(:active_support)
+Alba.enable_inference!(with: :active_support)
 ```
 
 You can also use `:oj_rails` for backend if you prefer using Oj.

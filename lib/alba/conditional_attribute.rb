@@ -1,9 +1,9 @@
+require_relative 'association'
+require_relative 'constants'
+
 module Alba
   # Represents attribute with `if` option
   class ConditionalAttribute
-    CONDITION_UNMET = Object.new.freeze
-    public_constant :CONDITION_UNMET # It's public for use in `Alba::Resource`
-
     # @param body [Symbol, Proc, Alba::Association, Alba::TypedAttribute] real attribute wrapped with condition
     # @param condition [Symbol, Proc] condition to check
     def initialize(body:, condition:)
@@ -15,14 +15,14 @@ module Alba
     #
     # @param resource [Alba::Resource]
     # @param object [Object] needed for collection, each object from collection
-    # @return [ConditionalAttribute::CONDITION_UNMET, Object] CONDITION_UNMET if condition is unmet, fetched attribute otherwise
+    # @return [Alba::REMOVE_KEY, Object] REMOVE_KEY if condition is unmet, fetched attribute otherwise
     def with_passing_condition(resource:, object: nil)
-      return CONDITION_UNMET unless condition_passes?(resource, object)
+      return Alba::REMOVE_KEY unless condition_passes?(resource, object)
 
       fetched_attribute = yield(@body)
       return fetched_attribute if fetched_attribute.nil? || !with_two_arity_proc_condition
 
-      return CONDITION_UNMET unless resource.instance_exec(object, attribute_from_association_body_or(fetched_attribute), &@condition)
+      return Alba::REMOVE_KEY unless resource.instance_exec(object, attribute_from_association_body_or(fetched_attribute), &@condition)
 
       fetched_attribute
     end

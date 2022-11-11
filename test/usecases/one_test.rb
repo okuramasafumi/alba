@@ -2,7 +2,7 @@ require_relative '../test_helper'
 
 class OneTest < MiniTest::Test
   def teardown
-    Alba.enable_inference!(with: :active_support)
+    Alba.inflector = :active_support
   end
 
   class User
@@ -159,17 +159,17 @@ class OneTest < MiniTest::Test
 
         one :profile
       end
-      OneTest.const_set('UserResource', klass)
+      OneTest.const_set(:UserResource, klass)
       klass
     end
   end
 
   def test_it_raises_error_when_no_resource_or_block_given_without_inference
-    Alba.disable_inference!
+    Alba.inflector = nil
     assert_raises(ArgumentError) { create_resource_class.call }
   end
 
-  Alba.enable_inference!(with: :active_support)
+  Alba.inflector = :active_support
   class UserResource7
     include Alba::Resource
 
