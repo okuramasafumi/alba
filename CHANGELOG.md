@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Deprecations
+
+- Deprecate `inference` related methods in favor of a unified `inflector` interface.
+  Deprecated methods are: `Alba.enable_inference!`, `Alba.disable_inference!`, and `Alba.inferring`.
+  Use `Alba.inflector = :active_support/:dry` or `Alba.inflector = SomeInflector` to enable.
+  Use `Alba.inflector = nil` to disable.
+  Use `Alba.inflector` to check if enabled.
+
 ## [2.0.1] 2022-11-02
 
 ### Fix
