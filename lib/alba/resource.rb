@@ -41,7 +41,7 @@ module Alba
         @object = object
         @params = params
         @within = within
-        @method_existence = {} # Cache for `respond_to?` result
+        @_method_existence = {} # Cache for `respond_to?` result
         DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.__send__(name)) }
       end
 
@@ -182,27 +182,27 @@ module Alba
       end
 
       def converter
-        lambda do |object|
-          attributes_to_hash(object, {})
+        lambda do |obj|
+          attributes_to_hash(obj, {})
         end
       end
 
       def collection_converter
-        lambda do |object, a|
+        lambda do |obj, a|
           a << {}
           h = a.last
-          attributes_to_hash(object, h)
+          attributes_to_hash(obj, h)
           a
         end
       end
 
-      def attributes_to_hash(object, hash)
+      def attributes_to_hash(obj, hash)
         attributes.each do |key, attribute|
-          set_key_and_attribute_body_from(object, key, attribute, hash)
+          set_key_and_attribute_body_from(obj, key, attribute, hash)
         rescue ::Alba::Error, FrozenError, TypeError
           raise
         rescue StandardError => e
-          handle_error(e, object, key, attribute, hash)
+          handle_error(e, obj, key, attribute, hash)
         end
         hash
       end
@@ -219,22 +219,22 @@ module Alba
         true
       end
 
-      def set_key_and_attribute_body_from(object, key, attribute, hash)
+      def set_key_and_attribute_body_from(obj, key, attribute, hash)
         key = transform_key(key)
-        value = fetch_attribute(object, key, attribute)
+        value = fetch_attribute(obj, key, attribute)
         return unless select(key, value)
 
         hash[key] = value unless value == Alba::REMOVE_KEY
       end
 
-      def handle_error(error, object, key, attribute, hash)
+      def handle_error(error, obj, key, attribute, hash)
         on_error = @_on_error || :raise
         case on_error # rubocop:disable Style/MissingElse
         when :raise, nil then raise(error)
         when :nullify then hash[key] = nil
         when :ignore then nil
         when Proc
-          key, value = on_error.call(error, object, key, attribute, self.class)
+          key, value = on_error.call(error, obj, key, attribute, self.class)
           hash[key] = value
         end
       end
@@ -255,23 +255,23 @@ module Alba
         end
       end
 
-      def fetch_attribute(object, key, attribute) # rubocop:disable Metrics/CyclomaticComplexity
+      def fetch_attribute(obj, key, attribute) # rubocop:disable Metrics/CyclomaticComplexity
         value = case attribute
-                when Symbol then fetch_attribute_from_object_and_resource(object, attribute)
-                when Proc then instance_exec(object, &attribute)
-                when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(object, params: params, within: within) }
-                when TypedAttribute, NestedAttribute then attribute.value(object)
-                when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: object) { |attr| fetch_attribute(object, key, attr) }
+                when Symbol then fetch_attribute_from_object_and_resource(obj, attribute)
+                when Proc then instance_exec(obj, &attribute)
+                when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(obj, params: params, within: within) }
+                when TypedAttribute, NestedAttribute then attribute.value(obj)
+                when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: obj) { |attr| fetch_attribute(obj, key, attr) }
                 else
                   raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
                 end
-        value.nil? && nil_handler ? instance_exec(object, key, attribute, &nil_handler) : value
+        value.nil? && nil_handler ? instance_exec(obj, key, attribute, &nil_handler) : value
       end
 
-      def fetch_attribute_from_object_and_resource(object, attribute)
-        has_method = @method_existence[attribute]
-        has_method = @method_existence[attribute] = object.respond_to?(attribute) if has_method.nil?
-        has_method ? object.__send__(attribute) : __send__(attribute, object)
+      def fetch_attribute_from_object_and_resource(obj, attribute)
+        has_method = @_method_existence[attribute]
+        has_method = @_method_existence[attribute] = obj.respond_to?(attribute) if has_method.nil?
+        has_method ? obj.__send__(attribute) : __send__(attribute, obj)
       end
 
       def nil_handler
