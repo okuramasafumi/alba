@@ -20,7 +20,7 @@ module Alba
       return Alba::REMOVE_KEY unless condition_passes?(resource, object)
 
       fetched_attribute = yield(@body)
-      return fetched_attribute if fetched_attribute.nil? || !with_two_arity_proc_condition
+      return fetched_attribute if !with_two_arity_proc_condition
 
       return Alba::REMOVE_KEY unless resource.instance_exec(object, attribute_from_association_body_or(fetched_attribute), &@condition)
 
