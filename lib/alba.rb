@@ -3,6 +3,7 @@ require_relative 'alba/version'
 require_relative 'alba/errors'
 require_relative 'alba/resource'
 require_relative 'alba/deprecation'
+require_relative 'alba/railtie' if defined?(Rails::Railtie)
 
 # Core module
 module Alba
