@@ -12,7 +12,7 @@ This guide is aimed at helping ActiveModelSerializers users transition to Alba, 
 
 ## Example class
 
-Example clsss is inherited `ActiveRecord::Base`, because [serializing PORO with AMS is pretty hard](https://github.com/rails-api/active_model_serializers/blob/0-10-stable/docs/howto/serialize_poro.md).
+Example class is inherited `ActiveRecord::Base`, because [serializing PORO with AMS is pretty hard](https://github.com/rails-api/active_model_serializers/blob/0-10-stable/docs/howto/serialize_poro.md).
 
 ```rb
 class User < ActiveRecord::Base
@@ -175,7 +175,7 @@ class UserSerializer < ActiveModel::Serializer
   has_many :articles, serializer: ArticleSerializer # For has_many relation
 end
 user = User.create!
-user.craete_profile! email: email
+user.create_profile! email: email
 user.articles.create! title: title, body: body
 ActiveModelSerializers::SerializableResource.new(
   user
