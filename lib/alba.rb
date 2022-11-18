@@ -4,6 +4,7 @@ require_relative 'alba/errors'
 require_relative 'alba/resource'
 require_relative 'alba/deprecation'
 require_relative 'alba/railtie' if defined?(Rails::Railtie)
+require_relative 'alba/hanami_provider' if defined?(Hanami)
 
 # Core module
 module Alba
