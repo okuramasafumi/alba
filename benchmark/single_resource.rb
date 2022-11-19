@@ -1,88 +1,7 @@
 # Benchmark script to run varieties of JSON serializers
 # Fetch Alba from local, otherwise fetch latest from RubyGems
 
-# --- Bundle dependencies ---
-
-require "bundler/inline"
-
-gemfile(true) do
-  source "https://rubygems.org"
-  git_source(:github) { |repo| "https://github.com/#{repo}.git" }
-
-  gem "active_model_serializers"
-  gem "activerecord", "6.1.3"
-  gem "alba", path: '../'
-  gem "benchmark-ips"
-  gem "benchmark-memory"
-  gem "blueprinter"
-  gem "jbuilder"
-  gem 'turbostreamer'
-  gem "jserializer"
-  gem "jsonapi-serializer" # successor of fast_jsonapi
-  gem "multi_json"
-  gem "panko_serializer"
-  gem "pg"
-  gem "primalize"
-  gem "oj"
-  gem "representable"
-  gem "simple_ams"
-  gem "sqlite3"
-end
-
-# --- Test data model setup ---
-
-require "pg"
-require "active_record"
-require "active_record/connection_adapters/postgresql_adapter"
-require "logger"
-require "oj"
-require "sqlite3"
-Oj.optimize_rails
-
-ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
-# ActiveRecord::Base.logger = Logger.new($stdout)
-
-ActiveRecord::Schema.define do
-  create_table :posts, force: true do |t|
-    t.string :body
-  end
-
-  create_table :comments, force: true do |t|
-    t.integer :post_id
-    t.string :body
-    t.integer :commenter_id
-  end
-
-  create_table :users, force: true do |t|
-    t.string :name
-  end
-end
-
-class Post < ActiveRecord::Base
-  has_many :comments
-  has_many :commenters, through: :comments, class_name: 'User', source: :commenter
-
-  def attributes
-    {id: nil, body: nil, commenter_names: commenter_names}
-  end
-
-  def commenter_names
-    commenters.pluck(:name)
-  end
-end
-
-class Comment < ActiveRecord::Base
-  belongs_to :post
-  belongs_to :commenter, class_name: 'User'
-
-  def attributes
-    {id: nil, body: nil}
-  end
-end
-
-class User < ActiveRecord::Base
-  has_many :comments
-end
+require_relative 'prep'
 
 # --- Alba serializers ---
 
@@ -177,70 +96,8 @@ class JserializerPostSerializer < Jserializer::Base
   end
 end
 
-
-# --- JSONAPI:Serializer serializers / (successor of fast_jsonapi) ---
-
-class JsonApiStandardCommentSerializer
-  include JSONAPI::Serializer
-
-  attribute :id
-  attribute :body
-end
-
-class JsonApiStandardPostSerializer
-  include JSONAPI::Serializer
-
-  # set_type :post  # optional
-  attribute :id
-  attribute :body
-  attribute :commenter_names
-
-  attribute :comments do |post|
-    post.comments.map { |comment| JsonApiSameFormatCommentSerializer.new(comment) }
-  end
-end
-
-# --- JSONAPI:Serializer serializers that format the code the same flat way as the other gems here ---
-
-# code to convert from JSON:API output to "flat" JSON, like the other serializers build
-class JsonApiSameFormatSerializer
-  include JSONAPI::Serializer
-
-  def as_json(*_options)
-    hash = serializable_hash
-
-    if hash[:data].is_a? Hash
-      hash[:data][:attributes]
-
-    elsif hash[:data].is_a? Array
-      hash[:data].pluck(:attributes)
-
-    elsif hash[:data].nil?
-      { }
-
-    else
-      raise "unexpected data type #{hash[:data].class}"
-    end
-  end
-end
-
-class JsonApiSameFormatCommentSerializer < JsonApiSameFormatSerializer
-  attribute :id
-  attribute :body
-end
-
-class JsonApiSameFormatPostSerializer < JsonApiSameFormatSerializer
-  attribute :id
-  attribute :body
-  attribute :commenter_names
-
-  attribute :comments do |post|
-    post.comments.map { |comment| JsonApiSameFormatCommentSerializer.new(comment) }
-  end
-end
-
 # --- Panko serializers ---
-#
+
 require "panko_serializer"
 
 class PankoCommentSerializer < Panko::Serializer
@@ -259,7 +116,7 @@ class PankoPostSerializer < Panko::Serializer
 end
 
 # --- Primalize serializers ---
-#
+
 class PrimalizeCommentResource < Primalize::Single
   attributes id: integer, body: string
 end
@@ -376,8 +233,6 @@ ams = Proc.new { AMSPostSerializer.new(post, {}).to_json }
 blueprinter = Proc.new { PostBlueprint.render(post) }
 jbuilder = Proc.new { post.to_builder.target! }
 jserializer = Proc.new { JserializerPostSerializer.new(post).to_json }
-jsonapi = proc { JsonApiStandardPostSerializer.new(post).to_json }
-jsonapi_same_format = proc { JsonApiSameFormatPostSerializer.new(post).to_json }
 panko = proc { PankoPostSerializer.new.serialize_to_json(post) }
 primalize = proc { PrimalizePostResource.new(post).to_json }
 rails = Proc.new { ActiveSupport::JSON.encode(post.serializable_hash(include: :comments)) }
@@ -395,8 +250,6 @@ puts "Serializer outputs ----------------------------------"
   blueprinter: blueprinter,
   jbuilder: jbuilder, # different order
   jserializer: jserializer,
-  jsonapi: jsonapi, # nested JSON:API format
-  jsonapi_same_format: jsonapi_same_format,
   panko: panko,
   primalize: primalize,
   rails: rails,
@@ -417,8 +270,6 @@ Benchmark.ips do |x|
   x.report(:blueprinter, &blueprinter)
   x.report(:jbuilder, &jbuilder)
   x.report(:jserializer, &jserializer)
-  x.report(:jsonapi, &jsonapi)
-  x.report(:jsonapi_same_format, &jsonapi_same_format)
   x.report(:panko, &panko)
   x.report(:primalize, &primalize)
   x.report(:rails, &rails)
@@ -438,8 +289,6 @@ Benchmark.memory do |x|
   x.report(:blueprinter, &blueprinter)
   x.report(:jbuilder, &jbuilder)
   x.report(:jserializer, &jserializer)
-  x.report(:jsonapi, &jsonapi)
-  x.report(:jsonapi_same_format, &jsonapi_same_format)
   x.report(:panko, &panko)
   x.report(:primalize, &primalize)
   x.report(:rails, &rails)
