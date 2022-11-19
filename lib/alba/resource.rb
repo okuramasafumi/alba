@@ -41,7 +41,6 @@ module Alba
         @object = object
         @params = params
         @within = within
-        @_method_existence = {} # Cache for `respond_to?` result
         DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.__send__(name)) }
       end
 
@@ -269,9 +268,9 @@ module Alba
       end
 
       def fetch_attribute_from_object_and_resource(obj, attribute)
-        has_method = @_method_existence[attribute]
-        has_method = @_method_existence[attribute] = obj.respond_to?(attribute) if has_method.nil?
-        has_method ? obj.__send__(attribute) : __send__(attribute, obj)
+        obj.__send__(attribute)
+      rescue NoMethodError
+        __send__(attribute, obj)
       end
 
       def nil_handler
@@ -321,7 +320,7 @@ module Alba
       # @param attrs_with_types [Hash<[Symbol, String], [Array<Symbol, Proc>, Symbol]>]
       #   attributes with name in its key and type and optional type converter in its value
       # @return [void]
-      def attributes(*attrs, if: nil, **attrs_with_types) # rubocop:disable Naming/MethodParameterName
+      def attributes(*attrs, if: nil, **attrs_with_types)
         if_value = binding.local_variable_get(:if)
         assign_attributes(attrs, if_value)
         assign_attributes_with_types(attrs_with_types, if_value)
