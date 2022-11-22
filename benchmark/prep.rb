@@ -34,7 +34,7 @@ require "active_record/connection_adapters/postgresql_adapter"
 require "logger"
 require "oj"
 require "sqlite3"
-Oj.optimize_rails
+Oj.optimize_rails unless ENV['NO_OJ_OPTIMIZE_RAILS']
 
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
 # ActiveRecord::Base.logger = Logger.new($stdout)

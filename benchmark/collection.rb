@@ -79,30 +79,6 @@ class FastSerializerPostResource
   has_many :comments, serializer: FastSerializerCommentResource
 end
 
-# --- JBuilder serializers ---
-
-require "jbuilder"
-
-class Post
-  def to_builder
-    Jbuilder.new do |post|
-      post.call(self, :id, :body, :commenter_names, :comments)
-    end
-  end
-
-  def commenter_names
-    commenters.pluck(:name)
-  end
-end
-
-class Comment
-  def to_builder
-    Jbuilder.new do |comment|
-      comment.call(self, :id, :body)
-    end
-  end
-end
-
 # --- Jserializer serializers ---
 
 require 'jserializer'
@@ -137,31 +113,6 @@ class PankoPostSerializer < Panko::Serializer
   def commenter_names
     object.commenters.pluck(:name)
   end
-end
-
-# --- Primalize serializers ---
-#
-class PrimalizeCommentResource < Primalize::Single
-  attributes id: integer, body: string
-end
-
-class PrimalizePostResource < Primalize::Single
-  alias post object
-
-  attributes(
-    id: integer,
-    body: string,
-    comments: array(primalize(PrimalizeCommentResource)),
-    commenter_names: array(string),
-  )
-
-  def commenter_names
-    post.commenters.pluck(:name)
-  end
-end
-
-class PrimalizePostsResource < Primalize::Many
-  attributes posts: enumerable(PrimalizePostResource)
 end
 
 # --- Representable serializers ---
@@ -268,13 +219,6 @@ end
 ams = Proc.new { ActiveModelSerializers::SerializableResource.new(posts, {each_serializer: AMSPostSerializer}).to_json }
 blueprinter = Proc.new { PostBlueprint.render(posts) }
 fast_serializer = Proc.new { FastSerializerPostResource.new(posts).to_json }
-jbuilder = Proc.new do
-  Jbuilder.new do |json|
-    json.array!(posts) do |post|
-      json.post post.to_builder
-    end
-  end.target!
-end
 jserializer = Proc.new { JserializerPostSerializer.new(posts, is_collection: true).to_json }
 panko = proc { Panko::ArraySerializer.new(posts, each_serializer: PankoPostSerializer).to_json }
 primalize = proc { PrimalizePostsResource.new(posts: posts).to_json }
@@ -287,22 +231,25 @@ turbostreamer = Proc.new { TurbostreamerSerializer.new(posts).to_json }
 
 # --- Execute the serializers to check their output ---
 GC.disable
-puts "Serializer outputs ----------------------------------"
+puts "Checking outputs..."
+correct = alba.call
+parsed_correct = JSON.parse(correct)
 {
-  alba: alba,
   alba_inline: alba_inline,
   ams: ams,
   blueprinter: blueprinter,
   fast_serializer: fast_serializer,
-  jbuilder: jbuilder, # different order
   jserializer: jserializer,
   panko: panko,
-  primalize: primalize,
   rails: rails,
   representable: representable,
   simple_ams: simple_ams,
   turbostreamer: turbostreamer
-}.each { |name, serializer| puts "#{name.to_s.ljust(24, ' ')} #{serializer.call}" }
+}.each do |name, serializer|
+  result = serializer.call
+  parsed_result = JSON.parse(result)
+  puts "#{name} yields wrong output: #{parsed_result}" unless parsed_result == parsed_correct
+end
 
 # --- Run the benchmarks ---
 
@@ -313,10 +260,8 @@ Benchmark.ips do |x|
   x.report(:ams, &ams)
   x.report(:blueprinter, &blueprinter)
   x.report(:fast_serializer, &fast_serializer)
-  x.report(:jbuilder, &jbuilder)
   x.report(:jserializer, &jserializer)
   x.report(:panko, &panko)
-  x.report(:primalize, &primalize)
   x.report(:rails, &rails)
   x.report(:representable, &representable)
   x.report(:simple_ams, &simple_ams)
@@ -333,10 +278,8 @@ Benchmark.memory do |x|
   x.report(:ams, &ams)
   x.report(:blueprinter, &blueprinter)
   x.report(:fast_serializer, &fast_serializer)
-  x.report(:jbuilder, &jbuilder)
   x.report(:jserializer, &jserializer)
   x.report(:panko, &panko)
-  x.report(:primalize, &primalize)
   x.report(:rails, &rails)
   x.report(:representable, &representable)
   x.report(:simple_ams, &simple_ams)
