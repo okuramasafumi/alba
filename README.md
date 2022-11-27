@@ -57,7 +57,7 @@ Or install it yourself as:
 
 ## Supported Ruby versions
 
-Alba supports CRuby 2.5 and higher and latest JRuby and TruffleRuby.
+Alba supports CRuby 2.6 and higher and latest JRuby and TruffleRuby.
 
 ## Documentation
 
