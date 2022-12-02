@@ -215,4 +215,72 @@ class OneTest < MiniTest::Test
       Foo::Bar::UserResource.new(user).serialize
     )
   end
+
+  class Soundtrack
+    attr_accessor :content
+
+    def initialize(content)
+      @content = content
+    end
+  end
+
+  class Movie
+    attr_accessor :id, :title
+
+    def initialize(id, title)
+      @id = id
+      @title = title
+    end
+  end
+
+  class TvShow
+    attr_accessor :id, :title
+
+    def initialize(id, title)
+      @id = id
+      @title = title
+    end
+  end
+
+  class MovieResource
+    include Alba::Resource
+
+    attributes :id, :title
+    attribute :type do
+      'movie'
+    end
+  end
+
+  class TvShowResource
+    include Alba::Resource
+
+    attributes :id, :title
+    attribute :type do
+      'tv_show'
+    end
+  end
+
+  class SoundtrackSerializer
+    include Alba::Resource
+
+    one :content, resource: ->(content) { content.is_a?(Movie) ? MovieResource : TvShowResource }
+  end
+
+  def test_polymorphic_association_with_proc_resource
+    movie = Movie.new(1, 'Yojimbo')
+    soundtrack = Soundtrack.new(movie)
+
+    assert_equal(
+     '{"content":{"id":1,"title":"Yojimbo","type":"movie"}}',
+      SoundtrackSerializer.new(soundtrack).serialize
+    )
+
+    tv_show = TvShow.new(1, 'Evangelion')
+    soundtrack = Soundtrack.new(tv_show)
+
+    assert_equal(
+     '{"content":{"id":1,"title":"Evangelion","type":"tv_show"}}',
+      SoundtrackSerializer.new(soundtrack).serialize
+    )
+  end
 end

@@ -37,8 +37,10 @@ module Alba
       @object = @condition.call(object, params, target) if @condition
       return if @object.nil?
 
-      if @resource.is_a?(Proc) && @object.is_a?(Enumerable)
-        to_h_with_each_resource(within, params)
+      if @resource.is_a?(Proc)
+        return to_h_with_each_resource(within, params) if @object.is_a?(Enumerable)
+
+        @resource.call(@object).new(@object, within: within, params: params).to_h
       else
         to_h_with_constantize_resource(within, params)
       end
