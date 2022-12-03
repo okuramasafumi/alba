@@ -6,7 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Deprecations
+## [2.1.0] 2022-12-03
+
+### Added
+
+- Add `select` method for filtering attributes [#270](https://github.com/okuramasafumi/alba/pull/270)
+- Allow ConditionalAttribute with 2-arity proc to reject nil attributes [#273](https://github.com/okuramasafumi/alba/pull/273)
+
+### Fixed
+
+- Add support for proc resource in one polymorphic associations [#281](https://github.com/okuramasafumi/alba/pull/281)
+
+### Deprecated
 
 - Deprecate `inference` related methods in favor of a unified `inflector` interface.
   Deprecated methods are: `Alba.enable_inference!`, `Alba.disable_inference!`, and `Alba.inferring`.
