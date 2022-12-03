@@ -405,7 +405,7 @@ class UserResource
 
   attributes :id
 
-  many :articles, ->(article) { article.with_comment? ? ArticleWithCommentResource : ArticleResource }
+  many :articles, resource: ->(article) { article.with_comment? ? ArticleWithCommentResource : ArticleResource }
 end
 ```
 
