@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # Specify your gem's dependencies in alba.gemspec
-gemspec
+# gemspec
 
 gem 'activesupport', require: false # For backend
 gem 'dry-inflector', require: false # For inflection
@@ -22,6 +22,7 @@ gem 'simplecov-cobertura', require: false # For test coverage
 gem 'yard', require: false # For documentation
 
 # For automatic inflector tests
+gem 'alba', path: "."
 gem 'rack-test', require: false
 gem 'rails', '~> 7.0', require: false
 
