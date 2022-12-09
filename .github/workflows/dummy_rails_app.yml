@@ -1,0 +1,22 @@
+name: Dummy Rails app tests
+
+on: [push,pull_request]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: [3.1]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+    - name: Run dummy Rails app tests
+      working-directory: ./test/dummy/rails
+      run: |
+        bundle exec rake
