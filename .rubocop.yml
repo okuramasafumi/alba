@@ -58,6 +58,11 @@ Metrics/ParameterLists:
   Exclude:
     - 'test/**/*.rb'
 
+# Putting extra empty line is not valuable in test
+# We prefer shorter test code
+Minitest/EmptyLineBeforeAssertionMethods:
+  Enabled: false
+
 # We need to eval resource code to test errors on resource classes
 Security/Eval:
   Exclude:
