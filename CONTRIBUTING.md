@@ -27,4 +27,4 @@ You're more than welcomed to submit a Pull Request! You are expected to follow t
 ## Documents
 
 * [code of conduct](https://github.com/okuramasafumi/alba/blob/master/CODE_OF_CONDUCT.md) for all contributors
-* [hacking document](https://github.com/okuramasafumi/alba/blob/master/DESIGN.md) for those who want to know the internal of Alba
+* [hacking document](https://github.com/okuramasafumi/alba/blob/main/HACKING.md) for those who want to know the internal of Alba
