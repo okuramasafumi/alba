@@ -230,4 +230,38 @@ class ConditionalAttributesTest < MiniTest::Test
       UserResource12.new(@user).serialize
     )
   end
+
+  class Foo
+    attr_reader :id, :name
+
+    def initialize(id, name)
+      @id = id
+      @name = name
+    end
+  end
+
+  class FooResource
+    include Alba::Resource
+
+    attributes :id
+
+    nested :bar, if: proc { params[:flag] } do
+      attributes :name
+      attribute :baz do
+        'baz'
+      end
+    end
+  end
+
+  def test_conditional_attributes_with_nested_attributes
+    foo = Foo.new(1, 'name')
+    assert_equal(
+      '{"id":1,"bar":{"name":"name","baz":"baz"}}',
+      FooResource.new(foo, params: {flag: true}).serialize
+    )
+    assert_equal(
+      '{"id":1}',
+      FooResource.new(foo, params: {flag: false}).serialize
+    )
+  end
 end
