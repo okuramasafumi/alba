@@ -297,8 +297,9 @@ module Alba
 
       # Detect if object is a collection or not.
       # When object is a Struct, it's Enumerable but not a collection
+      # When object is a Hash, it's not a collection
       def collection?
-        @object.is_a?(Enumerable) && !@object.is_a?(Struct)
+        !@object.is_a?(Hash) && @object.is_a?(Enumerable) && !@object.is_a?(Struct)
       end
     end
 
