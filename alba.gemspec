@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.description   = "Alba is the fastest JSON serializer for Ruby. It focuses on performance, flexibility and usability."
   spec.homepage      = 'https://github.com/okuramasafumi/alba'
   spec.license       = 'MIT'
-  spec.required_ruby_version = Gem::Requirement.new('>= 2.6.0')
+  spec.required_ruby_version = Gem::Requirement.new('>= 2.7.0')
 
   spec.metadata = {
     'bug_tracker_uri' => 'https://github.com/okuramasafumi/issues',
