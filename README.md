@@ -1072,7 +1072,7 @@ You can validate and convert input with types.
 class User
   attr_reader :id, :name, :age, :bio, :admin, :created_at
 
-  def initialize(id, name, age, bio = '', admin = false) # rubocop:disable Style/OptionalBooleanParameter
+  def initialize(id, name, age, bio = '', admin = false)
     @id = id
     @name = name
     @age = age
