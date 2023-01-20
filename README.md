@@ -23,6 +23,16 @@ If you have feature requests or interesting ideas, join us with [Ideas](https://
 
 If you want to know more about Alba, there's a [screencast](https://hanamimastery.com/episodes/21-serialization-with-alba) created by Sebastian from [Hanami Mastery](https://hanamimastery.com/). It covers basic features of Alba and how to use it in Hanami.
 
+## What users say about Alba
+
+> Alba is a well-maintained JSON serialization engine, for Ruby, JRuby, and TruffleRuby implementations, and what I like in this gem - except of its speed, is the easiness of use, no dependencies and the fact it plays well with any Ruby application!
+
+[Hanami Mastery by Seb Wilgosz](https://hanamimastery.com/episodes/21-serialization-with-alba)
+
+> Alba is more feature-rich and pretty fast, too
+
+[Gemfile of dreams by Evil Martians](https://evilmartians.com/chronicles/gemfile-of-dreams-libraries-we-use-to-build-rails-apps)
+
 ## Why Alba?
 
 Because it's fast, easy and feature rich!
