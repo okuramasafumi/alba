@@ -8,8 +8,8 @@ module Alba
 
     def_delegators :@resource, :object, :params, :serializable_hash, :to_h
 
-    # @params file [String] name of the layout file
-    # @params inline [Proc] a proc returning JSON string or a Hash representing JSON
+    # @param file [String] name of the layout file
+    # @param inline [Proc] a proc returning JSON string or a Hash representing JSON
     def initialize(file:, inline:)
       if file
         raise ArgumentError, 'File layout must be a String representing filename' unless file.is_a?(String)

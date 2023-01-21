@@ -78,7 +78,6 @@ module Alba
       #
       # @param root_key [Symbol, nil, true]
       # @param meta [Hash] metadata for this seialization
-      # @param symbolize_root_key [Boolean] determines if root key should be symbolized
       # @return [Hash]
       def as_json(root_key: nil, meta: {})
         key = root_key.nil? ? fetch_key : root_key.to_s
@@ -442,8 +441,8 @@ module Alba
 
       # Set layout
       #
-      # @params file [String] name of the layout file
-      # @params inline [Proc] a proc returning JSON string or a Hash representing JSON
+      # @param file [String] name of the layout file
+      # @param inline [Proc] a proc returning JSON string or a Hash representing JSON
       def layout(file: nil, inline: nil)
         @_layout = Layout.new(file: file, inline: inline)
       end
