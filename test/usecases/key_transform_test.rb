@@ -199,4 +199,17 @@ class KeyTransformTest < Minitest::Test
       UserResourceWithInlineAssociationNoCascade.new(@user).serialize
     )
   end
+
+  class InheritedResource < UserResourceLowerCamel
+    one :bank_account do
+      attributes :account_number
+    end
+  end
+
+  def test_transform_key_with_inheritance
+    assert_equal(
+      '{"id":1,"firstName":"Masafumi","lastName":"Okura","bankAccount":{"accountNumber":123456789}}',
+      InheritedResource.new(@user).serialize
+    )
+  end
 end
