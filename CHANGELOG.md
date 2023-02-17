@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] 2023-02-17
+
+### Added
+
+- Rails integration to set default inflector [#298](https://github.com/okuramasafumi/alba/pull/298)
+
+### Fixed
+
+- Fix cascade not working with association and inheritance [#300](https://github.com/okuramasafumi/alba/pull/300)
+
+### Removed
+
+- Drop support of Ruby 2.6
+
 ## [2.1.0] 2022-12-03
 
 ### Added
