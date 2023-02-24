@@ -43,7 +43,7 @@ Alba is faster than most of the alternatives. We have a [benchmark](https://gith
 
 ### Easy
 
-Alba is easy to use because there are only a few methods to remember. It's also easy to understand due to clean and short codebase. Finally it's easy to extend since it provides some methods for override to change default behavior of Alba.
+Alba is easy to use because there are only a few methods to remember. It's also easy to understand due to clean and small codebase. Finally it's easy to extend since it provides some methods for override to change default behavior of Alba.
 
 ### Feature rich
 
