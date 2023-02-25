@@ -38,6 +38,13 @@ class ResourceTest < MiniTest::Test
       {'foo' => {'id' => 1, 'bar_size' => 1, 'bars' => [{'id' => 1}]}},
       FooResource.new(@foo).as_json
     )
+
+    Alba.symbolize_keys!
+    assert_equal(
+      {foo: {id: 1, bar_size: 1, bars: [{id: 1}]}},
+      FooResource.new(@foo).as_json
+    )
+    Alba.stringify_keys!
   end
 
   def test_to_json

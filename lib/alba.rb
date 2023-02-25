@@ -107,10 +107,32 @@ module Alba
       const_parent.const_get("#{inflector.classify(name)}Resource")
     end
 
+    # Configure Alba to symbolize keys
+    def symbolize_keys!
+      @symbolize_keys = true
+    end
+
+    # Configure Alba to stringify (not symbolize) keys
+    def stringify_keys!
+      @symbolize_keys = false
+    end
+
+    # Regularize key to be either Symbol or String depending on @symbolize_keys
+    # Returns nil if key is nil
+    #
+    # @param key [String, Symbol, nil]
+    # @return [Symbol, String, nil]
+    def regularize_key(key)
+      return if key.nil?
+
+      @symbolize_keys ? key.to_sym : key.to_s
+    end
+
     # Reset config variables
     # Useful for test cleanup
     def reset!
       @encoder = default_encoder
+      @symbolize_keys = false
       @_on_error = :raise
       @_on_nil = nil
     end
