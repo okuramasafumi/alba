@@ -80,7 +80,8 @@ module Alba
       # @param meta [Hash] metadata for this seialization
       # @return [Hash]
       def as_json(root_key: nil, meta: {})
-        key = root_key.nil? ? fetch_key : root_key.to_s
+        key = root_key.nil? ? fetch_key : root_key
+        key = Alba.regularize_key(key)
         if key && !key.empty?
           h = {key => serializable_hash}
           hash_with_metadata(h, meta)
@@ -134,7 +135,11 @@ module Alba
 
       def serializable_hash_for_collection
         if @_collection_key
-          @object.to_h { |item| [item.public_send(@_collection_key).to_s, converter.call(item)] }
+          @object.to_h do |item|
+            k = item.public_send(@_collection_key)
+            key = Alba.regularize_key(k)
+            [key, converter.call(item)]
+          end
         else
           @object.each_with_object([], &collection_converter)
         end
@@ -147,20 +152,21 @@ module Alba
       end
 
       def _key_for_collection
-        if Alba.inflector
-          @_key_for_collection == true ? resource_name(pluralized: true) : @_key_for_collection.to_s
-        else
-          @_key_for_collection == true ? raise_root_key_inference_error : @_key_for_collection.to_s
-        end
+        k = if Alba.inflector
+              @_key_for_collection == true ? resource_name(pluralized: true) : @_key_for_collection
+            else
+              @_key_for_collection == true ? raise_root_key_inference_error : @_key_for_collection
+            end
+        Alba.regularize_key(k)
       end
 
-      # @return [String]
       def _key
-        if Alba.inflector
-          @_key == true ? resource_name(pluralized: false) : @_key.to_s
-        else
-          @_key == true ? raise_root_key_inference_error : @_key.to_s
-        end
+        k = if Alba.inflector
+              @_key == true ? resource_name(pluralized: false) : @_key
+            else
+              @_key == true ? raise_root_key_inference_error : @_key
+            end
+        Alba.regularize_key(k)
       end
 
       def resource_name(pluralized: false)
@@ -237,20 +243,20 @@ module Alba
         end
       end
 
-      # @return [Symbol]
       def transform_key(key) # rubocop:disable Metrics/CyclomaticComplexity
-        key = key.to_s
-        return key if @_transform_type == :none || key.empty? # We can skip transformation
+        return Alba.regularize_key(key) if @_transform_type == :none || key.nil? || key.empty? # We can skip transformation
 
         inflector = Alba.inflector
         raise Alba::Error, 'Inflector is nil. You must set inflector before transforming keys.' unless inflector
 
-        case @_transform_type # rubocop:disable Style/MissingElse
-        when :camel then inflector.camelize(key)
-        when :lower_camel then inflector.camelize_lower(key)
-        when :dash then inflector.dasherize(key)
-        when :snake then inflector.underscore(key)
-        end
+        key = key.to_s
+        k = case @_transform_type # rubocop:disable Style/MissingElse
+            when :camel then inflector.camelize(key)
+            when :lower_camel then inflector.camelize_lower(key)
+            when :dash then inflector.dasherize(key)
+            when :snake then inflector.underscore(key)
+            end
+        Alba.regularize_key(k)
       end
 
       def fetch_attribute(obj, key, attribute) # rubocop:disable Metrics/CyclomaticComplexity

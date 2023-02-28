@@ -133,6 +133,16 @@ class AlbaTest < Minitest::Test
           attributes :id
         end
       )
+
+      Alba.symbolize_keys!
+      Oj.default_options = {mode: :object}
+      assert_equal(
+        '{":foo":{":id":1}}',
+        Alba.serialize(@user, root_key: :foo) do
+          attributes :id
+        end
+      )
+      Alba.stringify_keys!
     end
   end
 
