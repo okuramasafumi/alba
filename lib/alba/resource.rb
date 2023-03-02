@@ -106,9 +106,7 @@ module Alba
 
       def _to_json(root_key, meta, options)
         options.reject! { |k, _| %i[layout prefixes template status].include?(k) } # Rails specific guard
-        # TODO: use `filter_map` after dropping support of Ruby 2.6
-        names = options.map { |k, v| k unless v.nil? }
-        names.compact!
+        names = options.filter_map { |k, v| k unless v.nil? }
         unless names.empty?
           names.sort!
           names.map! { |s| "\"#{s}\"" }
