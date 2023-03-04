@@ -271,7 +271,7 @@ class OneTest < MiniTest::Test
     soundtrack = Soundtrack.new(movie)
 
     assert_equal(
-     '{"content":{"id":1,"title":"Yojimbo","type":"movie"}}',
+      '{"content":{"id":1,"title":"Yojimbo","type":"movie"}}',
       SoundtrackSerializer.new(soundtrack).serialize
     )
 
@@ -279,7 +279,7 @@ class OneTest < MiniTest::Test
     soundtrack = Soundtrack.new(tv_show)
 
     assert_equal(
-     '{"content":{"id":1,"title":"Evangelion","type":"tv_show"}}',
+      '{"content":{"id":1,"title":"Evangelion","type":"tv_show"}}',
       SoundtrackSerializer.new(soundtrack).serialize
     )
   end
