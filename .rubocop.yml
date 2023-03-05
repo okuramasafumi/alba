@@ -22,6 +22,11 @@ AllCops:
 Bundler/GemVersion:
   Enabled: false
 
+# Test class is a class, but not really
+Layout/ClassStructure:
+  Exclude:
+    - 'test/**/*'
+
 # We'd like to write something like:
 #   assert_equal(
 #     expected,
