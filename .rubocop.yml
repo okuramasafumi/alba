@@ -92,7 +92,7 @@ Style/InlineComment:
   Enabled: false
 
 Style/MethodCallWithArgsParentheses:
-  IgnoredMethods: ['require', 'require_relative', 'include', 'extend', 'puts', 'p', 'warn', 'raise', 'send', 'public_send']
+  AllowedMethods: ['require', 'require_relative', 'include', 'extend', 'puts', 'p', 'warn', 'raise', 'send', 'public_send']
   Exclude:
     # There are so many `attributes` call without parenthese and that's absolutely fine
     - 'test/**/*.rb'
