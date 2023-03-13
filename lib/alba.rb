@@ -148,8 +148,7 @@ module Alba
       when :dry
         require 'dry/inflector'
         Dry::Inflector.new
-      else
-        validate_inflector(name_or_module)
+      else validate_inflector(name_or_module)
       end
     end
 
