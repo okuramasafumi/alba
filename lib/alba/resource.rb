@@ -241,20 +241,22 @@ module Alba
         end
       end
 
-      def transform_key(key) # rubocop:disable Metrics/CyclomaticComplexity
+      def transform_key(key)
         return Alba.regularize_key(key) if @_transform_type == :none || key.nil? || key.empty? # We can skip transformation
 
         inflector = Alba.inflector
         raise Alba::Error, 'Inflector is nil. You must set inflector before transforming keys.' unless inflector
 
-        key = key.to_s
-        k = case @_transform_type # rubocop:disable Style/MissingElse
-            when :camel then inflector.camelize(key)
-            when :lower_camel then inflector.camelize_lower(key)
-            when :dash then inflector.dasherize(key)
-            when :snake then inflector.underscore(key)
-            end
-        Alba.regularize_key(k)
+        Alba.regularize_key(_transform_key(inflector, key.to_s))
+      end
+
+      def _transform_key(inflector, key)
+        case @_transform_type # rubocop:disable Style/MissingElse
+        when :camel then inflector.camelize(key)
+        when :lower_camel then inflector.camelize_lower(key)
+        when :dash then inflector.dasherize(key)
+        when :snake then inflector.underscore(key)
+        end
       end
 
       def fetch_attribute(obj, key, attribute) # rubocop:disable Metrics/CyclomaticComplexity
