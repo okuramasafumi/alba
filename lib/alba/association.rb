@@ -32,7 +32,7 @@ module Alba
     # @param params [Hash] user-given Hash for arbitrary data
     # @return [Hash]
     def to_h(target, within: nil, params: {})
-      params = params.merge(@params) unless @params.empty?
+      params = params.merge(@params)
       @object = target.__send__(@name)
       @object = @condition.call(object, params, target) if @condition
       return if @object.nil?
