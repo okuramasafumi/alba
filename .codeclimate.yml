@@ -9,3 +9,4 @@ checks:
 exclude_patterns:
   - "benchmark/**/*"
   - "script/**/*"
+  - "test/**/*"
