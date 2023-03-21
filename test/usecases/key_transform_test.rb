@@ -212,4 +212,15 @@ class KeyTransformTest < Minitest::Test
       InheritedResource.new(@user).serialize
     )
   end
+
+  class BankAccountRootSerializer < BankAccountRootResource
+    # Just changing suffix
+  end
+
+  def test_transform_key_to_lower_camel_works_on_root_key_when_root_option_set_to_true_with_serializer_suffix
+    assert_equal(
+      '{"bankAccountRoot":{"accountNumber":123456789}}',
+      BankAccountRootSerializer.new(@bank_account).serialize
+    )
+  end
 end

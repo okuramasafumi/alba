@@ -170,7 +170,8 @@ module Alba
       def resource_name(pluralized: false)
         class_name = self.class.name
         inflector = Alba.inflector
-        name = inflector.demodulize(class_name).delete_suffix('Resource')
+        suffix = class_name.end_with?('Resource') ? 'Resource' : 'Serializer'
+        name = inflector.demodulize(class_name).delete_suffix(suffix)
         underscore_name = inflector.underscore(name)
         pluralized ? inflector.pluralize(underscore_name) : underscore_name
       end
