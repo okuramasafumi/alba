@@ -29,7 +29,7 @@ Other methods are rather trivial. They'll be added to this list when it turned o
 
 In `Alba::Resource` module there are some things to note.
 
-`@object` is an object for serialization. It's either singular object or collection.
+`@object` is an object for serialization. It's either a singular object or a collection.
 
 Attribute object can be either `Symbol`, `Proc`, `Alba::Association` or `Alba::TypedAttribute`.
 
