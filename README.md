@@ -150,6 +150,20 @@ else
 end
 ```
 
+### Naming
+
+Alba tries to infer resource name from class name like the following.
+
+|Class name|Resource name|
+| --- | --- |
+| FooResource | Foo |
+| FooSerializer | Foo |
+| FooElse | FooElse |
+
+Resource name is used as the default name of the root key, so you might want to name it ending with "Resource" or "Serializer"
+
+When you use Alba with Rails, it's recommended to put your resource/serializer classes in corresponding directory such as `app/resources` or `app/serializers`.
+
 ### Simple serialization with root key
 
 You can define attributes with (yes) `attributes` macro with attribute names. If your attribute need some calculations, you can use `attribute` with block.
