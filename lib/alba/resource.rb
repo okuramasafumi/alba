@@ -150,33 +150,24 @@ module Alba
       end
 
       def _key_for_collection
-        k = if Alba.inflector
-              @_key_for_collection == true ? resource_name(pluralized: true) : @_key_for_collection
-            else
-              @_key_for_collection == true ? raise_root_key_inference_error : @_key_for_collection
-            end
+        k = @_key_for_collection == true ? resource_name(pluralized: true) : @_key_for_collection
         Alba.regularize_key(k)
       end
 
       def _key
-        k = if Alba.inflector
-              @_key == true ? resource_name(pluralized: false) : @_key
-            else
-              @_key == true ? raise_root_key_inference_error : @_key
-            end
+        k = @_key == true ? resource_name(pluralized: false) : @_key
         Alba.regularize_key(k)
       end
 
       def resource_name(pluralized: false)
-        class_name = self.class.name
         inflector = Alba.inflector
-        name = inflector.demodulize(class_name).delete_suffix('Resource')
+        raise Alba::Error, 'You must set inflector when setting root key as true.' unless inflector
+
+        class_name = self.class.name
+        suffix = class_name.end_with?('Resource') ? 'Resource' : 'Serializer'
+        name = inflector.demodulize(class_name).delete_suffix(suffix)
         underscore_name = inflector.underscore(name)
         pluralized ? inflector.pluralize(underscore_name) : underscore_name
-      end
-
-      def raise_root_key_inference_error
-        raise Alba::Error, 'You must set inflector when setting root key as true.'
       end
 
       def transforming_root_key?
