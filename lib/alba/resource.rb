@@ -324,8 +324,9 @@ module Alba
 
       def assign_attributes(attrs, if_value)
         attrs.each do |attr_name|
-          attr = if_value ? ConditionalAttribute.new(body: attr_name.to_sym, condition: if_value) : attr_name.to_sym
-          @_attributes[attr_name.to_sym] = attr
+          attr_name = attr_name.to_sym
+          attr = if_value ? ConditionalAttribute.new(body: attr_name, condition: if_value) : attr_name
+          @_attributes[attr_name] = attr
         end
       end
       private :assign_attributes
