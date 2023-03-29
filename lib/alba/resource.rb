@@ -41,10 +41,7 @@ module Alba
         @object = object
         @params = params
         @within = within
-        DSLS.each_key do |name|
-          value = self.class.__send__(name)
-          instance_variable_set("@#{name}", value) unless value.nil?
-        end
+        DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.__send__(name)) }
       end
 
       # Serialize object into JSON string
