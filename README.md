@@ -558,6 +558,48 @@ Alba.serialize(something)
 
 Although this might be useful sometimes, it's generally recommended to define a class for Resource.
 
+#### Inline definition for multiple root keys
+
+While Alba doesn't directly support multiple root keys, you can simulate it with `Alba.serialize`.
+
+```ruby
+# Define foo and bar local variables here
+
+Alba.serialize do
+  attribute :key1 do
+    FooResource.new(foo).to_h
+  end
+
+  attribute :key2 do
+    BarResource.new(bar).to_h
+  end
+end
+# => JSON containing "key1" and "key2" as root keys
+```
+
+Note that we must use `to_h`, not `serialize`, with resources. 
+
+We can also generate a JSON with multiple root keys without making any class by the combination of `Alba.serialize` and `Alba.hashify`.
+
+```ruby
+# Define foo and bar local variables here
+
+Alba.serialize do
+  attribute :foo do
+    Alba.hashify(foo) do
+      attributes :id, :name # For example
+    end
+  end
+
+  attribute :bar do
+    Alba.hashify(bar) do
+      attributes :id
+    end
+  end
+end
+# => JSON containing "foo" and "bar" as root keys
+```
+
 ### Serializable Hash
 
 Instead of serializing to JSON, you can also output a Hash by calling `serializable_hash` or the `to_h` alias. Note also that the `serialize` method is aliased as `to_json`.

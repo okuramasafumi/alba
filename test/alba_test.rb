@@ -269,4 +269,23 @@ class AlbaTest < Minitest::Test
       Alba.inferring
     end
   end
+
+  def test_inline_serialization_for_multiple_root_keys
+    user = @user
+    profile = user.profile
+    assert_equal(
+      '{"key1":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]},"key2":{"email":"test@example.com"}}',
+      Alba.serialize do
+        attribute :key1 do
+          UserResource.new(user).to_h
+        end
+
+        attribute :key2 do
+          Alba.hashify(profile) do
+            attributes :email
+          end
+        end
+      end
+    )
+  end
 end
