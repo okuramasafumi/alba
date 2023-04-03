@@ -44,11 +44,21 @@ module Alba
     # @param block [Block] resource block
     # @return [String] serialized JSON string
     # @raise [ArgumentError] if block is absent or `with` argument's type is wrong
-    def serialize(object, root_key: nil, &block)
-      klass = block ? resource_class(&block) : infer_resource_class(object.class.name)
-
-      resource = klass.new(object)
+    def serialize(object = nil, root_key: nil, &block)
+      resource = resource_with(object, &block)
       resource.serialize(root_key: root_key)
+    end
+
+    # Hashify the object with inline definitions
+    #
+    # @param object [Object] the object to be serialized
+    # @param root_key [Symbol, nil, true]
+    # @param block [Block] resource block
+    # @return [String] serialized JSON string
+    # @raise [ArgumentError] if block is absent or `with` argument's type is wrong
+    def hashify(object = nil, root_key: nil, &block)
+      resource = resource_with(object, &block)
+      resource.as_json(root_key: root_key)
     end
 
     # Enable inference for key and resource name
@@ -138,6 +148,13 @@ module Alba
     end
 
     private
+
+    # This method could be part of public API, but for now it's private
+    def resource_with(object, &block)
+      klass = block ? resource_class(&block) : infer_resource_class(object.class.name)
+
+      klass.new(object)
+    end
 
     def inflector_from(name_or_module)
       case name_or_module
