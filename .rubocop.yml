@@ -4,6 +4,7 @@ inherit_gem:
   rubocop-sensible: 'config/rubocop.yml'
 
 require:
+  - rubocop-md
   - rubocop-minitest
   - rubocop-performance
   - rubocop-rake
@@ -85,8 +86,16 @@ Style/Copyright:
 Style/DisableCopsWithinSourceCodeDirective:
   Enabled: false
 
+Style/DocumentationMethod:
+  Exclude:
+    - 'README.md'
+
 Style/FrozenStringLiteralComment:
   Enabled: false
+
+Style/ImplicitRuntimeError:
+  Exclude:
+    - 'README.md'
 
 Style/InlineComment:
   Enabled: false
@@ -100,3 +109,7 @@ Style/MethodCallWithArgsParentheses:
 # There are so many cases we just want `if` expression!
 Style/MissingElse:
   EnforcedStyle: case
+
+Style/OptionalBooleanParameter:
+  Exclude:
+    - 'README.md'

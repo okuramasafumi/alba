@@ -143,8 +143,8 @@ Alba.inflector = nil
 To check if inference is enabled etc, inspect the return value of `inflector`:
 
 ```ruby
-if Alba.inflector == nil
-  puts "inflector not set"
+if Alba.inflector.nil?
+  puts 'inflector not set'
 else
   puts "inflector is set to #{Alba.inflector}"
 end
@@ -171,6 +171,7 @@ You can define attributes with (yes) `attributes` macro with attribute names. If
 ```ruby
 class User
   attr_accessor :id, :name, :email, :created_at, :updated_at
+
   def initialize(id, name, email)
     @id = id
     @name = name
@@ -370,11 +371,11 @@ class UserResource
 
   # Second proc works as a filter
   many :articles,
-    proc { |articles, params, user|
-      filter = params[:filter] || :odd?
-      articles.select {|a| a.id.send(filter) && !user.banned  }
-    },
-    resource: ArticleResource
+       proc { |articles, params, user|
+         filter = params[:filter] || :odd?
+         articles.select { |a| a.id.__send__(filter) && !user.banned }
+       },
+       resource: ArticleResource
 end
 
 user = User.new(1)
@@ -398,8 +399,8 @@ class UserResource
   attributes :id
 
   many :articles,
-    key: 'my_articles', # Set key here
-    resource: ArticleResource
+       key: 'my_articles', # Set key here
+       resource: ArticleResource
 end
 UserResource.new(user).serialize
 # => '{"id":1,"my_articles":[{"title":"Hello World!"}]}'
@@ -466,7 +467,7 @@ class FooResourceWithParamsOverride
 
   root_key :foo
 
-  one :bar, resource: BarResource, params: { expose_secret: false }
+  one :bar, resource: BarResource, params: {expose_secret: false}
 end
 
 Baz = Struct.new(:data, :secret)
@@ -577,7 +578,7 @@ end
 # => JSON containing "key1" and "key2" as root keys
 ```
 
-Note that we must use `to_h`, not `serialize`, with resources. 
+Note that we must use `to_h`, not `serialize`, with resources.
 
 We can also generate a JSON with multiple root keys without making any class by the combination of `Alba.serialize` and `Alba.hashify`.
 
@@ -852,20 +853,15 @@ A custom inflector can be plugged in as follows.
 module CustomInflector
   module_function
 
-  def camelize(string)
-  end
+  def camelize(string); end
 
-  def camelize_lower(string)
-  end
+  def camelize_lower(string); end
 
-  def dasherize(string)
-  end
+  def dasherize(string); end
 
-  def underscore(string)
-  end
+  def underscore(string); end
 
-  def classify(string)
-  end
+  def classify(string); end
 end
 
 Alba.inflector = CustomInflector
@@ -982,7 +978,7 @@ class User
   end
 
   def email
-    raise RuntimeError, 'Error!'
+    raise 'Error!'
   end
 end
 
@@ -1178,8 +1174,10 @@ Sometimes we want to serialize a collection into a Hash, not an Array. It's poss
 ```ruby
 class User
   attr_reader :id, :name
+
   def initialize(id, name)
-    @id, @name = id, name
+    @id = id
+    @name = name
   end
 end
 
@@ -1345,8 +1343,8 @@ module AlbaExtension
   # Here attrs are an Array of Symbol
   def formatted_time_attributes(*attrs)
     attrs.each do |attr|
-      attribute attr do |object|
-        time = object.send(attr)
+      attribute(attr) do |object|
+        time = object.__send__(attr)
         time.strftime('%m/%d/%Y')
       end
     end
@@ -1403,13 +1401,14 @@ Alba currently doesn't support logging directly, but you can add your own loggin
 
 ```ruby
 module Logging
-  def serialize(...) # `...` was added in Ruby 2.7
+  # `...` was added in Ruby 2.7
+  def serialize(...)
     puts serializable_hash
     super(...)
   end
 end
 
-FooResource.prepend Logging
+FooResource.prepend(Logging)
 FooResource.new(foo).serialize
 # => "{:id=>1}" is printed
 ```
