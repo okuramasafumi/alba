@@ -3,6 +3,10 @@
 inherit_gem:
   rubocop-sensible: 'config/rubocop.yml'
 
+inherit_mode:
+  merge:
+    - Exclude
+
 require:
   - rubocop-md
   - rubocop-minitest
@@ -85,6 +89,10 @@ Style/Copyright:
 # I know what I do :)
 Style/DisableCopsWithinSourceCodeDirective:
   Enabled: false
+
+Style/Documentation:
+  Exclude:
+    - 'test/**/*'
 
 Style/DocumentationMethod:
   Exclude:
