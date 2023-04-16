@@ -17,6 +17,7 @@ Class methods (DSL):
 * `attribute` for block style attribute
 * `attributes` for symbol style attribute
 * `association` and its aliases such as `one` for association
+* `nested` for nested attribute
 
 Instance methods:
 
