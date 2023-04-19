@@ -174,4 +174,32 @@ class ParamsTest < MiniTest::Test
       AnotherUserResource.new(user).serialize
     )
   end
+
+  class UserResourceWithNestedAttribute
+    include Alba::Resource
+
+    root_key :user
+
+    nested :timestamps do
+      attribute :created_at do |user|
+        user.created_at.getlocal(params[:timezone_offset]).strftime('%H:%M')
+      end
+
+      attribute :updated_at do |user|
+        user.updated_at.getlocal(params[:timezone_offset]).strftime('%H:%M')
+      end
+    end
+  end
+
+  def test_params_goes_down_to_nested_attributes
+    user = User.new(1, 'Masafumi OKURA', 'test@example.org')
+
+    user_created_at_in_tz = user.created_at.getlocal('-20:00').strftime('%H:%M')
+    user_updated_at_in_tz = user.updated_at.getlocal('-20:00').strftime('%H:%M')
+
+    assert_equal(
+      "{\"user\":{\"timestamps\":{\"created_at\":\"#{user_created_at_in_tz}\",\"updated_at\":\"#{user_updated_at_in_tz}\"}}}",
+      UserResourceWithNestedAttribute.new(user, params: {timezone_offset: '-20:00'}).serialize
+    )
+  end
 end
