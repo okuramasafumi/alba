@@ -8,12 +8,14 @@ module Alba
       @block = block
     end
 
-    # @return [Hash]
-    def value(object)
+    # @param object [Object] the object being serialized
+    # @param params [Hash] params Hash inherited from Resource
+    # @return [Hash] hash serialized from running the class body in the object
+    def value(object:, params:)
       resource_class = Alba.resource_class
       resource_class.transform_keys(@key_transformation)
       resource_class.class_eval(&@block)
-      resource_class.new(object).serializable_hash
+      resource_class.new(object, params: params).serializable_hash
     end
   end
 end
