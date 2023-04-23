@@ -17,15 +17,21 @@ module Alba
     WITHIN_DEFAULT = Object.new.freeze
     private_constant :WITHIN_DEFAULT
 
+    # `setup` method is meta-programmatically defined here for performance.
     # @private
-    def self.included(base)
+    def self.included(base) # rubocop:disable Metrics/MethodLength
       super
+      setup_method_body = 'private def _setup;'
       base.class_eval do
         # Initialize
         DSLS.each do |name, initial|
           instance_variable_set("@#{name}", initial.dup) unless instance_variable_defined?("@#{name}")
+          setup_method_body << "@#{name} = self.class.#{name};"
         end
+        base.define_method(:encode, Alba.encoder)
       end
+      setup_method_body << 'end'
+      base.class_eval(setup_method_body, __FILE__, __LINE__ + 1)
       base.include InstanceMethods
       base.extend ClassMethods
     end
@@ -41,7 +47,7 @@ module Alba
         @object = object
         @params = params
         @within = within
-        DSLS.each_key { |name| instance_variable_set("@#{name}", self.class.__send__(name)) }
+        _setup
       end
 
       # Serialize object into JSON string
@@ -99,10 +105,6 @@ module Alba
       alias to_h serializable_hash
 
       private
-
-      def encode(hash)
-        Alba.encoder.call(hash)
-      end
 
       def _to_json(root_key, meta, options)
         options.reject! { |k, _| %i[layout prefixes template status].include?(k) } # Rails specific guard
