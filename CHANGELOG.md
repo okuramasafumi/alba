@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] 2023-04-24
+
+### Added
+
+- Add compatibility option for key [#304](https://github.com/okuramasafumi/alba/pull/304)
+- It now infers resource name from Serializer [#309](https://github.com/okuramasafumi/alba/pull/309)
+- `Alba.serialize` is easier to use for multiple root keys [#311](https://github.com/okuramasafumi/alba/pull/311)
+- Gives access to params in nested_attribute [#312](https://github.com/okuramasafumi/alba/pull/312)
+  - Thank you, @GabrielErbetta
+
 ## [2.2.0] 2023-02-17
 
 ### Added
