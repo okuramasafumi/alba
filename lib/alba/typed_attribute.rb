@@ -1,5 +1,6 @@
 module Alba
   # Representing typed attributes to encapsulate logic about types
+  # @api private
   class TypedAttribute
     # @param name [Symbol, String]
     # @param type [Symbol, Class]

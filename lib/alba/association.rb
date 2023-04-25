@@ -1,8 +1,10 @@
 module Alba
   # Representing association
+  # @api private
   class Association
     @const_cache = {}
     class << self
+      # cache for `const_get`
       attr_reader :const_cache
     end
 

@@ -3,6 +3,7 @@ require 'forwardable'
 
 module Alba
   # Layout serialization
+  # @api private
   class Layout
     extend Forwardable
 

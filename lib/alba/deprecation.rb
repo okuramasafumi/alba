@@ -1,5 +1,6 @@
 module Alba
   # Module for printing deprecation warning
+  # @api private
   module Deprecation
     # Similar to {Kernel.warn} but prints caller as well
     #

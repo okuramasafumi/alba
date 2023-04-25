@@ -1,5 +1,6 @@
 module Alba
   # Representing nested attribute
+  # @api private
   class NestedAttribute
     # @param key_transformation [Symbol] determines how to transform keys
     # @param block [Proc] class body
