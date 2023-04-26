@@ -11,17 +11,17 @@ module Alba
   # Another is that `ActiveSupport::Inflector` doesn't have `camelize_lower` method that we want it to have, so this module works as an adapter.
   module DefaultInflector
     class << self
-      # @!method camelize
+      # @!method camelize(key)
       #   @see https://api.rubyonrails.org/classes/ActiveSupport/Inflector.html#method-i-camelize ActiveSupport::Inflector#camelize
-      # @!method dasherize
+      # @!method dasherize(key)
       #   @see https://api.rubyonrails.org/classes/ActiveSupport/Inflector.html#method-i-dasherize ActiveSupport::Inflector#dasherize
-      # @!method underscore
+      # @!method underscore(key)
       #   @see https://api.rubyonrails.org/classes/ActiveSupport/Inflector.html#method-i-underscore ActiveSupport::Inflector#underscore
-      # @!method classify
+      # @!method classify(key)
       #   @see https://api.rubyonrails.org/classes/ActiveSupport/Inflector.html#method-i-classify ActiveSupport::Inflector#classify
-      # @!method demodulize
+      # @!method demodulize(key)
       #   @see https://api.rubyonrails.org/classes/ActiveSupport/Inflector.html#method-i-demodulize ActiveSupport::Inflector#demodulize
-      # @!method pluralize
+      # @!method pluralize(key)
       #   @see https://api.rubyonrails.org/classes/ActiveSupport/Inflector.html#method-i-pluralize ActiveSupport::Inflector#pluralize
       delegate :camelize, :dasherize, :underscore, :classify, :demodulize, :pluralize, to: ActiveSupport::Inflector
     end
