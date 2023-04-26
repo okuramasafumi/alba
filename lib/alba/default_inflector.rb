@@ -2,7 +2,7 @@ begin
   require 'active_support/inflector'
   require 'active_support/core_ext/module/delegation'
 rescue LoadError
-  raise ::Alba::Error, 'To use default inflector, please install `ActiveSupport` gem.'
+  raise Alba::Error, 'To use default inflector, please install `ActiveSupport` gem.'
 end
 
 module Alba
