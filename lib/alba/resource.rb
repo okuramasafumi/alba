@@ -80,7 +80,7 @@ module Alba
         end
       end
 
-      # Returns a Hash correspondng {Resource#serialize}
+      # Returns a Hash correspondng {#serialize}
       #
       # @param root_key [Symbol, nil, true]
       # @param meta [Hash] metadata for this seialization

@@ -66,7 +66,7 @@ module Alba
     # @param with [Symbol, Class, Module] inflector
     #   When it's a Symbol, it sets inflector with given name
     #   When it's a Class or a Module, it sets given object to inflector
-    # @deprecated Use {#inflector=} instead
+    # @deprecated Use {.inflector=} instead
     def enable_inference!(with:)
       Alba::Deprecation.warn('Alba.enable_inference! is deprecated. Use `Alba.inflector=` instead.')
       @inflector = inflector_from(with)
@@ -75,14 +75,14 @@ module Alba
 
     # Disable inference for key and resource name
     #
-    # @deprecated Use {#inflector=} instead
+    # @deprecated Use {.inflector=} instead
     def disable_inference!
       Alba::Deprecation.warn('Alba.disable_inference! is deprecated. Use `Alba.inflector = nil` instead.')
       @inferring = false
       @inflector = nil
     end
 
-    # @deprecated Use {#inflector} instead
+    # @deprecated Use {.inflector} instead
     # @return [Boolean] whether inference is enabled or not
     def inferring
       Alba::Deprecation.warn('Alba.inferring is deprecated. Use `Alba.inflector` instead.')

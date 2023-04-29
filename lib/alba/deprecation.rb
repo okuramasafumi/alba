@@ -2,7 +2,7 @@ module Alba
   # Module for printing deprecation warning
   # @api private
   module Deprecation
-    # Similar to {Kernel.warn} but prints caller as well
+    # Similar to {#warn} but prints caller as well
     #
     # @param message [String] main message to print
     # @return void
