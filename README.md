@@ -11,6 +11,40 @@
 
 Alba is a JSON serializer for Ruby, JRuby, and TruffleRuby.
 
+## TL;DR
+
+Alba allows you to do something like below.
+
+```ruby
+class User
+  attr_accessor :id, :name, :email
+
+  def initialize(id, name, email)
+    @id = id
+    @name = name
+    @email = email
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  root_key :user
+
+  attributes :id, :name
+
+  attribute :name_with_email do |resource|
+    "#{resource.name}: #{resource.email}"
+  end
+end
+
+user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
+UserResource.new(user).serialize
+# => '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}'
+```
+
+Seems useful? Continue reading!
+
 ## Discussions
 
 Alba uses [GitHub Discussions](https://github.com/okuramasafumi/alba/discussions) to openly discuss the project.
