@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = Gem::Requirement.new('>= 2.7.0')
 
   spec.metadata = {
-    'bug_tracker_uri' => 'https://github.com/okuramasafumi/issues',
+    'bug_tracker_uri' => 'https://github.com/okuramasafumi/alba/issues',
     'changelog_uri' => 'https://github.com/okuramasafumi/alba/blob/main/CHANGELOG.md',
     'documentation_uri' => 'https://rubydoc.info/github/okuramasafumi/alba',
     'source_code_uri' => 'https://github.com/okuramasafumi/alba',
