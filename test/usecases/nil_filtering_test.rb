@@ -18,7 +18,7 @@ class NilFilteringTest < MiniTest::Test
 
     attributes :id, :name, :email
 
-    def select(_k, v)
+    def select(_k, v) # rubocop:disable Naming/MethodParameterName
       !v.nil?
     end
   end
