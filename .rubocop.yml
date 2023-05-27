@@ -73,6 +73,11 @@ Metrics/ParameterLists:
 Minitest/EmptyLineBeforeAssertionMethods:
   Enabled: false
 
+# By nature of that test
+Minitest/NoTestCases:
+  Exclude:
+    - 'test/dependencies/test_dependencies.rb'
+
 # We need to eval resource code to test errors on resource classes
 Security/Eval:
   Exclude:
