@@ -1,7 +1,7 @@
 ---
 
 inherit_gem:
-  rubocop-sensible: 'config/rubocop.yml'
+  rubocop-gem_dev: 'config/rubocop.yml'
 
 inherit_mode:
   merge:
@@ -31,6 +31,10 @@ Bundler/GemVersion:
 Layout/ClassStructure:
   Exclude:
     - 'test/**/*'
+
+# LineLength 80 comes from restrictions in good old days.
+Layout/LineLength:
+  Max: 160
 
 # We'd like to write something like:
 #   assert_equal(

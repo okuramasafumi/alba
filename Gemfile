@@ -10,11 +10,11 @@ gem 'minitest', '~> 5.14' # For test
 gem 'railties', require: false # For Rails integration testing
 gem 'rake', '~> 13.0' # For test and automation
 gem 'rubocop', '>= 0.79.0', require: false # For lint
+gem 'rubocop-gem_dev', '>= 0.3.0', require: false # For lint
 gem 'rubocop-md', '~> 1.0', require: false # For lint
 gem 'rubocop-minitest', '>= 0.25.0', require: false # For lint
 gem 'rubocop-performance', '>= 1.15.0', require: false # For lint
 gem 'rubocop-rake', '>= 0.5.1', require: false # For lint
-gem 'rubocop-sensible', '~> 0.3.0', require: false # For lint
 gem 'ruby-lsp', require: false # For language server
 gem 'simplecov', '~> 0.22.0', require: false # For test coverage
 gem 'simplecov-cobertura', require: false # For test coverage
