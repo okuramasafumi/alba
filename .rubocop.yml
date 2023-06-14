@@ -18,6 +18,7 @@ AllCops:
     - 'Rakefile'
     - 'alba.gemspec'
     - 'benchmark/**/*.rb'
+    - 'docs/**/*'
     - 'script/**/*.rb'
   NewCops: enable
   EnabledByDefault: true
