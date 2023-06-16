@@ -116,7 +116,7 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Error handling
 * Nil handling
 * Circular associations control
-* [Experimental] Types for validation and conversion
+* Types for validation and conversion
 * Layout
 * No runtime dependencies
 
