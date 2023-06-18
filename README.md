@@ -1104,6 +1104,11 @@ UserResource.new(User.new(1)).serialize
 # => '{"user":{"id":1,"name":"User1","age":20}}'
 ```
 
+Note that `on_nil` does NOT work when the given object itself is `nil`. There are a few possible ways to deal with `nil`.
+
+- Use `if` statement and avoid using Alba when the object is `nil`
+- Use "Null Object" pattern
+
 ### Metadata
 
 You can set a metadata with `meta` DSL or `meta` option.
