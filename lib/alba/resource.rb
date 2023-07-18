@@ -11,7 +11,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil}.freeze # rubocop:disable Layout/LineLength
+    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil}.freeze # rubocop:disable Layout/LineLength
     private_constant :DSLS
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -260,8 +260,7 @@ module Alba
                 when TypedAttribute then attribute.value(obj)
                 when NestedAttribute then attribute.value(object: obj, params: params)
                 when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: obj) { |attr| fetch_attribute(obj, key, attr) }
-                else
-                  raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
+                else raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
                 end
         value.nil? && nil_handler ? instance_exec(obj, key, attribute, &nil_handler) : value
       end
@@ -374,8 +373,7 @@ module Alba
       def association(name, condition = nil, resource: nil, key: nil, params: {}, **options, &block)
         key_transformation = @_key_transformation_cascade ? @_transform_type : :none
         assoc = Association.new(
-          name: name, condition: condition, resource: resource, params: params, nesting: nesting, key_transformation: key_transformation,
-&block
+          name: name, condition: condition, resource: resource, params: params, nesting: nesting, key_transformation: key_transformation, helper: @_helper, &block
         )
         @_attributes[key&.to_sym || name.to_sym] = options[:if] ? ConditionalAttribute.new(body: assoc, condition: options[:if]) : assoc
       end
@@ -502,6 +500,15 @@ module Alba
       # @param block [Block]
       def on_nil(&block)
         @_on_nil = block
+      end
+
+      # Define helper methods
+      #
+      # @param mod [Module] a module to extend
+      def helper(mod = @_helper || Module.new, &block)
+        mod.module_eval(&block) if block
+        extend mod
+        @_helper = mod
       end
     end
   end
