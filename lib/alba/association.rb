@@ -16,15 +16,16 @@ module Alba
     # @param params [Hash] params override for the association
     # @param nesting [String] a namespace where source class is inferred with
     # @param key_transformation [Symbol] key transformation type
+    # @param helper [Module] helper module to include
     # @param block [Block] used to define resource when resource arg is absent
-    def initialize(name:, condition: nil, resource: nil, params: {}, nesting: nil, key_transformation: :none, &block)
+    def initialize(name:, condition: nil, resource: nil, params: {}, nesting: nil, key_transformation: :none, helper: nil, &block)
       @name = name
       @condition = condition
       @resource = resource
       @params = params
       return if @resource
 
-      assign_resource(nesting, key_transformation, block)
+      assign_resource(nesting, key_transformation, block, helper)
     end
 
     # Recursively converts an object into a Hash
@@ -61,9 +62,10 @@ module Alba
       end
     end
 
-    def assign_resource(nesting, key_transformation, block)
+    def assign_resource(nesting, key_transformation, block, helper) # rubocop:disable Metrics/MethodLength
       @resource = if block
                     klass = Alba.resource_class
+                    klass.helper(helper) if helper
                     klass.transform_keys(key_transformation)
                     klass.class_eval(&block)
                     klass
