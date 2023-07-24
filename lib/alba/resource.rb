@@ -265,10 +265,21 @@ module Alba
         value.nil? && nil_handler ? instance_exec(obj, key, attribute, &nil_handler) : value
       end
 
+      # TODO: from version 3, `_fetch_attribute_from_resource_first` is default
       def fetch_attribute_from_object_and_resource(obj, attribute)
+        _fetch_attribute_from_object_first(obj, attribute)
+      end
+
+      def _fetch_attribute_from_object_first(obj, attribute)
         obj.__send__(attribute)
       rescue NoMethodError
         __send__(attribute, obj)
+      end
+
+      def _fetch_attribute_from_resource_first(obj, attribute)
+        __send__(attribute, obj)
+      rescue NoMethodError
+        obj.__send__(attribute)
       end
 
       def nil_handler
@@ -509,6 +520,16 @@ module Alba
         mod.module_eval(&block) if block
         extend mod
         @_helper = mod
+      end
+
+      # DSL for alias, purely for readability
+      def prefer_resource_method!
+        alias_method :fetch_attribute_from_object_and_resource, :_fetch_attribute_from_resource_first
+      end
+
+      # DSL for alias, purely for readability
+      def prefer_object_method!
+        alias_method :fetch_attribute_from_object_and_resource, :_fetch_attribute_from_object_first
       end
     end
   end
