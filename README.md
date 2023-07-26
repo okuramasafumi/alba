@@ -1338,12 +1338,12 @@ In case you don't want to have a file for layout, Alba lets you define and apply
 ```ruby
 class FooResource
   include Alba::Resource
-  layout inline: proc do
+  layout inline: proc {
     {
       header: 'my header',
       body: serializable_hash
     }
-  end
+  }
 end
 ```
 
@@ -1354,12 +1354,12 @@ You can also use a Proc which returns String, not a Hash, for an inline layout.
 ```ruby
 class FooResource
   include Alba::Resource
-  layout inline: proc do
+  layout inline: proc {
     %({
       "header": "my header",
       "body": #{serialized_json}
     })
-  end
+  }
 end
 ```
 
