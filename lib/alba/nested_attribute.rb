@@ -15,6 +15,7 @@ module Alba
     def value(object:, params:)
       resource_class = Alba.resource_class
       resource_class.transform_keys(@key_transformation)
+      resource_class.define_singleton_method(:params) { params }
       resource_class.class_eval(&@block)
       resource_class.new(object, params: params).serializable_hash
     end

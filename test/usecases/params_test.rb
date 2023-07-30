@@ -202,4 +202,29 @@ class ParamsTest < MiniTest::Test
       UserResourceWithNestedAttribute.new(user, params: {timezone_offset: '-18:00'}).serialize
     )
   end
+
+  class ArticleResourceWithNestedAttribute
+    include Alba::Resource
+
+    nested :nested do
+      result_of_expensive_calculation = params[:salt] + 2
+
+      attribute :foo do
+        result_of_expensive_calculation
+      end
+
+      attribute :bar do |article|
+        result_of_expensive_calculation + article.body.size
+      end
+    end
+  end
+
+  def test_params_inside_nested_attributes
+    article = Article.new(1, "a", "b")
+
+    assert_equal(
+      "{\"nested\":{\"foo\":42,\"bar\":43}}",
+      ArticleResourceWithNestedAttribute.new(article, params: {salt: 40}).serialize
+    )
+  end
 end
