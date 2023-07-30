@@ -10,7 +10,7 @@ module Alba
       @type = type
       @converter = case converter
                    when true then default_converter
-                   when false, nil then null_converter
+                   when false, nil then find_converter
                    else converter
                    end
     end
@@ -33,7 +33,7 @@ module Alba
                      when :Integer, ->(klass) { klass == Integer } then value.is_a?(Integer)
                      when :Boolean then [true, false].include?(value)
                      else
-                       raise Alba::UnsupportedType, "Unknown type: #{@type}"
+                       check_custom_types(value)
                      end
       [value, type_correct]
     end
@@ -47,16 +47,32 @@ module Alba
       when :Boolean
         ->(object) { !!object }
       else
-        raise Alba::UnsupportedType, "Unknown type: #{@type}"
+        converter_for_custom_types
       end
     end
 
-    def null_converter
-      ->(_) { raise TypeError }
+    def find_converter
+      if custom_type
+        converter_for_custom_types
+      else
+        ->(_) { raise TypeError }
+      end
     end
 
     def display_value_for(value)
       value.nil? ? 'nil' : value.class.name
+    end
+
+    def check_custom_types(value)
+      custom_type ? custom_type.check(value) : raise(Alba::UnsupportedType, "Unknown type: #{@type}")
+    end
+
+    def converter_for_custom_types
+      ->(object) { custom_type.convert(object) }
+    end
+
+    def custom_type
+      @custom_type ||= Alba.types.find { |t| t.name == @type }
     end
   end
 end

@@ -14,6 +14,8 @@ module Alba
     # Getter for inflector, a module responsible for inflecting strings
     attr_reader :inflector
 
+    attr_reader :types
+
     # Set the backend, which actually serializes object into JSON
     #
     # @param backend [#to_sym, nil] the name of the backend
@@ -142,6 +144,14 @@ module Alba
       @symbolize_keys ? key.to_sym : key.to_s
     end
 
+    # Register types, used for both builtin and custom types
+    #
+    # @see Alba::Type
+    # @return [void]
+    def register_type(name, check: false, convert: nil, auto_convert: false)
+      @types << Type.new(name, check: check, convert: convert, auto_convert: auto_convert)
+    end
+
     # Reset config variables
     # Useful for test cleanup
     def reset!
@@ -149,6 +159,7 @@ module Alba
       @symbolize_keys = false
       @_on_error = :raise
       @_on_nil = nil
+      @types = []
     end
 
     private
