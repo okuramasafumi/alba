@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class FieldSelectionTest < MiniTest::Test
+class FieldSelectionTest < Minitest::Test
   module FieldSelection
     def field_when_selected(*attrs, key:)
       attrs.each do |attr|

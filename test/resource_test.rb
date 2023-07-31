@@ -1,6 +1,6 @@
 require_relative 'test_helper'
 
-class ResourceTest < MiniTest::Test
+class ResourceTest < Minitest::Test
   class Foo
     attr_accessor :id, :bars
   end

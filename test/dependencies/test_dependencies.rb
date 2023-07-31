@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class DependenciesTest < MiniTest::Test
+class DependenciesTest < Minitest::Test
   class User
     attr_reader :first_name, :last_name
 

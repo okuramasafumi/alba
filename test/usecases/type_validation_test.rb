@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class TypeValidationTest < MiniTest::Test
+class TypeValidationTest < Minitest::Test
   class User
     attr_reader :id, :name, :age, :bio, :admin, :created_at
 

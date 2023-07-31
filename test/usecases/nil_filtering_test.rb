@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class NilFilteringTest < MiniTest::Test
+class NilFilteringTest < Minitest::Test
   class User
     attr_accessor :id, :name, :email, :created_at, :updated_at
 

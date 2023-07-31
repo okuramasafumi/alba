@@ -3,7 +3,7 @@ require 'rails'
 require_relative '../test_helper'
 require 'alba/railtie'
 
-class RailtiesTest < MiniTest::Test
+class RailtiesTest < Minitest::Test
   def test_railties
     Alba::Railtie.run_initializers
     assert_equal Alba::DefaultInflector, Alba.inflector

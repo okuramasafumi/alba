@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class OneTest < MiniTest::Test
+class OneTest < Minitest::Test
   def teardown
     Alba.inflector = :active_support
   end

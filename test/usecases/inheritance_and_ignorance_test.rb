@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class InheritanceAndIgnoranceTest < MiniTest::Test
+class InheritanceAndIgnoranceTest < Minitest::Test
   class Foo
     attr_accessor :id, :name, :body
 

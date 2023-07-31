@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class ManyTest < MiniTest::Test
+class ManyTest < Minitest::Test
   class User
     attr_accessor :id, :created_at, :updated_at, :articles
 

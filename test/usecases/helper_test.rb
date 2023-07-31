@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class HelperTest < MiniTest::Test
+class HelperTest < Minitest::Test
   class Library
     def id
       1

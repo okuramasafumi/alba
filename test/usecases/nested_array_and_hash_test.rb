@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class HashAttributeTest < MiniTest::Test
+class HashAttributeTest < Minitest::Test
   class Foo
     attr_reader :id, :config
     attr_accessor :bars

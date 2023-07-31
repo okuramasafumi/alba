@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class OnErrorTest < MiniTest::Test
+class OnErrorTest < Minitest::Test
   class User
     attr_accessor :id, :name, :created_at, :updated_at
 

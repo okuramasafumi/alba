@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class ConditionalAttributesTest < MiniTest::Test
+class ConditionalAttributesTest < Minitest::Test
   class User
     attr_accessor :id, :name, :profile, :articles
 

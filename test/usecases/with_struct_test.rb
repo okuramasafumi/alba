@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class WithStructTest < MiniTest::Test
+class WithStructTest < Minitest::Test
   User = Struct.new(:id, :name)
   private_constant :User
 

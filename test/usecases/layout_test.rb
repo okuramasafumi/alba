@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class LayoutTest < MiniTest::Test
+class LayoutTest < Minitest::Test
   class User
     attr_accessor :id, :name, :email
 

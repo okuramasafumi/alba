@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class UserDefinedSerializableHashTest < MiniTest::Test
+class UserDefinedSerializableHashTest < Minitest::Test
   class Foo
     attr_accessor :id, :name
 

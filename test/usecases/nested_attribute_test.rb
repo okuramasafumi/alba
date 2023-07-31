@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class NestedAttributeTest < MiniTest::Test
+class NestedAttributeTest < Minitest::Test
   class User
     attr_accessor :id, :name, :email, :city, :zipcode
 
