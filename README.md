@@ -1367,6 +1367,49 @@ It looks similar to file layout but you must use string interpolation for method
 
 Also note that we use percentage notation here to use double quotes. Using single quotes in inline string layout causes the error which might be resolved in other ways.
 
+### Helper
+
+Inheritance works well in most of the cases to share behaviors. One of the exceptions is when you want to shared behaviors with inline association. For example:
+
+```ruby
+class ApplicationResource
+  include Alba::Resource
+
+  def self.with_id
+    attributes :id
+  end
+end
+
+class LibraryResource < ApplicationResource
+  with_id
+  attributes :created_at
+
+  with_many :library_books do
+    with_id # This DOES NOT work!
+    attributes :created_at
+  end
+end
+```
+
+This doesn't work. Technically, inside of `has_many` is a separate class which doesn't inherit from the base class (`LibraryResource` in this example).
+
+`helper` solves this problem. It's just a mark for methods that should be shared with inline associations.
+
+```ruby
+class ApplicationResource
+  include Alba::Resource
+
+  helper do
+    def with_id
+      attributes :id
+    end
+  end
+end
+# Now `LibraryResource` works!
+```
+
+Within `helper` block, all methods should be defined without `self.`.
+
 ### Caching
 
 Currently, Alba doesn't support caching, primarily due to the behavior of `ActiveRecord::Relation`'s cache. See [the issue](https://github.com/rails/rails/issues/41784).
