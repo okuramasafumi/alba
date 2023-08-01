@@ -397,7 +397,7 @@ module Alba
         if name.nil?
           nil
         else
-          name.rpartition('::').first.tap { |n| n.empty? ? nil : n }
+          name.rpartition('::').first.then { |n| n.empty? ? nil : n }
         end
       end
       private :nesting
