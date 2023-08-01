@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] 2023-08-02
+
+### Added
+
+- Implement helper [#322](https://github.com/okuramasafumi/alba/pull/322)
+- Add `prefer_resource_method!` [#323](https://github.com/okuramasafumi/alba/pull/323)
+
+### Fixed
+
+- Fix the bug of resource name inference [No PR](https://github.com/okuramasafumi/alba/commit/dab7091efa4a76ce9e538e08efa7349c296a705c)
+
 ## [2.3.0] 2023-04-24
 
 ### Added
