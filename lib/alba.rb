@@ -114,7 +114,11 @@ module Alba
       raise Alba::Error, 'Inference is disabled so Alba cannot infer resource name. Set inflector before use.' unless Alba.inflector
 
       const_parent = nesting.nil? ? Object : Object.const_get(nesting)
-      const_parent.const_get("#{inflector.classify(name)}Resource")
+      begin
+        const_parent.const_get("#{inflector.classify(name)}Resource")
+      rescue # Retry for serializer
+        const_parent.const_get("#{inflector.classify(name)}Serializer")
+      end
     end
 
     # Configure Alba to symbolize keys
