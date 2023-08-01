@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.1] 2023-08-02
+
+#### Fixed
+
+- Fix the bug of resource name inference for classes whose name end with "Serializer" [No PR](https://github.com/okuramasafumi/alba/commit/1695af4351981725231fd071aaef5b2e4174fb26)
+
 ## [2.4.0] 2023-08-02
 
 ### Added
