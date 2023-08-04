@@ -83,6 +83,12 @@ Alba is easy to use because there are only a few methods to remember. It's also 
 
 While Alba's core is simple, it provides additional features when you need them, For example, Alba provides [a way to control circular associations](#circular-associations-control), [root key and association resource name inference](#root-key-and-association-resource-name-inference) and [supports layouts](#layout).
 
+### Other reasons
+
+- Dependency free, no need to install `oj` or `activesupport` while Alba works well with them
+- Well tested, the test coverage is 99%
+- Well maintained, gettings frequent update and new releases (see [version history](https://rubygems.org/gems/alba/versions))
+
 ## Installation
 
 Add this line to your application's Gemfile:
