@@ -116,7 +116,7 @@ module Alba
       const_parent = nesting.nil? ? Object : Object.const_get(nesting)
       begin
         const_parent.const_get("#{inflector.classify(name)}Resource")
-      rescue # Retry for serializer
+      rescue NameError # Retry for serializer
         const_parent.const_get("#{inflector.classify(name)}Serializer")
       end
     end
