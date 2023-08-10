@@ -22,7 +22,7 @@ AllCops:
     - 'script/**/*.rb'
   NewCops: enable
   EnabledByDefault: true
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.0
 
 # Items in Gemfile is dev dependencies and we don't have to specify versions.
 Bundler/GemVersion:
