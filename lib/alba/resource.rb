@@ -382,9 +382,9 @@ module Alba
       # @return [void]
       # @see Alba::Association#initialize
       def association(name, condition = nil, resource: nil, key: nil, params: {}, **options, &block)
-        key_transformation = @_key_transformation_cascade ? @_transform_type : :none
+        transformation = @_key_transformation_cascade ? @_transform_type : :none
         assoc = Association.new(
-          name: name, condition: condition, resource: resource, params: params, nesting: nesting, key_transformation: key_transformation, helper: @_helper, &block
+          name: name, condition: condition, resource: resource, params: params, nesting: nesting, key_transformation: transformation, helper: @_helper, &block
         )
         @_attributes[key&.to_sym || name.to_sym] = options[:if] ? ConditionalAttribute.new(body: assoc, condition: options[:if]) : assoc
       end
