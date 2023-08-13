@@ -66,6 +66,7 @@ Metrics/ClassLength:
   Exclude:
     - 'lib/alba/resource.rb'
     - 'lib/alba.rb'
+    - 'test/**/*.rb' # Neec to specify this
 
 Metrics/ModuleLength:
   Exclude:
