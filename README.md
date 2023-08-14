@@ -290,7 +290,7 @@ class User
   end
 
   def name_with_email
-    "dummy!"
+    'dummy!'
   end
 end
 
@@ -1382,7 +1382,7 @@ class ApplicationResource
   include Alba::Resource
 
   def self.with_id
-    attributes :id
+    attributes(:id)
   end
 end
 
@@ -1407,7 +1407,7 @@ class ApplicationResource
 
   helper do
     def with_id
-      attributes :id
+      attributes(:id)
     end
   end
 end

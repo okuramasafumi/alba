@@ -3,6 +3,7 @@ require_relative '../test_helper'
 class ObjectMethodAndResourceMethodTest < Minitest::Test
   class Foo
     attr_reader :id
+
     def initialize(id)
       @id = id
     end

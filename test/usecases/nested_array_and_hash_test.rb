@@ -36,7 +36,7 @@ class HashAttributeTest < Minitest::Test
     many :bars, resource: BarResource
 
     def attributes
-      @_attributes.reject { |key, _| key == :config }
+      @_attributes.except(:config)
     end
   end
 
