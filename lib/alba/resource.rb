@@ -59,25 +59,13 @@ module Alba
         serialize_with(as_json(root_key: root_key, meta: meta))
       end
 
-      if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.0')
-        # For Rails compatibility
-        # The first options is a dummy parameter but required
-        # You can pass empty Hash if you don't want to pass any arguments
-        #
-        # @see #serialize
-        # @see https://github.com/rails/rails/blob/7-0-stable/actionpack/lib/action_controller/metal/renderers.rb#L156
-        def to_json(options, root_key: nil, meta: {})
-          _to_json(root_key, meta, options)
-        end
-      else
-        # For Rails compatibility
-        # The first options is a dummy parameter
-        #
-        # @see #serialize
-        # @see https://github.com/rails/rails/blob/7-0-stable/actionpack/lib/action_controller/metal/renderers.rb#L156
-        def to_json(options = {}, root_key: nil, meta: {})
-          _to_json(root_key, meta, options)
-        end
+      # For Rails compatibility
+      # The first options is a dummy parameter
+      #
+      # @see #serialize
+      # @see https://github.com/rails/rails/blob/7-0-stable/actionpack/lib/action_controller/metal/renderers.rb#L156
+      def to_json(options = {}, root_key: nil, meta: {})
+        _to_json(root_key, meta, options)
       end
 
       # Returns a Hash correspondng {#serialize}
