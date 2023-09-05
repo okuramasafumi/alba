@@ -11,8 +11,8 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil}.freeze # rubocop:disable Layout/LineLength
-    private_constant :DSLS
+    INTERNAL_VARIABLES = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil}.freeze # rubocop:disable Layout/LineLength
+    private_constant :INTERNAL_VARIABLES
 
     WITHIN_DEFAULT = Object.new.freeze
     private_constant :WITHIN_DEFAULT
@@ -24,7 +24,7 @@ module Alba
       setup_method_body = 'private def _setup;'
       base.class_eval do
         # Initialize
-        DSLS.each do |name, initial|
+        INTERNAL_VARIABLES.each do |name, initial|
           instance_variable_set("@#{name}", initial.dup) unless instance_variable_defined?("@#{name}")
           setup_method_body << "@#{name} = self.class.#{name};"
         end
@@ -300,12 +300,12 @@ module Alba
 
     # Class methods
     module ClassMethods
-      attr_reader(*DSLS.keys)
+      attr_reader(*INTERNAL_VARIABLES.keys)
 
       # @private
       def inherited(subclass)
         super
-        DSLS.each_key { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}").clone) }
+        INTERNAL_VARIABLES.each_key { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}").clone) }
       end
 
       # Defining methods for DSLs and disable parameter number check since for users' benefits increasing params is fine
