@@ -12,7 +12,8 @@ module Alba
 
     # @param name [Symbol, String] name of the method to fetch association
     # @param condition [Proc, nil] a proc filtering data
-    # @param resource [Class<Alba::Resource>, nil] a resource class for the association
+    # @param resource [Class<Alba::Resource>, Proc, String, Symbol, nil]
+    #   a resource class for the association, a proc returning a resource class or a name of the resource
     # @param params [Hash] params override for the association
     # @param nesting [String] a namespace where source class is inferred with
     # @param key_transformation [Symbol] key transformation type
