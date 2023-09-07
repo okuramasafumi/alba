@@ -327,4 +327,16 @@ class ManyTest < Minitest::Test
       FolderNodeResource.new(folder).serialize
     )
   end
+
+  class WrongResource
+    include Alba::Resource
+
+    many :chars, resource: [:wrong]
+  end
+
+  def test_wrong_resource_error
+    assert_raises(Alba::Error, 'Unexpected resource type: Array') do
+      WrongResource.new('fake').serialize
+    end
+  end
 end

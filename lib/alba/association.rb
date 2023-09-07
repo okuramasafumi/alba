@@ -53,13 +53,15 @@ module Alba
     private
 
     def constantize(resource)
-      case resource # rubocop:disable Style/MissingElse
+      case resource
       when Class
         resource
       when Symbol, String
         self.class.const_cache.fetch(resource) do
           self.class.const_cache[resource] = Object.const_get(resource)
         end
+      else
+        raise Error, "Unexpected resource type: #{resource.class}"
       end
     end
 
