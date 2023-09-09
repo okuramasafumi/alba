@@ -521,4 +521,9 @@ module Alba
       end
     end
   end
+
+  Serializer = Resource
+  public_constant :Serializer
 end
+
+

@@ -105,4 +105,22 @@ class ResourceTest < Minitest::Test
       FooResource.new(@foo).serializable_hash
     )
   end
+
+  class FooSerializer
+    include Alba::Serializer
+    root_key :foo
+    attributes :id, :bar_size
+    many :bars, resource: BarResource
+
+    def bar_size(foo)
+      foo.bars.size
+    end
+  end
+
+  def test_include_serializer
+    assert_equal(
+      '{"foo":{"id":1,"bar_size":1,"bars":[{"id":1}]}}',
+      FooSerializer.new(@foo).to_json
+    )
+  end
 end
