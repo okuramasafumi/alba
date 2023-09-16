@@ -175,7 +175,7 @@ module Alba
 
     def set_encoder_from_backend
       @encoder = case @backend
-                 when :oj, :oj_strict then try_oj
+                 when :oj, :oj_strict then try_oj(mode: :strict)
                  when :oj_rails then try_oj(mode: :rails)
                  when :oj_default then try_oj(mode: :default)
                  when :active_support then try_active_support
@@ -185,7 +185,7 @@ module Alba
                  end
     end
 
-    def try_oj(mode: :strict)
+    def try_oj(mode:)
       require 'oj'
       case mode
       when :default
