@@ -136,18 +136,24 @@ Alba's configuration is fairly simple.
 
 Backend is the actual part serializing an object into JSON. Alba supports these backends.
 
-|name|description|requires_external_gem|
-|--|--|--|
-|`oj`, `oj_strict`|Using Oj in `strict` mode|Yes(C extension)|
-|`oj_rails`|It's `oj` but in `rails` mode|Yes(C extension)|
-|`oj_default`|It's `oj` but respects mode set by users|Yes(C extension)|
-|`active_support`|For Rails compatibility|Yes|
-|`default`, `json`|Using `json` gem|No|
+|name|description|requires_external_gem| encoder|
+|--|--|--|--|
+|`oj`, `oj_strict`|Using Oj in `strict` mode|Yes(C extension)|`Oj.dump(object, mode: :strict)`|
+|`oj_rails`|It's `oj` but in `rails` mode|Yes(C extension)|`Oj.dump(object, mode: :rails)`|
+|`oj_default`|It's `oj` but respects mode set by users|Yes(C extension)|`Oj.dump(object)`|
+|`active_support`|For Rails compatibility|Yes|`ActiveSupport::JSON.encode(object)`|
+|`default`, `json`|Using `json` gem|No|`JSON.generate(object)`|
 
 You can set a backend like this:
 
 ```ruby
 Alba.backend = :oj
+```
+
+This is equivalent as:
+
+```ruby
+Alba.encoder = ->(object) { Oj.dump(object, mode: :strict) }
 ```
 
 #### Encoder configuration
