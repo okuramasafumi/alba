@@ -99,6 +99,7 @@ Style/ConstantVisibility:
     - 'lib/alba/version.rb'
     - 'test/**/*.rb'
 
+# Copyright is in README
 Style/Copyright:
   Enabled: false
 
@@ -106,21 +107,26 @@ Style/Copyright:
 Style/DisableCopsWithinSourceCodeDirective:
   Enabled: false
 
+# Test files doesn't need to have documentation
 Style/Documentation:
   Exclude:
     - 'test/**/*'
 
+# In README it's so obvious
 Style/DocumentationMethod:
   Exclude:
     - 'README.md'
 
+# This might be true in the future, but not many good things
 Style/FrozenStringLiteralComment:
   Enabled: false
 
+# I don't want to think about error class in example code
 Style/ImplicitRuntimeError:
   Exclude:
     - 'README.md'
 
+# We use it, don't we?
 Style/InlineComment:
   Enabled: false
 
@@ -134,6 +140,7 @@ Style/MethodCallWithArgsParentheses:
 Style/MissingElse:
   EnforcedStyle: case
 
+# It's example code, please forgive us
 Style/OptionalBooleanParameter:
   Exclude:
     - 'README.md'
