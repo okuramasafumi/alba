@@ -58,13 +58,13 @@ class TypeValidationTest < Minitest::Test
     assert_equal 'Attribute bio is expected to be String but actually nil.', error.message
   end
 
-  class UnsupportedTypeUserResource
-    include Alba::Resource
-
-    attributes name: Symbol
-  end
-
   def test_it_raises_error_when_type_is_not_supported
-    assert_raises(Alba::UnsupportedType) { UnsupportedTypeUserResource.new(@user).serialize }
+    assert_raises(Alba::UnsupportedType) do
+      Class.new do
+        include Alba::Resource
+
+        attributes name: Symbol
+      end
+    end
   end
 end

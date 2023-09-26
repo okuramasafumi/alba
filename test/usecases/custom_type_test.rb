@@ -1,8 +1,8 @@
 require_relative '../test_helper'
 
 class CustomTypeTest < Minitest::Test
-  Alba.register_type :iso8601, convert: ->(time) { time.iso8601(3) }, auto_convert: true
-  Alba.register_type :iso8601_no_auto, convert: ->(time) { time.iso8601(3) }
+  Alba.register_type :iso8601, converter: ->(time) { time.iso8601(3) }, auto_convert: true
+  Alba.register_type :iso8601_no_auto, converter: ->(time) { time.iso8601(3) }
   Alba.register_type :less_than_three, check: ->(obj) { obj.is_a?(Integer) && obj < 3 }
 
   User = Struct.new(:id, :created_at)
@@ -19,7 +19,6 @@ class CustomTypeTest < Minitest::Test
   end
 
   def test_custom_type_with_auto_convert
-
     assert_equal(
       %({"id":1,"created_at":"#{@t.iso8601(3)}"}),
       UserResource.new(@user).serialize

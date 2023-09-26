@@ -9,12 +9,10 @@ require_relative 'alba/railtie' if defined?(Rails::Railtie)
 # Core module
 module Alba
   class << self
-    attr_reader :backend, :encoder
+    attr_reader :backend, :encoder, :types
 
     # Getter for inflector, a module responsible for inflecting strings
     attr_reader :inflector
-
-    attr_reader :types
 
     # Set the backend, which actually serializes object into JSON
     #
@@ -148,8 +146,8 @@ module Alba
     #
     # @see Alba::Type
     # @return [void]
-    def register_type(name, check: false, convert: nil, auto_convert: false)
-      @types << Type.new(name, check: check, convert: convert, auto_convert: auto_convert)
+    def register_type(name, check: false, converter: nil, auto_convert: false)
+      @types << Type.new(name, check: check, converter: converter, auto_convert: auto_convert)
     end
 
     # Reset config variables
@@ -160,6 +158,7 @@ module Alba
       @_on_error = :raise
       @_on_nil = nil
       @types = []
+      register_default_types
     end
 
     private
@@ -229,6 +228,14 @@ module Alba
       end
 
       inflector
+    end
+
+    def register_default_types # rubocop:disable Metrics/AbcSize
+      register_type(:String, check: ->(obj) { obj.is_a?(String) }, converter: ->(obj) { obj.to_s })
+      register_type(String, check: ->(obj) { obj.is_a?(String) }, converter: ->(obj) { obj.to_s })
+      register_type(:Integer, check: ->(obj) { obj.is_a?(Integer) }, converter: ->(obj) { Integer(obj) })
+      register_type(Integer, check: ->(obj) { obj.is_a?(Integer) }, converter: ->(obj) { Integer(obj) })
+      register_type(:Boolean, check: ->(obj) { [true, false].include?(obj) }, converter: ->(obj) { !!obj })
     end
   end
 
