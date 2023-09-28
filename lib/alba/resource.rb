@@ -1,6 +1,7 @@
 require_relative 'association'
 require_relative 'conditional_attribute'
 require_relative 'constants'
+require_relative 'type'
 require_relative 'typed_attribute'
 require_relative 'nested_attribute'
 require_relative 'deprecation'
