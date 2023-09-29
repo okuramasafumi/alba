@@ -7,7 +7,7 @@ module Alba
     # @param converter [Proc]
     def initialize(name:, type:, converter:)
       @name = name
-      t = real_type(type)
+      t = Alba.find_type(type)
       @type = case converter
               when true then t.dup.tap { _1.auto_convert = true }
               when false, nil then t
@@ -27,13 +27,6 @@ module Alba
     end
 
     private
-
-    def real_type(type_name)
-      result = Alba.types.find { |t| t.name == type_name }
-      raise(Alba::UnsupportedType, "Unknown type: #{type_name}") unless result
-
-      result
-    end
 
     def display_value_for(value)
       value.nil? ? 'nil' : value.class.name

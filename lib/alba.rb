@@ -9,7 +9,7 @@ require_relative 'alba/railtie' if defined?(Rails::Railtie)
 # Core module
 module Alba
   class << self
-    attr_reader :backend, :encoder, :types
+    attr_reader :backend, :encoder
 
     # Getter for inflector, a module responsible for inflecting strings
     attr_reader :inflector
@@ -147,7 +147,16 @@ module Alba
     # @see Alba::Type
     # @return [void]
     def register_type(name, check: false, converter: nil, auto_convert: false)
-      @types << Type.new(name, check: check, converter: converter, auto_convert: auto_convert)
+      @types[name] = Type.new(name, check: check, converter: converter, auto_convert: auto_convert)
+    end
+
+    # Find type by name
+    #
+    # @return [Alba::Type]
+    def find_type(name)
+      @types.fetch(name) do
+        raise(Alba::UnsupportedType, "Unknown type: #{name}")
+      end
     end
 
     # Reset config variables
@@ -157,7 +166,7 @@ module Alba
       @symbolize_keys = false
       @_on_error = :raise
       @_on_nil = nil
-      @types = []
+      @types = {}
       register_default_types
     end
 
