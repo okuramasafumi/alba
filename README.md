@@ -1243,7 +1243,7 @@ You can control circular associations with `within` option. `within` option is a
 
 For more details, please refer to [test code](https://github.com/okuramasafumi/alba/blob/main/test/usecases/circular_association_test.rb)
 
-### Experimental support of types
+### Types
 
 You can validate and convert input with types.
 
@@ -1282,7 +1282,26 @@ UserResource.new(user).serialize
 # => TypeError, 'Attribute bio is expected to be String but actually nil.'
 ```
 
-Note that this feature is experimental and interfaces are subject to change.
+#### Custom types
+
+You can define custom types to abstract data conversion logic. To define custom types, you can use `Alba.register_type` like below.
+
+```ruby
+# Typically in initializer
+Alba.register_type :iso8601, converter: ->(time) { time.iso8601(3) }, auto_convert: true
+```
+
+Then use it as regular types.
+
+```rb
+class UserResource
+  include Alba::Resource
+
+  attributes :id, created_at: :iso8601
+end
+```
+
+You now get `created_at` attribute with `iso8601` format!
 
 ### Collection serialization into Hash
 
