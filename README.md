@@ -1592,7 +1592,7 @@ FooResource.new(foo).serialize
 # => "{:id=>1}" is printed
 ```
 
-Here, we override `serialize` method with `prepend`. In overridden method we print the result of `serializable_hash` that gives the basic hash for serialization to `serialize` method. Using `...` allows us to override without knowing method signiture of `serialize`.
+Here, we override `serialize` method with `prepend`. In overridden method we print the result of `serializable_hash` that gives the basic hash for serialization to `serialize` method. Using `...` allows us to override without knowing method signature of `serialize`.
 
 Don't forget calling `super` in this way.
 
