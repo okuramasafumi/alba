@@ -133,8 +133,9 @@ Style/InlineComment:
 Style/MethodCallWithArgsParentheses:
   AllowedMethods: ['require', 'require_relative', 'include', 'extend', 'puts', 'p', 'warn', 'raise', 'send', 'public_send', 'alias_method']
   Exclude:
-    # There are so many `attributes` call without parenthese and that's absolutely fine
+    # There are so many calls like `attributes` and `register_type` without parenthese and that's absolutely fine
     - 'test/**/*.rb'
+    - 'README.md'
 
 # There are so many cases we just want `if` expression!
 Style/MissingElse:
