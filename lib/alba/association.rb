@@ -36,16 +36,16 @@ module Alba
     # @return [Hash]
     def to_h(target, within: nil, params: {})
       params = params.merge(@params)
-      @object = target.__send__(@name)
-      @object = @condition.call(object, params, target) if @condition
-      return if @object.nil?
+      object = target.__send__(@name)
+      object = @condition.call(object, params, target) if @condition
+      return if object.nil?
 
       if @resource.is_a?(Proc)
-        return to_h_with_each_resource(within, params) if @object.is_a?(Enumerable)
+        return to_h_with_each_resource(within, params) if object.is_a?(Enumerable)
 
-        @resource.call(@object).new(@object, within: within, params: params).to_h
+        @resource.call(object).new(object, within: within, params: params).to_h
       else
-        to_h_with_constantize_resource(within, params)
+        to_h_with_constantize_resource(object, within, params)
       end
     end
 
@@ -56,6 +56,7 @@ module Alba
       when Class
         resource
       when Symbol, String
+        Object.const_get(resource)
         self.class.const_cache.fetch(resource) do
           self.class.const_cache[resource] = Object.const_get(resource)
         end
@@ -82,7 +83,7 @@ module Alba
       end
     end
 
-    def to_h_with_constantize_resource(within, params)
+    def to_h_with_constantize_resource(object, within, params)
       @resource = constantize(@resource)
       @resource.new(object, params: params, within: within).to_h
     end
