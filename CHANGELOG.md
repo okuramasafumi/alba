@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.0.0] 2023-10-11
 
+### IMPORTANT
+
+**This release contains an important bug fix that can cause data corruption.**
+**If you're using Ruby 3, it's highly recommended to upgrade to [v3.0.0](https://rubygems.org/gems/alba/versions/3.0.0)**
+**If you're using Ruby 2, please upgrade to [v2.4.2](https://rubygems.org/gems/alba/versions/2.4.2) that contains bug fix only as soon as possible.**
+
 ### Added
 
 - Custom type [#333](https://github.com/okuramasafumi/alba/pull/333)
