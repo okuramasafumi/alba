@@ -254,9 +254,8 @@ module Alba
         value.nil? && nil_handler ? instance_exec(obj, key, attribute, &nil_handler) : value
       end
 
-      # TODO: from version 3, `_fetch_attribute_from_resource_first` is default
       def fetch_attribute_from_object_and_resource(obj, attribute)
-        _fetch_attribute_from_object_first(obj, attribute)
+        _fetch_attribute_from_resource_first(obj, attribute)
       end
 
       def _fetch_attribute_from_object_first(obj, attribute)
