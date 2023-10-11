@@ -8,7 +8,7 @@ module Alba
       attr_reader :const_cache
     end
 
-    attr_reader :object, :name
+    attr_reader :name
 
     # @param name [Symbol, String] name of the method to fetch association
     # @param condition [Proc, nil] a proc filtering data
@@ -42,7 +42,7 @@ module Alba
       return if object.nil?
 
       if @resource.is_a?(Proc)
-        return to_h_with_each_resource(within, params) if object.is_a?(Enumerable)
+        return to_h_with_each_resource(object, within, params) if object.is_a?(Enumerable)
 
         @resource.call(object).new(object, within: within, params: params).to_h
       else
@@ -80,8 +80,8 @@ module Alba
                   end
     end
 
-    def to_h_with_each_resource(within, params)
-      @object.map do |item|
+    def to_h_with_each_resource(object, within, params)
+      object.map do |item|
         @resource.call(item).new(item, within: within, params: params).to_h
       end
     end

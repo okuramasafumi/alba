@@ -1,5 +1,6 @@
 require_relative 'association'
 require_relative 'constants'
+require 'ostruct'
 
 module Alba
   # Represents attribute with `if` option
@@ -23,7 +24,7 @@ module Alba
       fetched_attribute = yield(@body)
       return fetched_attribute unless with_two_arity_proc_condition
 
-      return Alba::REMOVE_KEY unless resource.instance_exec(object, attribute_from_association_body_or(fetched_attribute), &@condition)
+      return Alba::REMOVE_KEY unless resource.instance_exec(object, objectize(fetched_attribute), &@condition)
 
       fetched_attribute
     end
@@ -48,8 +49,18 @@ module Alba
       @condition.is_a?(Proc) && @condition.arity >= 2
     end
 
-    def attribute_from_association_body_or(fetched_attribute)
-      @body.is_a?(Alba::Association) ? @body.object : fetched_attribute
+    # OpenStruct is used as a simple solution for converting Hash or Array of Hash into an object
+    # Using OpenStruct is not good in general, but in this case there's no other solution
+    def objectize(fetched_attribute)
+      return fetched_attribute unless @body.is_a?(Alba::Association)
+
+      if fetched_attribute.is_a?(Array)
+        fetched_attribute.map do |hash|
+          OpenStruct.new(hash)
+        end
+      else
+        OpenStruct.new(fetched_attribute)
+      end
     end
   end
 end
