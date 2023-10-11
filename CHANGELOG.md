@@ -6,6 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] 2023-10-11
+
+### Added
+
+- Custom type [#333](https://github.com/okuramasafumi/alba/pull/333)
+
+### Changed
+
+- Prefer resource method [#323](https://github.com/okuramasafumi/alba/pull/323)
+
+### Fixed
+
+- Multithread bug [No PR](https://github.com/okuramasafumi/alba/commit/d20ed9efbf2f99827c12b8a07308e2f5aea6ab6d)
+  - This is a critical bug that can cause data corruption.
+
+### Removed
+
+- Drop support for Ruby 2 series [No PR](https://github.com/okuramasafumi/alba/commit/20be222555bde69c31fa9cbe4408b3f638cd7580)
+
 ## [2.4.1] 2023-08-02
 
 #### Fixed
