@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-class ObjectMethodAndResourceMethodTest < Minitest::Test
+4class ObjectMethodAndResourceMethodTest < Minitest::Test
   class Foo
     attr_reader :id
 
@@ -55,9 +55,8 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
     end
   end
 
-  # TODO: perfer resource method by default from version 3
   def test_default_behavior
-    assert_equal '{"id":1}', FooResource3.new(@foo).serialize
+    assert_equal '{"id":42}', FooResource3.new(@foo).serialize
   end
 
   class FooResource4
