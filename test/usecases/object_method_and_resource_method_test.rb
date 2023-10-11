@@ -1,6 +1,6 @@
 require_relative '../test_helper'
 
-4class ObjectMethodAndResourceMethodTest < Minitest::Test
+class ObjectMethodAndResourceMethodTest < Minitest::Test
   class Foo
     attr_reader :id
 
