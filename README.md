@@ -11,6 +11,14 @@
 
 Alba is a JSON serializer for Ruby, JRuby, and TruffleRuby.
 
+## IMPORTANT NOTICE
+
+Both version `3.0.0` and `2.4.2` contain important bug fix.
+However, version `3.0.0` has some bugs (see https://github.com/okuramasafumi/alba/issues/342).
+Until they get fixed, it's highly recommended to upgrade to version `2.4.2`.
+Dependabot and similar tools might create an automated Pull Request to upgrade to `3.0.0`, so it might be required to upgrade to `2.4.2` manually.
+Sorry for the inconvenience.
+
 ## TL;DR
 
 Alba allows you to do something like below.
