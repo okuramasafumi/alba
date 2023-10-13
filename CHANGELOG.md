@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.1] 2023-10-13
+
+### Fixed
+
+- Fixed a bug where methods such as `test` or `params` cannot be used as attribute name [#344](https://github.com/okuramasafumi/alba/pull/344)
+- Remove redundant code
+
 ## [3.0.0] 2023-10-11
 
 ### IMPORTANT
