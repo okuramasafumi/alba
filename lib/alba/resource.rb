@@ -11,7 +11,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil}.freeze # rubocop:disable Layout/LineLength
+    DSLS = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil, _resource_methods: []}.freeze # rubocop:disable Layout/LineLength
     private_constant :DSLS
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -277,9 +277,15 @@ module Alba
       end
 
       def _fetch_attribute_from_resource_first(obj, attribute)
-        __send__(attribute, obj)
-      rescue NoMethodError
-        obj.__send__(attribute)
+        if @_resource_methods.include?(attribute)
+          begin
+            __send__(attribute, obj)
+          rescue NoMethodError
+            obj.__send__(attribute)
+          end
+        else
+          obj.__send__(attribute)
+        end
       end
 
       def nil_handler
@@ -313,6 +319,12 @@ module Alba
     # Class methods
     module ClassMethods
       attr_reader(*DSLS.keys)
+
+      # This `method_added` is used for defining "resource methods"
+      def method_added(method_name)
+        _resource_methods << method_name.to_sym unless method_name.to_sym == :_setup
+        super
+      end
 
       # @private
       def inherited(subclass)
