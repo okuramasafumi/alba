@@ -13,7 +13,7 @@ This guide is aimed at helping Jbuilder users transition to Alba, and it consist
 
 ## Example class
 
-This example will also be replaced by ActiveReord.
+This example will also be replaced by ActiveRecord.
 
 ```rb
 class User
