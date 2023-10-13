@@ -7,6 +7,16 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
     def initialize(id)
       @id = id
     end
+
+    # There's `Kernel#test` method but this one should be called
+    def test
+      'test'
+    end
+
+    # `params` is an existing method on `Alba::Resource` but this one should be called
+    def params
+      'params'
+    end
   end
 
   def setup
@@ -69,5 +79,49 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
 
   def test_prefer_resource_method_but_it_is_not_there
     assert_equal '{"id":1}', FooResource4.new(@foo).serialize
+  end
+
+  class FooResource5
+    include Alba::Resource
+
+    attributes :id, :test # Kernel#test should not be called
+  end
+
+  def test_kernel_method_not_called
+    assert_equal '{"id":1,"test":"test"}', FooResource5.new(@foo).serialize
+  end
+
+  class FooResource6
+    include Alba::Resource
+
+    attributes :id, :params
+  end
+
+  def test_params_not_overridden
+    assert_equal '{"id":1,"params":"params"}', FooResource6.new(@foo).serialize
+  end
+
+  class FooResource7 < FooResource
+    include Alba::Resource
+
+    attributes :test
+  end
+
+  def test_inheritance_works_with_resource_method
+    assert_equal '{"id":42,"test":"test"}', FooResource7.new(@foo).serialize
+  end
+
+  class FooResource8 < FooResource
+    include Alba::Resource
+
+    attributes :test
+
+    def test(_)
+      'overridden'
+    end
+  end
+
+  def test_new_method_defined_in_inherited_class_works
+    assert_equal '{"id":42,"test":"overridden"}', FooResource8.new(@foo).serialize
   end
 end

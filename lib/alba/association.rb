@@ -57,7 +57,6 @@ module Alba
       when Class
         resource
       when Symbol, String
-        Object.const_get(resource)
         self.class.const_cache.fetch(resource) do
           self.class.const_cache[resource] = Object.const_get(resource)
         end
