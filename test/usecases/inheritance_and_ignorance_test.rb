@@ -17,7 +17,7 @@ class InheritanceAndIgnoranceTest < Minitest::Test
     attributes :id, :name, :body
   end
 
-  class RestrictedFooResouce < GenericFooResource
+  class RestrictedFooResource < GenericFooResource
     def attributes
       super.select { |key, _| key.to_sym == :name }
     end
@@ -25,6 +25,6 @@ class InheritanceAndIgnoranceTest < Minitest::Test
 
   def test_it_ignores_attributes
     foo = Foo.new(1, 'my foo', 'my body')
-    assert_equal '{"name":"my foo"}', RestrictedFooResouce.new(foo).serialize
+    assert_equal '{"name":"my foo"}', RestrictedFooResource.new(foo).serialize
   end
 end
