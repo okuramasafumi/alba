@@ -291,72 +291,77 @@ class UserResource
 end
 ```
 
-#### Prefer methods on resource
+#### Methods conflict
 
-By default, Alba prefers methods on the object to methods on the resource. This means if you have a following situation:
+Consider following code:
 
 ```ruby
-class User
-  attr_accessor :id, :name, :email
-
-  def initialize(id, name, email)
-    @id = id
-    @name = name
-    @email = email
-  end
-
-  def name_with_email
-    'dummy!'
+class Foo
+  def bar
+    "This is Foo"
   end
 end
 
-class UserResource
+class FooResource
   include Alba::Resource
 
-  root_key :user, :users # Later is for plural
+  attributes :bar
 
-  attributes :id, :name, :name_with_email
+  def bar
+    "This is FooResource"
+  end
+end
 
-  # Same method exists in `User` class!
+FooResource.new(Foo.new).serialize
+```
+
+By default, Alba create the JSON as `'{"bar":"This is FooResource"}'`. This means Alba calls a method on a Resource class and doesn't call a method on a target object. This rule is applied to methods that are explicitly defined on Resource class, so methods that Resource class inherits from `Object` class such as `format` are ignored.
+
+```ruby
+class Foo
+  def format
+    "This is Foo"
+  end
+end
+
+class FooResource
+  include Alba::Resource
+
+  attributes :bar
+
+  # Here, `format` method is available
+end
+
+FooResource.new(Foo.new).serialize
+# => '{"bar":"This is Foo"}'
+```
+
+If you'd like Alba to call methods on a target object, use `prefer_object_method!` like below.
+
+```ruby
+class Foo
+  def bar
+    "This is Foo"
+  end
+end
+
+class FooResource
+  include Alba::Resource
+
+  prefer_object_method! # <- important
+
+  attributes :bar
+
   # This is not called
-  def name_with_email(user)
-    "#{user.name}: #{user.email}"
+  def bar
+    "This is FooResource"
   end
 end
 
-user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
-UserResource.new(user).serialize
-# => '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"dummy!"}}'
+FooResource.new(Foo.new).serialize
+# => '{"bar":"This is Foo"}'
 ```
-
-You can see that `name_with_email` is now `dummy!` from `User#name_with_email`. You cna change this behavior by using `prefer_resource_method!` DSL in a resource class:
-
-```ruby
-# With the same `User` class
-
-class UserResource
-  include Alba::Resource
-
-  prefer_resource_method! # This line is important
-
-  root_key :user, :users # Later is for plural
-
-  attributes :id, :name, :name_with_email
-
-  # Same method exists in `User` class!
-  # But now this is called!
-  def name_with_email(user)
-    "#{user.name}: #{user.email}"
-  end
-end
-
-user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
-UserResource.new(user).serialize
-# => '{"user":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}'
-```
-
-The next major version of Alba will change this default behavior to prefer resource methods. In case you want to preserve current behavior, there's `prefer_object_method!` DSL, which does that.
-
+ 
 #### Params
 
 You can pass a Hash to the resource for internal use. It can be used as "flags" to control attribute content.
