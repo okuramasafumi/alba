@@ -298,7 +298,7 @@ Consider following code:
 ```ruby
 class Foo
   def bar
-    "This is Foo"
+    'This is Foo'
   end
 end
 
@@ -308,7 +308,7 @@ class FooResource
   attributes :bar
 
   def bar
-    "This is FooResource"
+    'This is FooResource'
   end
 end
 
@@ -320,7 +320,7 @@ By default, Alba create the JSON as `'{"bar":"This is FooResource"}'`. This mean
 ```ruby
 class Foo
   def format
-    "This is Foo"
+    'This is Foo'
   end
 end
 
@@ -341,7 +341,7 @@ If you'd like Alba to call methods on a target object, use `prefer_object_method
 ```ruby
 class Foo
   def bar
-    "This is Foo"
+    'This is Foo'
   end
 end
 
@@ -354,7 +354,7 @@ class FooResource
 
   # This is not called
   def bar
-    "This is FooResource"
+    'This is FooResource'
   end
 end
 
