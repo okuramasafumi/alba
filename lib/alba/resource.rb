@@ -96,12 +96,11 @@ module Alba
       private
 
       def _to_json(root_key, meta, options)
-        options.reject! { |k, _| %i[layout prefixes template status].include?(k) } # Rails specific guard
-        names = options.filter_map { |k, v| k unless v.nil? }
-        unless names.empty?
-          names.sort!
-          names.map! { |s| "\"#{s}\"" }
-          message = "You passed #{names.join(', ')} options but ignored. Please refer to the document: https://github.com/okuramasafumi/alba/blob/main/docs/rails.md"
+        confusing_options = options.keys.select { |k| k.to_sym == :only || k.to_sym == :except }
+        unless confusing_options.empty?
+          confusing_options.sort!
+          confusing_options.map! { |s| "\"#{s}\"" }
+          message = "You passed #{confusing_options.join(' and ')} options but ignored. Please refer to the document: https://github.com/okuramasafumi/alba/blob/main/docs/rails.md"
           Kernel.warn(message)
         end
         serialize(root_key: root_key, meta: meta)

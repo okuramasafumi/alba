@@ -75,8 +75,7 @@ class ResourceTest < Minitest::Test
         meta: {this: :meta}
       )
     end
-    message = "You passed \"except\", \"include\", \"methods\", \"only\", \"root\" options but ignored. Please refer to the document: https://github.com/okuramasafumi/alba/blob/main/docs/rails.md\n"
-    assert_output('', message) { result = execute2.call }
+    assert_output('', "You passed \"except\" and \"only\" options but ignored. Please refer to the document: https://github.com/okuramasafumi/alba/blob/main/docs/rails.md\n") { result = execute2.call }
     assert_equal(
       '{"foo":{"id":1,"bar_size":1,"bars":[{"id":1}]},"meta":{"this":"meta"}}',
       result
