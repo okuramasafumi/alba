@@ -71,10 +71,11 @@ module Alba
 
       # Returns a Hash correspondng {#serialize}
       #
+      # @param _options [Hash] dummy parameter for Rails compatibility
       # @param root_key [Symbol, nil, true]
       # @param meta [Hash] metadata for this seialization
       # @return [Hash]
-      def as_json(root_key: nil, meta: {})
+      def as_json(_options = {}, root_key: nil, meta: {})
         key = root_key.nil? ? fetch_key : root_key
         key = Alba.regularize_key(key)
         if key && !key.empty?
