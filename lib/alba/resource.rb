@@ -247,7 +247,7 @@ module Alba
                 when Proc then instance_exec(obj, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(obj, params: params, within: within) }
                 when TypedAttribute then attribute.value(obj)
-                when NestedAttribute then attribute.value(object: obj, params: params)
+                when NestedAttribute then attribute.value(object: obj, params: params, within: @within)
                 when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: obj) { |attr| fetch_attribute(obj, key, attr) }
                 else raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
                 end

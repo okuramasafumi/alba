@@ -194,4 +194,125 @@ class CircularAssociationTest < Minitest::Test
       BookResource.new(book, within: 'book').serialize # This is not supported
     end
   end
+
+  class User
+    attr_accessor :id, :full_name, :company
+
+    def type
+      'users'
+    end
+  end
+
+  class Company
+    attr_accessor :id, :name, :users
+
+    def type
+      'companies'
+    end
+  end
+
+  class UserResource
+    include Alba::Resource
+
+    attributes :type, :id
+
+    nested_attribute :attributes do
+      attributes :full_name
+    end
+
+    nested_attribute :relationships do
+      has_one :company, resource: CompanyResource
+    end
+  end
+
+  class CompanyResource
+    include Alba::Resource
+
+    attributes :type, :id
+
+    nested_attribute :attributes do
+      attributes :name
+    end
+
+    nested_attribute :relationships do
+      has_many :users, resource: UserResource
+    end
+  end
+
+  # rubocop:disable Style/StringHashKeys
+  def test_within_for_nested_attributes
+    company = Company.new.tap do |c|
+      c.id = 42
+      c.name = 'a_new_company'
+    end
+
+    users = [
+      User.new.tap do |u|
+        u.id = 43
+        u.full_name = 'a_new_user_0'
+      end
+    ]
+
+    company.users = users
+    users.each { |u| u.company = company }
+
+    result1 = {
+      'type' => 'companies',
+      'id' => 42,
+      'attributes' => {
+        'name' => 'a_new_company'
+      },
+      'relationships' => {
+        'users' => [
+          {
+            'type' => 'users',
+            'id' => 43,
+            'attributes' => {
+              'full_name' => 'a_new_user_0'
+            },
+            'relationships' => {}
+          }
+        ]
+      }
+    }
+    assert_equal(
+      result1,
+      CompanyResource.new(company, within: [:users]).to_h
+    )
+
+    result2 = {
+      'type' => 'companies',
+      'id' => 42,
+      'attributes' => {
+        'name' => 'a_new_company'
+      },
+      'relationships' => {
+        'users' => [
+          {
+            'type' => 'users',
+            'id' => 43,
+            'attributes' => {
+              'full_name' => 'a_new_user_0'
+            },
+            'relationships' => {
+              'company' => {
+                'type' => 'companies',
+                'id' => 42,
+                'attributes' => {
+                  'name' => 'a_new_company'
+                },
+                'relationships' => {}
+              }
+            }
+          }
+        ]
+      }
+    }
+
+    assert_equal(
+      result2,
+      CompanyResource.new(company, within: {users: :company}).to_h
+    )
+  end
+  # rubocop:enable Style/StringHashKeys
 end
