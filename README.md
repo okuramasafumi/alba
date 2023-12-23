@@ -1457,6 +1457,8 @@ end
 
 Within `helper` block, all methods should be defined without `self.`.
 
+`helper`
+
 ### Caching
 
 Currently, Alba doesn't support caching, primarily due to the behavior of `ActiveRecord::Relation`'s cache. See [the issue](https://github.com/rails/rails/issues/41784).
@@ -1562,6 +1564,40 @@ end
 ```
 
 In this way we have shorter and cleaner code. Note that we need to use `send` or `public_send` in `attribute` block to get attribute data.
+
+#### Using `helper`
+
+When we `extend AlbaExtension` like above, it's not available in inline associations.
+
+```ruby
+class BarResource
+  include Alba::Resource
+  extend AlbaExtension
+  # other attributes
+  formatted_time_attributes :created_at, :updated_at
+
+  one :something do
+    # This DOES NOT work!
+    formatted_time_attributes :updated_at
+  end
+end
+```
+
+In this case, we can use [helper](#helper) instead of `extend`.
+
+```ruby
+class BarResource
+  include Alba::Resource
+  helper AlbaExtension # HERE!
+  # other attributes
+  formatted_time_attributes :created_at, :updated_at
+
+  one :something do
+    # This WORKS!
+    formatted_time_attributes :updated_at
+  end
+end
+```
 
 ### Debugging
 
