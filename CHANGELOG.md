@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.3] 2023-12-25
+
+### Fixed
+
+- Make `as_json` compatible with Rails [#350](https://github.com/okuramasafumi/alba/pull/350)
+- Fix circular association for nested_attribute [#353](https://github.com/okuramasafumi/alba/pull/353)
+
 ## [3.0.2] 2023-12-05
 
 ### Fixed
