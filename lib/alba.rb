@@ -114,11 +114,14 @@ module Alba
       raise Alba::Error, 'Inference is disabled so Alba cannot infer resource name. Set inflector before use.' unless Alba.inflector
 
       const_parent = nesting.nil? ? Object : Object.const_get(nesting)
+      # rubocop-performance 1.20.2 might resolve this
+      # rubocop:disable Performance/StringIdentifierArgument
       begin
         const_parent.const_get("#{inflector.classify(name)}Resource")
       rescue NameError # Retry for serializer
         const_parent.const_get("#{inflector.classify(name)}Serializer")
       end
+      # rubocop:enable Performance/StringIdentifierArgument
     end
 
     # Configure Alba to symbolize keys

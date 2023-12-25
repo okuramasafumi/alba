@@ -26,7 +26,7 @@ module Alba
       base.class_eval do
         # Initialize
         INTERNAL_VARIABLES.each do |name, initial|
-          instance_variable_set("@#{name}", initial.dup) unless instance_variable_defined?("@#{name}")
+          instance_variable_set(:"@#{name}", initial.dup) unless instance_variable_defined?(:"@#{name}")
           setup_method_body << "@#{name} = self.class.#{name};"
         end
         base.define_method(:encode, Alba.encoder)
@@ -317,7 +317,7 @@ module Alba
       # @private
       def inherited(subclass)
         super
-        INTERNAL_VARIABLES.each_key { |name| subclass.instance_variable_set("@#{name}", instance_variable_get("@#{name}").clone) }
+        INTERNAL_VARIABLES.each_key { |name| subclass.instance_variable_set(:"@#{name}", instance_variable_get(:"@#{name}").clone) }
       end
 
       # Defining methods for DSLs and disable parameter number check since for users' benefits increasing params is fine
