@@ -2,9 +2,7 @@ require 'simplecov'
 
 require 'simplecov-cobertura'
 
-if ENV['CI']
-  SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
-end
+SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter if ENV['CI']
 SimpleCov.start do
   add_filter '/test/'
   enable_coverage :branch
