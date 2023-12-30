@@ -19,8 +19,12 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
     end
   end
 
+  # Dummy class which causes Alba to fallback
+  Bar = Struct.new(:name)
+
   def setup
     @foo = Foo.new(1)
+    @bar = Bar.new('dummy')
   end
 
   class FooResource
@@ -37,6 +41,7 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
 
   def test_prefer_resource_method
     assert_equal '{"id":42}', FooResource.new(@foo).serialize
+    assert_equal '{"id":42}', FooResource.new(@bar).serialize
   end
 
   class FooResource2
@@ -53,6 +58,7 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
 
   def test_prefer_object_method
     assert_equal '{"id":1}', FooResource2.new(@foo).serialize
+    assert_equal '{"id":42}', FooResource2.new(@bar).serialize
   end
 
   class FooResource3
@@ -67,6 +73,7 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
 
   def test_default_behavior
     assert_equal '{"id":42}', FooResource3.new(@foo).serialize
+    assert_equal '{"id":42}', FooResource3.new(@bar).serialize
   end
 
   class FooResource4
@@ -79,6 +86,7 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
 
   def test_prefer_resource_method_but_it_is_not_there
     assert_equal '{"id":1}', FooResource4.new(@foo).serialize
+    assert_raises(NoMethodError) { FooResource4.new(@bar).serialize }
   end
 
   class FooResource5
@@ -89,6 +97,7 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
 
   def test_kernel_method_not_called
     assert_equal '{"id":1,"test":"test"}', FooResource5.new(@foo).serialize
+    assert_raises(NoMethodError) { FooResource5.new(@bar).serialize }
   end
 
   class FooResource6
@@ -99,6 +108,7 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
 
   def test_params_not_overridden
     assert_equal '{"id":1,"params":"params"}', FooResource6.new(@foo).serialize
+    assert_raises(NoMethodError) { FooResource6.new(@bar).serialize }
   end
 
   class FooResource7 < FooResource
@@ -109,6 +119,7 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
 
   def test_inheritance_works_with_resource_method
     assert_equal '{"id":42,"test":"test"}', FooResource7.new(@foo).serialize
+    assert_raises(ArgumentError) { FooResource7.new(@bar).serialize } # `Kernel#test` is called
   end
 
   class FooResource8 < FooResource
@@ -123,5 +134,6 @@ class ObjectMethodAndResourceMethodTest < Minitest::Test
 
   def test_new_method_defined_in_inherited_class_works
     assert_equal '{"id":42,"test":"overridden"}', FooResource8.new(@foo).serialize
+    assert_equal '{"id":42,"test":"overridden"}', FooResource8.new(@bar).serialize
   end
 end
