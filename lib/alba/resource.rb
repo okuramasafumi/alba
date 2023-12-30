@@ -212,14 +212,17 @@ module Alba
       end
 
       def handle_error(error, obj, key, attribute, hash)
-        on_error = @_on_error || :raise
-        case on_error # rubocop:disable Style/MissingElse
+        case (on_error = @_on_error || :raise)
         when :raise, nil then raise(error)
         when :nullify then hash[key] = nil
         when :ignore then nil
         when Proc
           key, value = on_error.call(error, obj, key, attribute, self.class)
           hash[key] = value
+        else
+          # :nocov:
+          raise Alba::Error, 'Impossible path'
+          # :nocov:
         end
       end
 
@@ -233,11 +236,15 @@ module Alba
       end
 
       def _transform_key(inflector, key)
-        case @_transform_type # rubocop:disable Style/MissingElse
+        case @_transform_type
         when :camel then inflector.camelize(key)
         when :lower_camel then inflector.camelize_lower(key)
         when :dash then inflector.dasherize(key)
         when :snake then inflector.underscore(key)
+        else
+          # :nocov:
+          raise Alba::Error, "Unknown transform type: #{@_transform_type}"
+          # :nocov:
         end
       end
 
