@@ -239,11 +239,13 @@ module Alba
       inflector
     end
 
-    def register_default_types # rubocop:disable Metrics/AbcSize
-      register_type(:String, check: ->(obj) { obj.is_a?(String) }, converter: ->(obj) { obj.to_s })
-      register_type(String, check: ->(obj) { obj.is_a?(String) }, converter: ->(obj) { obj.to_s })
-      register_type(:Integer, check: ->(obj) { obj.is_a?(Integer) }, converter: ->(obj) { Integer(obj) })
-      register_type(Integer, check: ->(obj) { obj.is_a?(Integer) }, converter: ->(obj) { Integer(obj) })
+    def register_default_types
+      [String, :String].each do |t|
+        register_type(t, check: ->(obj) { obj.is_a?(String) }, converter: ->(obj) { obj.to_s })
+      end
+      [Integer, :Integer].each do |t|
+        register_type(t, check: ->(obj) { obj.is_a?(Integer) }, converter: ->(obj) { Integer(obj) })
+      end
       register_type(:Boolean, check: ->(obj) { [true, false].include?(obj) }, converter: ->(obj) { !!obj })
     end
   end
