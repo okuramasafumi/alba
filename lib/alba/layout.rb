@@ -12,17 +12,17 @@ module Alba
     # @param file [String] name of the layout file
     # @param inline [Proc] a proc returning JSON string or a Hash representing JSON
     def initialize(file:, inline:)
-      if file
-        raise ArgumentError, 'File layout must be a String representing filename' unless file.is_a?(String)
+      @body = if file
+                raise ArgumentError, 'File layout must be a String representing filename' unless file.is_a?(String)
 
-        @body = file
-      elsif inline
-        raise ArgumentError, 'Inline layout must be a Proc returning a Hash or a String' unless inline.is_a?(Proc)
+                file
+              elsif inline
+                raise ArgumentError, 'Inline layout must be a Proc returning a Hash or a String' unless inline.is_a?(Proc)
 
-        @body = inline
-      else
-        raise ArgumentError, 'Layout must be either String or Proc'
-      end
+                inline
+              else
+                raise ArgumentError, 'Layout must be either String or Proc'
+              end
     end
 
     # Serialize within layout
