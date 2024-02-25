@@ -66,7 +66,14 @@ module Alba
       # @see #serialize
       # @see https://github.com/rails/rails/blob/7-0-stable/actionpack/lib/action_controller/metal/renderers.rb#L156
       def to_json(options = {}, root_key: nil, meta: {})
-        _to_json(root_key, meta, options)
+        confusing_options = options.keys.select { |k| k.to_sym == :only || k.to_sym == :except }
+        unless confusing_options.empty?
+          confusing_options.sort!
+          confusing_options.map! { |s| "\"#{s}\"" }
+          message = "You passed #{confusing_options.join(' and ')} options but ignored. Please refer to the document: https://github.com/okuramasafumi/alba/blob/main/docs/rails.md"
+          Kernel.warn(message)
+        end
+        serialize(root_key: root_key, meta: meta)
       end
 
       # Returns a Hash correspondng {#serialize}
@@ -95,17 +102,6 @@ module Alba
       alias to_h serializable_hash
 
       private
-
-      def _to_json(root_key, meta, options)
-        confusing_options = options.keys.select { |k| k.to_sym == :only || k.to_sym == :except }
-        unless confusing_options.empty?
-          confusing_options.sort!
-          confusing_options.map! { |s| "\"#{s}\"" }
-          message = "You passed #{confusing_options.join(' and ')} options but ignored. Please refer to the document: https://github.com/okuramasafumi/alba/blob/main/docs/rails.md"
-          Kernel.warn(message)
-        end
-        serialize(root_key: root_key, meta: meta)
-      end
 
       def serialize_with(hash)
         serialized_json = encode(hash)
