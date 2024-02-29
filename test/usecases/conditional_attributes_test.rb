@@ -264,4 +264,23 @@ class ConditionalAttributesTest < Minitest::Test
       FooResource.new(foo, params: {flag: false}).serialize
     )
   end
+
+  class FooTypedResource
+    include Alba::Resource
+
+    attributes id: Integer
+    attributes name: :String, if: proc { params[:flag] }
+  end
+
+  def test_conditional_attributes_with_type
+    foo = Foo.new(1, 'name')
+    assert_equal(
+      '{"id":1,"name":"name"}',
+      FooTypedResource.new(foo, params: {flag: true}).serialize
+    )
+    assert_equal(
+      '{"id":1}',
+      FooTypedResource.new(foo, params: {flag: false}).serialize
+    )
+  end
 end
