@@ -52,6 +52,13 @@ class DependenciesTest < Minitest::Test
       end
       assert_equal('You must set inflector when setting root key as true.', err.message)
     end
+
+    def test_alba_error_is_raised_if_default_inflector_is_used
+      err = assert_raises(Alba::Error) do
+        Alba.inflector = :default
+      end
+      assert_equal('To use default inflector, please install `ActiveSupport` gem.', err.message)
+    end
   elsif ENV['BUNDLE_GEMFILE'] == File.expand_path('gemfiles/without_oj.gemfile')
     def test_it_warns_when_set_backend_as_oj_but_oj_is_not_available
       assert_output('', "`Oj` is not installed, falling back to default JSON encoder.\n") { Alba.backend = :oj }
