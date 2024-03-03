@@ -15,7 +15,6 @@ require:
 
 AllCops:
   Exclude:
-    - 'Rakefile'
     - 'alba.gemspec'
     - 'benchmark/**/*.rb'
     - 'docs/**/*'
