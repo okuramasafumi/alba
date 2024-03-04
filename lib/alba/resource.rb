@@ -252,7 +252,9 @@ module Alba
                 when TypedAttribute then attribute.value(obj)
                 when NestedAttribute then attribute.value(object: obj, params: params, within: @within)
                 when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: obj) { |attr| fetch_attribute(obj, key, attr) }
+                  # :nocov:
                 else raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
+                  # :nocov:
                 end
         value.nil? && nil_handler ? instance_exec(obj, key, attribute, &nil_handler) : value
       end
