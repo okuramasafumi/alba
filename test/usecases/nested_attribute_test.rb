@@ -79,4 +79,31 @@ class NestedAttributeTest < Minitest::Test
       BarResource.new(Bar.new('foo')).serialize
     )
   end
+
+  def test_raising_error_without_block
+    assert_raises(ArgumentError) do
+      Class.new do
+        include Alba::Resource
+
+        nested_attribute :foo
+      end
+    end
+  end
+
+  class Bar2Resource
+    include Alba::Resource
+
+    transform_keys :camel, cascade: false
+
+    nested_attribute :na do
+      attributes :some_value
+    end
+
+    def test_without_key_transformation_cascade
+      assert_equal(
+        '{"na":{"some_value":"foo"}}',
+        Bar2Resource.new(Bar.new('foo')).serialize
+      )
+    end
+  end
 end
