@@ -130,6 +130,7 @@ You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramas
 * Selectable backend
 * Key transformation
 * Root key and association resource name inference
+* Inline definition without explicit classes
 * Error handling
 * Nil handling
 * Circular associations control
