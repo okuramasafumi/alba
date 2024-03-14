@@ -271,11 +271,7 @@ module Alba
 
       def _fetch_attribute_from_resource_first(obj, attribute)
         if @_resource_methods.include?(attribute)
-          begin
-            __send__(attribute, obj)
-          rescue NoMethodError
-            obj.__send__(attribute)
-          end
+          __send__(attribute, obj)
         else
           obj.__send__(attribute)
         end
