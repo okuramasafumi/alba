@@ -1233,6 +1233,65 @@ UserResource.new([user]).serialize
 
 UserResource.new([user]).serialize(meta: {foo: :bar})
 # => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"meta":{"size":1,"foo":"bar"}}'
+```
+
+You can change the key for metadata. If you change the key, it also affects the key when you pass `meta` option.
+
+```ruby
+# You can change meta key
+class UserResourceWithDifferentMetaKey
+  include Alba::Resource
+
+  root_key :user, :users
+
+  attributes :id, :name
+
+  meta :my_meta do
+    {foo: :bar}
+  end
+end
+
+UserResourceWithDifferentMetaKey.new([user]).serialize
+# => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"my_meta":{"foo":"bar"}}'
+
+UserResourceWithDifferentMetaKey.new([user]).serialize(meta: {extra: 42})
+# => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"meta":{"size":1,"extra":42}}'
+
+class UserResourceChangingMetaKeyOnly
+  include Alba::Resource
+
+  root_key :user, :users
+
+  attributes :id, :name
+
+  meta :my_meta
+end
+
+UserResourceChangingMetaKeyOnly.new([user]).serialize
+# => '{"users":[{"id":1,"name":"Masafumi OKURA"}]}'
+
+UserResourceChangingMetaKeyOnly.new([user]).serialize(meta: {extra: 42})
+# => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"my_meta":{"extra":42}}'
+```
+
+It's also possible to remove the key for metadata, resulting a flat structure.
+
+```ruby
+class UserResourceRemovingMetaKey
+  include Alba::Resource
+
+  root_key :user, :users
+
+  attributes :id, :name
+
+  meta nil
+end
+
+UserResourceRemovingMetaKey.new([user]).serialize
+# => '{"users":[{"id":1,"name":"Masafumi OKURA"}]}'
+
+UserResourceRemovingMetaKey.new([user]).serialize(meta: {extra: 42})
+# => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"extra":42}'
 
 # You can set metadata with `meta` option alone
 

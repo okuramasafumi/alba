@@ -111,11 +111,20 @@ module Alba
       end
 
       def hash_with_metadata(hash, meta)
-        return hash if meta.empty? && @_meta.nil?
+        return hash if meta.empty? && @_meta&.last.nil?
 
-        metadata = @_meta ? instance_eval(&@_meta).merge(meta) : meta
-        hash[:meta] = metadata
+        key, block = @_meta || :meta
+
+        if key
+          hash[key] = _metadata(block, meta)
+        else
+          _metadata(block, meta).each { |k, v| hash[k] = v }
+        end
         hash
+      end
+
+      def _metadata(block, meta)
+        block ? instance_eval(&block).merge(meta) : meta
       end
 
       def serializable_hash_for_collection
@@ -446,8 +455,8 @@ module Alba
       end
 
       # Set metadata
-      def meta(&block)
-        @_meta = block
+      def meta(key = :meta, &block)
+        @_meta = [key, block]
       end
 
       # Set layout

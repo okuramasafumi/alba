@@ -93,4 +93,89 @@ class MetaTest < Minitest::Test
       UserResourceWithoutMeta.new([@user]).serialize(meta: {class: 'MetaTest'})
     )
   end
+
+  class UserResource2
+    include Alba::Resource
+
+    root_key :user, :users
+
+    attributes :id, :name
+
+    meta :my_meta do
+      if object.is_a?(Enumerable)
+        {size: object.size}
+      else
+        {foo: :bar}
+      end
+    end
+  end
+
+  def test_changing_meta_key
+    assert_equal(
+      '{"users":[{"id":1,"name":"Masafumi OKURA"}],"my_meta":{"size":1}}',
+      UserResource2.new([@user]).serialize
+    )
+  end
+
+  def test_changing_meta_key_with_meta_ooption
+    assert_equal(
+      '{"users":[{"id":1,"name":"Masafumi OKURA"}],"my_meta":{"size":1,"extra":42}}',
+      UserResource2.new([@user]).serialize(meta: {extra: 42})
+    )
+  end
+
+  def test_changing_meta_keu_and_overriding_meta
+    assert_equal(
+      '{"users":[{"id":1,"name":"Masafumi OKURA"}],"my_meta":{"size":42}}',
+      UserResource2.new([@user]).serialize(meta: {size: 42})
+    )
+  end
+
+  class UserResource3
+    include Alba::Resource
+
+    root_key :user, :users
+
+    attributes :id, :name
+
+    meta :my_meta # Change meta key only
+  end
+
+  def test_changing_meta_key_only
+    assert_equal(
+      '{"users":[{"id":1,"name":"Masafumi OKURA"}],"my_meta":{"extra":42}}',
+      UserResource3.new([@user]).serialize(meta: {extra: 42})
+    )
+  end
+
+  def test_changing_meta_key_and_eventually_no_meta
+    assert_equal(
+      '{"users":[{"id":1,"name":"Masafumi OKURA"}]}',
+      UserResource3.new([@user]).serialize
+    )
+  end
+
+  class UserResource4
+    include Alba::Resource
+
+    root_key :user, :users
+
+    attributes :id, :name
+
+    meta nil # Do not nest meta key
+  end
+
+  def test_meta_without_nesting
+    assert_equal(
+      '{"users":[{"id":1,"name":"Masafumi OKURA"}],"extra":42}',
+      UserResource4.new([@user]).serialize(meta: {extra: 42})
+    )
+  end
+
+  def test_meta_without_nesting_but_eventually_no_meta
+    assert_equal(
+      '{"users":[{"id":1,"name":"Masafumi OKURA"}]}',
+      UserResource4.new([@user]).serialize
+    )
+  end
 end
