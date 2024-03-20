@@ -22,7 +22,7 @@ module Alba
     # @private
     def self.included(base) # rubocop:disable Metrics/MethodLength
       super
-      setup_method_body = 'private def _setup;'
+      setup_method_body = +'private def _setup;'
       base.class_eval do
         # Initialize
         INTERNAL_VARIABLES.each do |name, initial|
