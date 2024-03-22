@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] 2024-03-23
+
+### Added
+
+- Add the ability to change key for metadata [#362](https://github.com/okuramasafumi/alba/pull/362)
+
 ## [3.0.3] 2023-12-25
 
 ### Fixed
