@@ -13,7 +13,7 @@ gem 'rubocop', '~> 1.62.0', require: false # For lint
 gem 'rubocop-gem_dev', '>= 0.3.0', require: false # For lint
 gem 'rubocop-md', '~> 1.0', require: false # For lint
 gem 'rubocop-minitest', '~> 0.35.0', require: false # For lint
-gem 'rubocop-performance', '~> 1.20.2', require: false # For lint
+gem 'rubocop-performance', '~> 1.21.0', require: false # For lint
 gem 'rubocop-rake', '~> 0.6.0', require: false # For lint
 gem 'ruby-lsp', require: false # For language server
 gem 'simplecov', '~> 0.22.0', require: false # For test coverage
