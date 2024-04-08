@@ -88,6 +88,11 @@ Minitest/NoTestCases:
   Exclude:
     - 'test/dependencies/test_dependencies.rb'
 
+# We need to use `OpenStruct` to wrap object in ConfitionalAttribute
+Performance/OpenStruct:
+  Exclude:
+    - 'lib/alba/conditional_attribute.rb'
+
 # We need to eval resource code to test errors on resource classes
 Security/Eval:
   Exclude:
@@ -139,6 +144,11 @@ Style/MethodCallWithArgsParentheses:
 # There are so many cases we just want `if` expression!
 Style/MissingElse:
   EnforcedStyle: case
+
+# We need to use `OpenStruct` to wrap object in ConfitionalAttribute
+Style/OpenStructUse:
+  Exclude:
+    - 'lib/alba/conditional_attribute.rb'
 
 # It's example code, please forgive us
 Style/OptionalBooleanParameter:

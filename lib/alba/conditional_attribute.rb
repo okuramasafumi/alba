@@ -51,8 +51,6 @@ module Alba
 
     # OpenStruct is used as a simple solution for converting Hash or Array of Hash into an object
     # Using OpenStruct is not good in general, but in this case there's no other solution
-    # rubocop:disable Style/OpenStructUse
-    # rubocop:disable Performance/OpenStruct
     def objectize(fetched_attribute)
       return fetched_attribute unless @body.is_a?(Alba::Association)
 
@@ -64,7 +62,5 @@ module Alba
         OpenStruct.new(fetched_attribute)
       end
     end
-    # rubocop:enable Style/OpenStructUse
-    # rubocop:enable Performance/OpenStruct
   end
 end
