@@ -1659,6 +1659,19 @@ class BarResource
 end
 ```
 
+You can also pass options to your helpers.
+
+```ruby
+# In helper module
+def time_attributes(*attrs, **options)
+  attrs.each do |attr|
+    attribute(attr, **options) do |object|
+      object.__send__(attr).iso8601
+    end
+  end
+end
+```
+
 ### Debugging
 
 Debugging is not easy. If you find Alba not working as you expect, there are a few things to do:
