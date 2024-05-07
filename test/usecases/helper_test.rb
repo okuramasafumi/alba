@@ -55,13 +55,14 @@ class HelperTest < Minitest::Test
 
       has_one :author do
         with_id
+        with_name
       end
     end
   end
 
   def test_using_baseclass_method_in_block
     assert_equal(
-      '{"id":1,"library_books":[{"id":2,"author":{"id":3}}]}',
+      '{"id":1,"library_books":[{"id":2,"author":{"id":3,"name":"The author"}}]}',
       LibraryResource.new(Library.new).serialize
     )
   end
