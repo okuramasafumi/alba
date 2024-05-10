@@ -92,7 +92,7 @@ Alba is easy to use because there are only a few methods to remember. It's also 
 
 ### Feature rich
 
-While Alba's core is simple, it provides additional features when you need them, For example, Alba provides [a way to control circular associations](#circular-associations-control), [root key and association resource name inference](#root-key-and-association-resource-name-inference) and [supports layouts](#layout).
+While Alba's core is simple, it provides additional features when you need them. For example, Alba provides [a way to control circular associations](#circular-associations-control), [root key and association resource name inference](#root-key-and-association-resource-name-inference) and [supports layouts](#layout).
 
 ### Other reasons
 
