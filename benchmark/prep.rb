@@ -7,7 +7,7 @@ gemfile(true) do
   git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
   gem "active_model_serializers"
-  gem "activerecord", "6.1.3"
+  gem "activerecord", "~> 7.1"
   gem "alba", path: '../'
   gem "benchmark-ips"
   gem "benchmark-memory"
@@ -23,7 +23,7 @@ gemfile(true) do
   gem "oj"
   gem "representable"
   gem "simple_ams"
-  gem "sqlite3"
+  gem "sqlite3", "~> 1.4"
 end
 
 # --- Test data model setup ---
