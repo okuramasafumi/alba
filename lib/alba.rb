@@ -241,7 +241,7 @@ module Alba
 
     def register_default_types
       [String, :String].each do |t|
-        register_type(t, check: ->(obj) { obj.is_a?(String) }, converter: ->(obj) { obj.to_s })
+        register_type(t, check: ->(obj) { obj.is_a?(String) }, converter: lambda(&:to_s))
       end
       [Integer, :Integer].each do |t|
         register_type(t, check: ->(obj) { obj.is_a?(Integer) }, converter: ->(obj) { Integer(obj) })
