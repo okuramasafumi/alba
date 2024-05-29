@@ -363,7 +363,7 @@ end
 FooResource.new(Foo.new).serialize
 # => '{"bar":"This is Foo"}'
 ```
- 
+
 #### Params
 
 You can pass a Hash to the resource for internal use. It can be used as "flags" to control attribute content.
@@ -1709,7 +1709,7 @@ module Logging
   # `...` was added in Ruby 2.7
   def serialize(...)
     puts serializable_hash
-    super(...)
+    super
   end
 end
 
