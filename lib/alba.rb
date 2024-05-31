@@ -170,14 +170,14 @@ module Alba
       register_default_types
     end
 
-    private
-
     # This method could be part of public API, but for now it's private
     def resource_with(object, &block)
       klass = block ? resource_class(&block) : infer_resource_class(object.class.name)
 
       klass.new(object)
     end
+
+    private
 
     def inflector_from(name_or_module)
       case name_or_module
