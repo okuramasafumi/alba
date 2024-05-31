@@ -15,7 +15,6 @@ gem 'rubocop-md', '~> 1.0', require: false # For lint
 gem 'rubocop-minitest', '~> 0.35.0', require: false # For lint
 gem 'rubocop-performance', '~> 1.21.0', require: false # For lint
 gem 'rubocop-rake', '~> 0.6.0', require: false # For lint
-gem 'ruby-lsp', require: false # For language server
 gem 'simplecov', '~> 0.22.0', require: false # For test coverage
 gem 'simplecov-cobertura', require: false # For test coverage
 # gem 'steep', require: false # For language server and typing
