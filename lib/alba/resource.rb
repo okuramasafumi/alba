@@ -22,17 +22,17 @@ module Alba
     # @private
     def self.included(base) # rubocop:disable Metrics/MethodLength
       super
-      setup_method_body = +'private def _setup;'
       base.class_eval do
         # Initialize
+        setup_method_body = +'private def _setup;'
         INTERNAL_VARIABLES.each do |name, initial|
           instance_variable_set(:"@#{name}", initial.dup) unless instance_variable_defined?(:"@#{name}")
           setup_method_body << "@#{name} = self.class.#{name};"
         end
-        base.define_method(:encode, Alba.encoder)
+        setup_method_body << 'end'
+        class_eval(setup_method_body, __FILE__, __LINE__ + 1)
+        define_method(:encode, Alba.encoder)
       end
-      setup_method_body << 'end'
-      base.class_eval(setup_method_body, __FILE__, __LINE__ + 1)
       base.include InstanceMethods
       base.extend ClassMethods
     end
