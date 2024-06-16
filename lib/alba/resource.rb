@@ -486,6 +486,26 @@ module Alba
         @_key_transformation_cascade = cascade
       end
 
+      # Transform keys as specified type AFTER the class is defined
+      # Note that this is an experimental API and may be removed/changed
+      #
+      # @see #transform_keys
+      def transform_keys!(type)
+        dup.class_eval do
+          transform_keys(type, root: @_transforming_root_key, cascade: @_key_transformation_cascade)
+
+          if @_key_transformation_cascade
+            # We need to update key transformation of associations and nested attributes
+            @_attributes.each_value do |attr|
+              next unless attr.is_a?(Association) || attr.is_a?(NestedAttribute)
+
+              attr.key_transformation = type
+            end
+          end
+          self # Return the new class
+        end
+      end
+
       # Sets key for collection serialization
       #
       # @param key [String, Symbol]

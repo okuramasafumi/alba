@@ -123,6 +123,17 @@ class KeyTransformTest < Minitest::Test
     )
   end
 
+  def test_transform_key_bang
+    assert_equal(
+      '{"Id":1,"FirstName":"Masafumi","LastName":"Okura"}',
+      UserResourceNone.transform_keys!(:camel).new(@user).serialize
+    )
+    assert_equal(
+      '{"id":1,"first_name":"Masafumi","last_name":"Okura"}',
+      UserResourceCamel.transform_keys!(:snake).new(@user).serialize
+    )
+  end
+
   def test_transform_key_to_dash_with_key_inference_does_work_on_root_key_when_root_option_is_not_set
     assert_equal(
       '{"bank-account":{"account-number":123456789}}',
@@ -152,6 +163,10 @@ class KeyTransformTest < Minitest::Test
     assert_equal(
       '{"Id":1,"FirstName":"Masafumi","LastName":"Okura"}',
       UserResourceCamelChild.new(@user).serialize
+    )
+    assert_equal(
+      '{"id":1,"firstName":"Masafumi","lastName":"Okura"}',
+      UserResourceCamelChild.transform_keys!(:lower_camel).new(@user).serialize
     )
   end
 
@@ -183,6 +198,10 @@ class KeyTransformTest < Minitest::Test
       '{"id":1,"firstName":"Masafumi","lastName":"Okura","bankAccount":{"accountNumber":123456789},"fakeAttribute":{"someAttribute":{"realAttribute":42}}}',
       UserResourceWithInlineAssociation.new(@user).serialize
     )
+    assert_equal(
+      '{"Id":1,"FirstName":"Masafumi","LastName":"Okura","BankAccount":{"AccountNumber":123456789},"FakeAttribute":{"SomeAttribute":{"RealAttribute":42}}}',
+      UserResourceWithInlineAssociation.transform_keys!(:camel).new(@user).serialize
+    )
   end
 
   class UserResourceWithInlineAssociationNoCascade < UserResource
@@ -197,6 +216,10 @@ class KeyTransformTest < Minitest::Test
     assert_equal(
       '{"id":1,"firstName":"Masafumi","lastName":"Okura","bankAccount":{"account_number":123456789}}',
       UserResourceWithInlineAssociationNoCascade.new(@user).serialize
+    )
+    assert_equal(
+      '{"Id":1,"FirstName":"Masafumi","LastName":"Okura","BankAccount":{"account_number":123456789}}',
+      UserResourceWithInlineAssociationNoCascade.transform_keys!(:camel).new(@user).serialize
     )
   end
 
