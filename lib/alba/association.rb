@@ -29,6 +29,11 @@ module Alba
       assign_resource(nesting, key_transformation, block, helper)
     end
 
+    # This is the same API in `NestedAttribute`
+    def key_transformation=(type)
+      @resource.transform_keys(type) unless @resource.is_a?(Proc)
+    end
+
     # Recursively converts an object into a Hash
     #
     # @param target [Object] the object having an association method

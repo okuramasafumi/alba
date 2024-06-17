@@ -2,6 +2,9 @@ module Alba
   # Representing nested attribute
   # @api private
   class NestedAttribute
+    # Setter for key_transformation, used when it's changed after class definition
+    attr_writer :key_transformation
+
     # @param key_transformation [Symbol] determines how to transform keys
     # @param block [Proc] class body
     def initialize(key_transformation: :none, &block)

@@ -1517,7 +1517,36 @@ end
 
 Within `helper` block, all methods should be defined without `self.`.
 
-`helper`
+### Experimental: modification API
+
+Alba now provides an experimental API to modify existing resource class without adding new classes. Currently only `transform_keys!` is implemented.
+
+Modification API returns a new class with given modifications. It's useful when you want lots of resource classes with small changes. See it in action:
+
+```ruby
+class FooResource
+  include Alba::Resource
+
+  transform_keys :camel
+
+  attributes :id
+end
+
+# Rails app
+class FoosController < ApplicationController
+  def index
+    foos = Foo.where(some: :condition)
+    key_transformation_type = params[:key_transformation_type] # Say it's "lower_camel"
+    # When params is absent, do not use modification API since it's slower
+    resource_class = key_transformation_type ? FooResource.transform_keys!(key_transformation_type) : FooResource
+    render json: resource_class.new(foos).serialize # The keys are lower_camel
+  end
+end
+```
+
+The point is that there's no need to define classes for each key transformation type (dash, camel, lower_camel and snake). This gives even more flexibility.
+
+There are some drawbacks with this approach. For example, it creates an internal, anonymous class when it's called, so there is a performance penalty and debugging difficulty. It's recommended to define classes manually when you don't need high flexibility.
 
 ### Caching
 
