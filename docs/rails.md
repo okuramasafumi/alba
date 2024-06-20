@@ -44,3 +44,13 @@ render json: FooResource.new(foo), only: [:id]
 # This is OK
 render json: FooResource.new(foo), status: 200
 ```
+
+### Shorthand for rendering JSON with Alba
+
+Now you can render JSON with shorthand.
+
+First, using `render json: serialize(target)` renders JSON for given target object. You can pass `with: SomeSerializer` option to render with `SomeSerializer` in this case. If you skip `with` option Alba tries to find the correct serialize automatically.
+
+There is a shorter version: `render_serialized_json(target)`. It also accepts `with` option.
+
+It's recommended to use `with` option now since it cannot automatically find correct serializers sometimes.
