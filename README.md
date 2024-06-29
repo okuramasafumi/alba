@@ -98,7 +98,7 @@ While Alba's core is simple, it provides additional features when you need them.
 
 - Dependency free, no need to install `oj` or `activesupport` while Alba works well with them
 - Well tested, the test coverage is 99%
-- Well maintained, gettings frequent update and new releases (see [version history](https://rubygems.org/gems/alba/versions))
+- Well maintained, getting frequent update and new releases (see [version history](https://rubygems.org/gems/alba/versions))
 
 ## Installation
 
