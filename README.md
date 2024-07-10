@@ -1255,7 +1255,7 @@ UserResourceWithDifferentMetaKey.new([user]).serialize
 # => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"my_meta":{"foo":"bar"}}'
 
 UserResourceWithDifferentMetaKey.new([user]).serialize(meta: {extra: 42})
-# => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"meta":{"size":1,"extra":42}}'
+# => '{"users":[{"id":1,"name":"Masafumi OKURA"}],"my_meta":{"foo":"bar","extra":42}}'
 
 class UserResourceChangingMetaKeyOnly
   include Alba::Resource
