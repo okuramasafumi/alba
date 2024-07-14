@@ -1023,6 +1023,36 @@ user = User.new(1, nil, nil)
 UserResource.new(user).serialize # => '{"id":1}'
 ```
 
+#### Caution for the second parameter in `if` proc
+
+`if` proc takes two parameters. The first one is the target object, `user` in the example above. The second one is `attribute` representing each attribute `if` option affects. Note that it actually calls attribute methods, so you cannot use it to prevent attribute methods called. This means if the target object is an `ActiveRecord::Base` object and using `association` with `if` option, you might want to skip the second parameter so that the SQL query won't be issued.
+
+Example:
+
+```ruby
+class User < ApplicationRecord
+  has_many :posts
+end
+
+class Post < ApplicationRecord
+  belongs_to :user
+end
+
+class UserResource
+  include Alba::Resource
+
+  # Since `_posts` parameter exists, `user.posts` are loaded
+  many :posts, if: proc { |user, _posts| user.admin? }
+end
+
+class UserResource2
+  include Alba::Resource
+
+  # Since `_posts` parameter doesn't exist, `user.posts` are NOT loaded
+  many :posts, if: proc { |user| user.admin? }
+end
+```
+
 ### Default
 
 Alba doesn't support default value for attributes, but it's easy to set a default value.
