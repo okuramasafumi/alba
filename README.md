@@ -1049,7 +1049,7 @@ class UserResource2
   include Alba::Resource
 
   # Since `_posts` parameter doesn't exist, `user.posts` are NOT loaded
-  many :posts, if: proc { |user| user.admin? }
+  many :posts, if: proc { |user| user.admin? && params[:include_post] }
 end
 ```
 
