@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../test_helper'
 
 class OneTest < Minitest::Test
@@ -100,7 +102,7 @@ class OneTest < Minitest::Test
 
     one :profile,
         proc { |profile, params|
-          profile.email.sub!('@', params[:replace_atmark_with]) if params[:replace_atmark_with]
+          profile.email = profile.email.sub('@', params[:replace_atmark_with]) if params[:replace_atmark_with]
           profile
         },
         resource: ProfileResource

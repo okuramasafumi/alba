@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Alba
   # Representing typed attributes to encapsulate logic about types
   # @api private

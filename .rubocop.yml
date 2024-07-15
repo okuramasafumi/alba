@@ -121,10 +121,6 @@ Style/DocumentationMethod:
   Exclude:
     - 'README.md'
 
-# This might be true in the future, but not many good things
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
 # I don't want to think about error class in example code
 Style/ImplicitRuntimeError:
   Exclude:

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 require_relative 'alba/version'
 require_relative 'alba/errors'

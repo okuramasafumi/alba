@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'association'
 require_relative 'conditional_attribute'
 require_relative 'constants'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Fake implementation of custom inflector
 module CustomInflector
   module_function

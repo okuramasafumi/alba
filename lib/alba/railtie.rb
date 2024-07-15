@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Alba
   # Rails integration
   class Railtie < Rails::Railtie

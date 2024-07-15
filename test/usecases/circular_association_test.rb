@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Based on https://github.com/jsonapi-serializer/comparisons
 require_relative '../test_helper'
 require 'securerandom'

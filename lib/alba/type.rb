@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Alba
   # Representing type itself, combined with {Alba::TypedAttribute}
   class Type

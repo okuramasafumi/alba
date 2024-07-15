@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Rails integration
 require 'rails'
 require_relative '../test_helper'

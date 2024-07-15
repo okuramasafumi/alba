@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Alba
   # Module for printing deprecation warning
   # @api private
