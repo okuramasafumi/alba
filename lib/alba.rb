@@ -241,7 +241,7 @@ module Alba
       inflector
     end
 
-    def register_default_types
+    def register_default_types # rubocop:disable Mertics/AbcSize
       [String, :String].each do |t|
         register_type(t, check: ->(obj) { obj.is_a?(String) }, converter: lambda(&:to_s))
       end
@@ -249,6 +249,9 @@ module Alba
         register_type(t, check: ->(obj) { obj.is_a?(Integer) }, converter: ->(obj) { Integer(obj) })
       end
       register_type(:Boolean, check: ->(obj) { [true, false].include?(obj) }, converter: ->(obj) { !!obj })
+      [String, Integer].each do |t|
+        register_type(:"ArrayOf#{t}", check: ->(d) { d.is_a?(Array) && d.all? { _1.is_a?(t) } })
+      end
     end
   end
 
