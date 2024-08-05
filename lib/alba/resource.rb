@@ -236,23 +236,7 @@ module Alba
       def transform_key(key)
         return Alba.regularize_key(key) if @_transform_type == :none || key.nil? || key.empty? # We can skip transformation
 
-        inflector = Alba.inflector
-        raise Alba::Error, 'Inflector is nil. You must set inflector before transforming keys.' unless inflector
-
-        Alba.regularize_key(_transform_key(inflector, key.to_s))
-      end
-
-      def _transform_key(inflector, key)
-        case @_transform_type
-        when :camel then inflector.camelize(key)
-        when :lower_camel then inflector.camelize_lower(key)
-        when :dash then inflector.dasherize(key)
-        when :snake then inflector.underscore(key)
-        else
-          # :nocov:
-          raise Alba::Error, "Unknown transform type: #{@_transform_type}"
-          # :nocov:
-        end
+        Alba.transform_key(key, transform_type: @_transform_type)
       end
 
       def fetch_attribute(obj, key, attribute) # rubocop:disable Metrics/CyclomaticComplexity

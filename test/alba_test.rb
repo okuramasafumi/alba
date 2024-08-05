@@ -290,4 +290,48 @@ class AlbaTest < Minitest::Test
       end
     )
   end
+
+  def test_transform_key_with_camel
+    Alba.inflector = :active_support
+    assert_equal(
+      'FooBar',
+      Alba.transform_key(:foo_bar, transform_type: :camel)
+    )
+    Alba.inflector = nil
+  end
+
+  def test_transform_key_with_lower_camel
+    Alba.inflector = :active_support
+    assert_equal(
+      'fooBar',
+      Alba.transform_key('foo_bar', transform_type: :lower_camel)
+    )
+    Alba.inflector = nil
+  end
+
+  def test_transform_key_with_dash
+    Alba.inflector = :active_support
+    assert_equal(
+      'foo-bar',
+      Alba.transform_key(:foo_bar, transform_type: :dash)
+    )
+    Alba.inflector = nil
+  end
+
+  def test_transform_key_with_snake
+    Alba.inflector = :active_support
+    assert_equal(
+      'foo_bar',
+      Alba.transform_key('FooBar', transform_type: :snake)
+    )
+    Alba.inflector = nil
+  end
+
+  def test_transform_key_with_unknown
+    Alba.inflector = :active_support
+    assert_raises(Alba::Error) do
+      Alba.transform_key(:foo_bar, transform_type: :this_is_an_error)
+    end
+    Alba.inflector = nil
+  end
 end

@@ -144,6 +144,26 @@ module Alba
       @symbolize_keys ? key.to_sym : key.to_s
     end
 
+    # Transform a key with given transform_type
+    #
+    # @param key [String] a target key
+    # @param transform_type [Symbol] a transform type, either one of `camel`, `lower_camel`, `dash` or `snake`
+    # @return [String]
+    def transform_key(key, transform_type:)
+      raise Alba::Error, 'Inflector is nil. You must set inflector before transforming keys.' unless inflector
+
+      key = key.to_s
+
+      k = case transform_type
+          when :camel then inflector.camelize(key)
+          when :lower_camel then inflector.camelize_lower(key)
+          when :dash then inflector.dasherize(key)
+          when :snake then inflector.underscore(key)
+          else raise Alba::Error, "Unknown transform type: #{transform_type}"
+          end
+      regularize_key(k)
+    end
+
     # Register types, used for both builtin and custom types
     #
     # @see Alba::Type
