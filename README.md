@@ -317,7 +317,7 @@ end
 FooResource.new(Foo.new).serialize
 ```
 
-By default, Alba create the JSON as `'{"bar":"This is FooResource"}'`. This means Alba calls a method on a Resource class and doesn't call a method on a target object. This rule is applied to methods that are explicitly defined on Resource class, so methods that Resource class inherits from `Object` class such as `format` are ignored.
+By default, Alba creates the JSON as `'{"bar":"This is FooResource"}'`. This means Alba calls a method on a Resource class and doesn't call a method on a target object. This rule is applied to methods that are explicitly defined on Resource class, so methods that Resource class inherits from `Object` class such as `format` are ignored.
 
 ```ruby
 class Foo
