@@ -1,33 +1,7 @@
-# --- Bundle dependencies ---
-
-require "bundler/inline"
-
-gemfile(true) do
-  source "https://rubygems.org"
-  git_source(:github) { |repo| "https://github.com/#{repo}.git" }
-
-  gem "active_model_serializers"
-  gem "activerecord", "~> 7.1"
-  gem "alba", path: '../'
-  gem "benchmark-ips"
-  gem "benchmark-memory"
-  gem "blueprinter"
-  gem "fast_serializer_ruby"
-  gem "jbuilder"
-  gem 'turbostreamer'
-  gem "jserializer"
-  gem "multi_json"
-  gem "panko_serializer"
-  gem "pg"
-  gem "primalize"
-  gem "oj"
-  gem "representable"
-  gem "simple_ams"
-  gem "sqlite3", "~> 1.4"
-end
-
 # --- Test data model setup ---
 
+RubyVM::YJIT.enable if ENV["YJIT"]
+require "csv"
 require "pg"
 require "active_record"
 require "active_record/connection_adapters/postgresql_adapter"

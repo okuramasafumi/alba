@@ -221,7 +221,6 @@ blueprinter = Proc.new { PostBlueprint.render(posts) }
 fast_serializer = Proc.new { FastSerializerPostResource.new(posts).to_json }
 jserializer = Proc.new { JserializerPostSerializer.new(posts, is_collection: true).to_json }
 panko = proc { Panko::ArraySerializer.new(posts, each_serializer: PankoPostSerializer).to_json }
-primalize = proc { PrimalizePostsResource.new(posts: posts).to_json }
 rails = Proc.new do
   ActiveSupport::JSON.encode(posts.map{ |post| post.serializable_hash(include: :comments) })
 end
@@ -253,8 +252,7 @@ end
 
 # --- Run the benchmarks ---
 
-require 'benchmark/ips'
-Benchmark.ips do |x|
+benchmark_body = lambda do |x|
   x.report(:alba, &alba)
   x.report(:alba_inline, &alba_inline)
   x.report(:ams, &ams)
@@ -270,20 +268,8 @@ Benchmark.ips do |x|
   x.compare!
 end
 
+require 'benchmark/ips'
+Benchmark.ips(&benchmark_body)
 
 require 'benchmark/memory'
-Benchmark.memory do |x|
-  x.report(:alba, &alba)
-  x.report(:alba_inline, &alba_inline)
-  x.report(:ams, &ams)
-  x.report(:blueprinter, &blueprinter)
-  x.report(:fast_serializer, &fast_serializer)
-  x.report(:jserializer, &jserializer)
-  x.report(:panko, &panko)
-  x.report(:rails, &rails)
-  x.report(:representable, &representable)
-  x.report(:simple_ams, &simple_ams)
-  x.report(:turbostreamer, &turbostreamer)
-
-  x.compare!
-end
+Benchmark.memory(&benchmark_body)
