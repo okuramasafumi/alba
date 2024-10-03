@@ -1409,6 +1409,12 @@ end
 
 You now get `created_at` attribute with `iso8601` format!
 
+#### Generating TypeScript types with typelizer gem
+
+We often want TypeScript types corresponding to serializers. That's possible with [typelizer](https://github.com/skryukov/typelizer) gem.
+
+For more information, please read its README.
+
 ### Collection serialization into Hash
 
 Sometimes we want to serialize a collection into a Hash, not an Array. It's possible with Alba.
