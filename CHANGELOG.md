@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] 2024-10-09
+
+### Added
+
+- Add `ArrayOfString` and `ArrayOfInteger` type [#378](https://github.com/okuramasafumi/alba/pull/378)
+
 ## [3.2.0] 2024-06-21
 
 ### Added
