@@ -1,0 +1,24 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+
+gem 'active_model_serializers'
+gem 'activerecord', '~> 7.1'
+gem 'alba', path: '../'
+gem 'benchmark-ips'
+gem 'benchmark-memory'
+gem 'blueprinter'
+gem 'fast_serializer_ruby'
+gem 'jbuilder'
+gem 'jserializer'
+gem 'multi_json'
+gem 'oj'
+gem 'oj_serializers'
+gem 'panko_serializer'
+gem 'pg'
+gem 'primalize'
+gem 'representable'
+gem 'simple_ams'
+gem 'sqlite3', '~> 1.4'
+gem 'turbostreamer'
