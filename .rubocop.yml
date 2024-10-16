@@ -23,6 +23,10 @@ AllCops:
   EnabledByDefault: true
   TargetRubyVersion: 3.0
 
+Bundler/GemComment:
+  Exclude:
+    - 'benchmark/**/*'
+
 # Items in Gemfile is dev dependencies and we don't have to specify versions.
 Bundler/GemVersion:
   Enabled: false
