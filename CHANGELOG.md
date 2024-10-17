@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.1] 2024-10-17
+
+### Fixed
+
+- Add ostruct as gemspec dependency to be prepared for ruby 3.3.5. [#386](https://github.com/okuramasafumi/alba/pull/386)
+
 ## [3.3.0] 2024-10-09
 
 ### Added
