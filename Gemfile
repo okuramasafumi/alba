@@ -11,7 +11,7 @@ gem 'ffaker', require: false # For testing
 gem 'minitest', '~> 5.14' # For test
 gem 'railties', require: false # For Rails integration testing
 gem 'rake', '~> 13.0' # For test and automation
-gem 'rubocop', '~> 1.66.1', require: false # For lint
+gem 'rubocop', '~> 1.67.0', require: false # For lint
 gem 'rubocop-gem_dev', '>= 0.3.0', require: false # For lint
 gem 'rubocop-md', '~> 1.0', require: false # For lint
 gem 'rubocop-minitest', '~> 0.36.0', require: false # For lint
