@@ -261,7 +261,7 @@ module Alba
       inflector
     end
 
-    def register_default_types # rubocop:disable Mertics/AbcSize
+    def register_default_types # rubocop:disable Metrics/AbcSize
       [String, :String].each do |t|
         register_type(t, check: ->(obj) { obj.is_a?(String) }, converter: lambda(&:to_s))
       end
