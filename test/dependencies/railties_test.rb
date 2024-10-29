@@ -16,11 +16,25 @@ class RailtiesTest < Minitest::Test
   end
 
   def test_rails_controller_integration
-    controller = Class.new(ActionController::Base)
-    assert_includes controller.instance_methods, :serialize
+    base_controller = Class.new(ActionController::Base)
+    api_controller = Class.new(ActionController::API)
+    assert_includes base_controller.instance_methods, :serialize
+    assert_includes api_controller.instance_methods, :serialize
   end
 
   class FoosController < ActionController::Base
+    def show
+      foo = Foo.new(1, 'foo')
+      render json: serialize(foo)
+    end
+
+    def index
+      foo = Foo.new(1, 'foo')
+      render_serialized_json([foo], with: FooResource)
+    end
+  end
+
+  class FoosAPIController < ActionController::API
     def show
       foo = Foo.new(1, 'foo')
       render json: serialize(foo)
@@ -57,21 +71,33 @@ class RailtiesTest < Minitest::Test
   end
 
   def test_foos_controller_show
-    controller = foos_controller
+    controller = controller_instance(FoosController)
+    controller.show
+    assert_equal '{"id":1,"name":"foo"}', controller.response_body.first
+  end
+
+  def test_foos_api_controller_show
+    controller = controller_instance(FoosAPIController)
     controller.show
     assert_equal '{"id":1,"name":"foo"}', controller.response_body.first
   end
 
   def test_foos_controller_index
-    controller = foos_controller
+    controller = controller_instance(FoosController)
+    controller.index
+    assert_equal '[{"id":1,"name":"foo"}]', controller.response_body.first
+  end
+
+  def test_foos_api_controller_index
+    controller = controller_instance(FoosAPIController)
     controller.index
     assert_equal '[{"id":1,"name":"foo"}]', controller.response_body.first
   end
 
   private
 
-  def foos_controller
-    controller = FoosController.new
+  def controller_instance(controller_class)
+    controller = controller_class.new
     # Mock the request and response
     request = Object.new.tap do |o|
       o.define_singleton_method(:variant) { :sp }
