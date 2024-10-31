@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.3] 2024-10-31
+
+### Fixed
+
+- Resource method is those explicitly defined only [27996a04598c57943e184ee34224a2cee9bf2e9d]
+
 ## [2.4.2] 2023-10-11
 
 ### Fixed
