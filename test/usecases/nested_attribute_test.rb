@@ -108,4 +108,24 @@ class NestedAttributeTest < Minitest::Test
       )
     end
   end
+
+  # TODO: Fix this test
+  # class Bar3Resource
+  #   include Alba::Resource
+  #
+  #   nested_attribute :na do
+  #     attributes :some_value
+  #   end
+  #
+  #   def some_value(_object)
+  #     'From resource method'
+  #   end
+  # end
+  #
+  # def test_nested_attribute_with_resource_method
+  #   assert_equal(
+  #     '{"na":{"some_value":"From resource method"}}',
+  #     Bar3Resource.new(Bar.new('foo')).serialize
+  #   )
+  # end
 end

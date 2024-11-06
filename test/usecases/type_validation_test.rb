@@ -69,4 +69,23 @@ class TypeValidationTest < Minitest::Test
       end
     end
   end
+
+  class AnotherUserResource
+    include Alba::Resource
+
+    prefer_resource_method!
+
+    attributes :name, id: [String, true], age: [Integer, true], bio: String, admin: [:Boolean, true], created_at: [String, ->(object) { object.strftime('%F') }]
+
+    def bio(_object)
+      'This is a bio defined in a resource'
+    end
+  end
+
+  def test_it_uses_resource_method
+    assert_equal(
+      '{"name":"Masafumi OKURA","id":"1","age":32,"bio":"This is a bio defined in a resource","admin":false,"created_at":"2020-10-10"}',
+      AnotherUserResource.new(@user).serialize
+    )
+  end
 end

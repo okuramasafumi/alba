@@ -239,12 +239,12 @@ module Alba
         Alba.transform_key(key, transform_type: @_transform_type)
       end
 
-      def fetch_attribute(obj, key, attribute) # rubocop:disable Metrics/CyclomaticComplexity
+      def fetch_attribute(obj, key, attribute) # rubocop:disable Metrics
         value = case attribute
                 when Symbol then fetch_attribute_from_object_and_resource(obj, attribute)
                 when Proc then instance_exec(obj, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(obj, params: params, within: within) }
-                when TypedAttribute then attribute.value(obj)
+                when TypedAttribute then attribute.value { |attr| fetch_attribute(obj, key, attr) }
                 when NestedAttribute then attribute.value(object: obj, params: params, within: @within)
                 when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: obj) { |attr| fetch_attribute(obj, key, attr) }
                   # :nocov:
