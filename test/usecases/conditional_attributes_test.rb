@@ -233,6 +233,21 @@ class ConditionalAttributesTest < Minitest::Test
     )
   end
 
+  class UserResource13 < UserResource
+    attributes :name, if: proc { true }
+
+    def name(_object)
+      'From resource method'
+    end
+  end
+
+  def test_conditional_attributes_with_if_and_resource_method
+    assert_equal(
+      '{"id":1,"name":"From resource method"}',
+      UserResource13.new(@user).serialize
+    )
+  end
+
   class Foo
     attr_reader :id, :name
 
@@ -283,6 +298,29 @@ class ConditionalAttributesTest < Minitest::Test
     assert_equal(
       '{"id":1}',
       FooTypedResource.new(foo, params: {flag: false}).serialize
+    )
+  end
+
+  class FooTypedResource2
+    include Alba::Resource
+
+    attributes id: Integer
+    attributes name: :String, if: proc { params[:flag] }
+
+    def name(_object)
+      'From resource method'
+    end
+  end
+
+  def test_conditional_attributes_with_type_and_resource_method
+    foo = Foo.new(1, 'name')
+    assert_equal(
+      '{"id":1,"name":"From resource method"}',
+      FooTypedResource2.new(foo, params: {flag: true}).serialize
+    )
+    assert_equal(
+      '{"id":1}',
+      FooTypedResource2.new(foo, params: {flag: false}).serialize
     )
   end
 end

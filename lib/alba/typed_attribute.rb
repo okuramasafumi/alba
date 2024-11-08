@@ -18,10 +18,9 @@ module Alba
               end
     end
 
-    # @param object [Object] target to check and convert type with
     # @return [String, Integer, Boolean] type-checked or type-converted object
-    def value(object)
-      v = object.__send__(@name)
+    def value
+      v = yield(@name)
       result = @type.check(v)
       result ? v : @type.convert(v)
     rescue TypeError
