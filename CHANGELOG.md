@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.3] 2024-11-09
+
+### Fixed
+
+- TypedAttribute now respects prefer_resource_method! [#391](https://github.com/okuramasafumi/alba/pull/391)
+
 ## [3.3.2] 2024-10-30
 
 ### Fixed
