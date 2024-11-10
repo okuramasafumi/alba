@@ -192,7 +192,11 @@ module Alba
       register_default_types
     end
 
-    # This method could be part of public API, but for now it's private
+    # Get a resource object from arguments
+    # If block is given, it creates a resource class with the block
+    # Otherwise, it infers resource class from the object's class name
+    #
+    # @ param object [Object] the object whose class name is used for inferring resource class
     def resource_with(object, &block)
       klass = block ? resource_class(&block) : infer_resource_class(object.class.name)
 
