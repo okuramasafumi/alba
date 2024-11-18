@@ -56,7 +56,7 @@ module Alba
       # Serialize object into JSON string
       #
       # @param root_key [Symbol, nil, true]
-      # @param meta [Hash] metadata for this seialization
+      # @param meta [Hash] metadata for this serialization
       # @return [String] serialized JSON string
       def serialize(root_key: nil, meta: {})
         serialize_with(as_json(root_key: root_key, meta: meta))
@@ -78,11 +78,11 @@ module Alba
         serialize(root_key: root_key, meta: meta)
       end
 
-      # Returns a Hash correspondng {#serialize}
+      # Returns a Hash corresponding {#serialize}
       #
       # @param _options [Hash] dummy parameter for Rails compatibility
       # @param root_key [Symbol, nil, true]
-      # @param meta [Hash] metadata for this seialization
+      # @param meta [Hash] metadata for this serialization
       # @return [Hash]
       def as_json(_options = {}, root_key: nil, meta: {})
         key = root_key.nil? ? fetch_key : root_key
