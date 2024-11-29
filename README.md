@@ -730,6 +730,60 @@ end
 # => JSON containing "foo" and "bar" as root keys
 ```
 
+#### Inline definition with heterogeneous collection
+
+Alba allows to serialize a heterogeneous collection with `Alba.serialize`.
+
+```ruby
+Foo = Data.define(:id, :name)
+Bar = Data.define(:id, :address)
+
+class FooResource
+  include Alba::Resource
+
+  attributes :id, :name
+end
+
+class BarResource
+  include Alba::Resource
+
+  attributes :id, :address
+end
+
+class CustomFooResource
+  include Alba::Resource
+
+  attributes :id
+end
+
+foo1 = Foo.new(1, 'foo1')
+foo2 = Foo.new(2, 'foo2')
+bar1 = Bar.new(1, 'bar1')
+bar2 = Bar.new(2, 'bar2')
+
+# This works only when inflector is set
+Alba.serialize([foo1, bar1, foo2, bar2], with: :inference)
+# => '[{"id":1,"name":"foo1"},{"id":1,"address":"bar1"},{"id":2,"name":"foo2"},{"id":2,"address":"bar2"}]'
+
+Alba.serialize(
+  [foo1, bar1, foo2, bar2],
+  # `with` option takes a lambda to return resource class
+  with: lambda do |obj|
+          case obj
+          when Foo
+            CustomFooResource
+          when Bar
+            BarResource
+          else
+            raise # Impossible in this case
+          end
+        end
+)
+# => '[{"id":1},{"id":1,"address":"bar1"},{"id":2},{"id":2,"address":"bar2"}]'
+# Note `CustomFooResource` is used here
+
+```
+
 ### Serializable Hash
 
 Instead of serializing to JSON, you can also output a Hash by calling `serializable_hash` or the `to_h` alias. Note also that the `serialize` method is aliased as `to_json`.

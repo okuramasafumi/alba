@@ -42,25 +42,44 @@ module Alba
     # Serialize the object with inline definitions
     #
     # @param object [Object] the object to be serialized
+    # @param with [:inference, Proc, Class<Alba::Resource>] determines how to get resource class for each object
     # @param root_key [Symbol, nil, true]
     # @param block [Block] resource block
     # @return [String] serialized JSON string
     # @raise [ArgumentError] if block is absent or `with` argument's type is wrong
-    def serialize(object = nil, root_key: nil, &block)
-      resource = resource_with(object, &block)
-      resource.serialize(root_key: root_key)
+    def serialize(object = nil, with: :inference, root_key: nil, &block)
+      if collection?(object)
+        h = hashify_collection(object, with, &block)
+        Alba.encoder.call(h)
+      else
+        resource = resource_with(object, &block)
+        resource.serialize(root_key: root_key)
+      end
     end
 
     # Hashify the object with inline definitions
     #
     # @param object [Object] the object to be serialized
+    # @param with [:inference, Proc, Class<Alba::Resource>] determines how to get resource class for each object
     # @param root_key [Symbol, nil, true]
     # @param block [Block] resource block
     # @return [String] serialized JSON string
     # @raise [ArgumentError] if block is absent or `with` argument's type is wrong
-    def hashify(object = nil, root_key: nil, &block)
-      resource = resource_with(object, &block)
-      resource.as_json(root_key: root_key)
+    def hashify(object = nil, with: :inference, root_key: nil, &block)
+      if collection?(object)
+        hashify_collection(object, with, &block)
+      else
+        resource = resource_with(object, &block)
+        resource.as_json(root_key: root_key)
+      end
+    end
+
+    # Detect if object is a collection or not.
+    # When object is a Struct, it's Enumerable but not a collection
+    #
+    # @api private
+    def collection?(object)
+      object.is_a?(Enumerable) && !object.is_a?(Struct)
     end
 
     # Enable inference for key and resource name
@@ -254,6 +273,24 @@ module Alba
     def default_encoder
       lambda do |hash|
         JSON.generate(hash)
+      end
+    end
+
+    def hashify_collection(collection, with, &block) # rubocop:disable Metrics/MethodLength
+      collection.map do |obj|
+        resource = if block
+                     resource_class(&block)
+                   else
+                     case with
+                     when Class then with
+                     when :inference then infer_resource_class(obj.class.name)
+                     when Proc then with.call(obj)
+                     else raise ArgumentError, '`with` argument must be either :inference, Proc or Class'
+                     end
+                   end
+        raise Alba::Error if resource.nil?
+
+        resource.new(obj).to_h
       end
     end
 
