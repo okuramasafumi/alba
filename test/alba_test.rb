@@ -243,12 +243,12 @@ class AlbaTest < Minitest::Test
     assert_raises(Alba::Error) { Alba.serialize(@user) }
   end
 
-  class Foo # rubocop:disable Lint/EmptyClass
+  class Empty # rubocop:disable Lint/EmptyClass
   end
 
   def test_it_raises_error_when_inferred_resource_does_not_exist_even_when_infernce_is_enabled
     Alba.inflector = :active_support
-    assert_raises(NameError) { Alba.serialize(Foo.new) }
+    assert_raises(NameError) { Alba.serialize(Empty.new) }
     Alba.inflector = nil
   end
 
@@ -289,6 +289,140 @@ class AlbaTest < Minitest::Test
         end
       end
     )
+  end
+
+  def test_serialize_collection_with_empty_collection
+    assert_equal(
+      '[]',
+      Alba.serialize([])
+    )
+    assert_equal(
+      '[]',
+      Alba.serialize([], with: :inference)
+    )
+  end
+
+  Foo = Struct.new(:id, :name)
+  Bar = Struct.new(:id, :address)
+
+  class FooResource
+    include Alba::Resource
+
+    attributes :id, :name
+  end
+
+  class BarResource
+    include Alba::Resource
+
+    attributes :id, :address
+  end
+
+  class CustomFooResource
+    include Alba::Resource
+
+    attributes :id
+  end
+
+  def test_serialize_collection_with_same_type
+    with_inflector(:active_support) do
+      foo1 = Foo.new(1, 'foo1')
+      foo2 = Foo.new(2, 'foo2')
+
+      assert_equal(
+        '[{"id":1,"name":"foo1"},{"id":2,"name":"foo2"}]',
+        Alba.serialize([foo1, foo2])
+      )
+      assert_equal(
+        '[{"id":1,"name":"foo1"},{"id":2,"name":"foo2"}]',
+        Alba.serialize([foo1, foo2], with: FooResource)
+      )
+    end
+  end
+
+  def test_serialize_collection_with_different_types
+    original = Alba.inflector
+    Alba.inflector = :active_support
+
+    foo1 = Foo.new(1, 'foo1')
+    foo2 = Foo.new(2, 'foo2')
+    bar1 = Bar.new(1, 'bar1')
+    bar2 = Bar.new(2, 'bar2')
+
+    assert_equal(
+      '[{"id":1,"name":"foo1"},{"id":1,"address":"bar1"},{"id":2,"name":"foo2"},{"id":2,"address":"bar2"}]',
+      Alba.serialize([foo1, bar1, foo2, bar2], with: :inference)
+    )
+    assert_equal(
+      '[{"id":1},{"id":1,"address":"bar1"},{"id":2},{"id":2,"address":"bar2"}]',
+      Alba.serialize(
+        [foo1, bar1, foo2, bar2],
+        with: lambda do |obj|
+                case obj
+                when Foo
+                  CustomFooResource
+                when Bar
+                  BarResource
+                else
+                  raise # Impossible in this case
+                end
+              end
+      )
+    )
+    Alba.inflector = nil
+    assert_raises(Alba::Error) { Alba.serialize([foo1, bar1, foo2, bar2]) }
+    Alba.inflector = original
+  end
+
+  # rubocop:disable Style/StringHashKeys
+  def test_hashify_collection_with_different_types
+    original = Alba.inflector
+    Alba.inflector = :active_support
+
+    foo1 = Foo.new(1, 'foo1')
+    foo2 = Foo.new(2, 'foo2')
+    bar1 = Bar.new(1, 'bar1')
+    bar2 = Bar.new(2, 'bar2')
+
+    assert_equal(
+      [{'id' => 1, 'name' => 'foo1'}, {'id' => 1, 'address' => 'bar1'}, {'id' => 2, 'name' => 'foo2'}, {'id' => 2, 'address' => 'bar2'}],
+      Alba.hashify([foo1, bar1, foo2, bar2], with: :inference)
+    )
+    assert_equal(
+      [{'id' => 1}, {'id' => 1, 'address' => 'bar1'}, {'id' => 2}, {'id' => 2, 'address' => 'bar2'}],
+      Alba.hashify(
+        [foo1, bar1, foo2, bar2],
+        with: lambda do |obj|
+                case obj
+                when Foo
+                  CustomFooResource
+                when Bar
+                  BarResource
+                else
+                  raise # Impossible in this case
+                end
+              end
+      )
+    )
+    Alba.inflector = nil
+    assert_raises(Alba::Error) { Alba.hashify([foo1, bar1, foo2, bar2]) }
+    Alba.inflector = original
+  end
+  # rubocop:enable Style/StringHashKeys
+
+  def test_serialize_collection_with_block
+    foo1 = Foo.new(1, 'foo1')
+    foo2 = Foo.new(2, 'foo2')
+
+    assert_equal(
+      '[{"id":1},{"id":2}]',
+      Alba.serialize([foo1, foo2]) do
+        attributes :id
+      end
+    )
+  end
+
+  def test_serialize_collection_with_unknown_with
+    assert_raises(ArgumentError, '`with` argument must be either :inference, Proc or Class') { Alba.serialize([1, 2, 3], with: :unknown) }
   end
 
   def test_transform_key_with_camel

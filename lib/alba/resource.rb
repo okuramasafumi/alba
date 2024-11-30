@@ -99,7 +99,7 @@ module Alba
       #
       # @return [Hash]
       def serializable_hash
-        collection? ? serializable_hash_for_collection : converter.call(@object)
+        Alba.collection?(@object) ? serializable_hash_for_collection : converter.call(@object)
       end
       alias to_h serializable_hash
 
@@ -143,7 +143,7 @@ module Alba
 
       # @return [String]
       def fetch_key
-        k = collection? ? _key_for_collection : _key
+        k = Alba.collection?(@object) ? _key_for_collection : _key
         transforming_root_key? ? transform_key(k) : k
       end
 
@@ -291,12 +291,6 @@ module Alba
         else
           raise Alba::Error, "Unknown type for within option: #{@within.class}"
         end
-      end
-
-      # Detect if object is a collection or not.
-      # When object is a Struct, it's Enumerable but not a collection
-      def collection?
-        @object.is_a?(Enumerable) && !@object.is_a?(Struct)
       end
     end
 
