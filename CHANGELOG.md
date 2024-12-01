@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0] 2024-12-01
+
+### Added
+
+- `Alba.serialize` now works with heterogeneous collection [#396](https://github.com/okuramasafumi/alba/pull/396)
+
 ## [3.3.3] 2024-11-09
 
 ### Fixed
