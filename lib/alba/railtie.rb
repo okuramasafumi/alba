@@ -7,13 +7,14 @@ module Alba
       Alba.inflector = :active_support
 
       ActiveSupport.on_load(:action_controller) do
-        define_method(:serialize) do |obj, with: nil, &block|
-          with.nil? ? Alba.resource_with(obj, &block) : with.new(obj)
+        define_method(:serialize) do |obj, with: nil, root_key: nil, meta: {}, &block|
+          resource = with.nil? ? Alba.resource_with(obj, &block) : with.new(obj)
+          resource.to_json(root_key: root_key, meta: meta)
         end
 
-        define_method(:render_serialized_json) do |obj, with: nil, &block|
+        define_method(:render_serialized_json) do |obj, with: nil, root_key: nil, meta: {}, &block|
           json = with.nil? ? Alba.resource_with(obj, &block) : with.new(obj)
-          render json: json
+          render json: json.to_json(root_key: root_key, meta: meta)
         end
       end
     end
