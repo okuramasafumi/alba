@@ -46,6 +46,18 @@ class RailtiesTest < Minitest::Test
     end
   end
 
+  class MyFoosController < ActionController::Base
+    def show
+      foo = Foo.new(1, 'foo')
+      render json: serialize(foo, root_key: 'foo')
+    end
+
+    def index
+      foo = Foo.new(1, 'foo')
+      render_serialized_json([foo], with: FooResource, root_key: 'foos', meta: {total: 1})
+    end
+  end
+
   Foo = Struct.new(:id, :name)
 
   class FooResource
@@ -92,6 +104,18 @@ class RailtiesTest < Minitest::Test
     controller = controller_instance(FoosAPIController)
     controller.index
     assert_equal '[{"id":1,"name":"foo"}]', controller.response_body.first
+  end
+
+  def test_foos_controller_show_with_options
+    controller = controller_instance(MyFoosController)
+    controller.show
+    assert_equal '{"foo":{"id":1,"name":"foo"}}', controller.response_body.first
+  end
+
+  def test_foos_controller_index_with_options
+    controller = controller_instance(MyFoosController)
+    controller.index
+    assert_equal '{"foos":[{"id":1,"name":"foo"}],"meta":{"total":1}}', controller.response_body.first
   end
 
   private
