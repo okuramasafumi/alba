@@ -100,13 +100,13 @@ class NestedAttributeTest < Minitest::Test
     nested_attribute :na do
       attributes :some_value
     end
+  end
 
-    def test_without_key_transformation_cascade
-      assert_equal(
-        '{"na":{"some_value":"foo"}}',
-        Bar2Resource.new(Bar.new('foo')).serialize
-      )
-    end
+  def test_without_key_transformation_cascade
+    assert_equal(
+      '{"Na":{"some_value":"foo"}}',
+      Bar2Resource.new(Bar.new('foo')).serialize
+    )
   end
 
   # TODO: Fix this test
