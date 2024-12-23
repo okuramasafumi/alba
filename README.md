@@ -1156,7 +1156,7 @@ end
 class UserResource
   include Alba::Resource
 
-  root_key!
+  root_key! # This is required to add inferred root key, otherwise it has no root key
 
   attributes :id
 
