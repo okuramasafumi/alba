@@ -686,7 +686,7 @@ Alba.serialize(something)
 # => Same as `FooResource.new(something).serialize` when `something` is an instance of `Foo`.
 ```
 
-Although this might be useful sometimes, it's generally recommended to define a class for Resource.
+Although this might be useful sometimes, it's generally recommended to define a class for Resource. Defining a class is often more readable and more maintainable, and inline definitions cannot levarage the benefit of YJIT (it's the slowest with the benchmark YJIT enabled).
 
 #### Inline definition for multiple root keys
 
