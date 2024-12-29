@@ -117,6 +117,7 @@ module Alba
     #   When it's a Class or a Module, it should have some methods, see {Alba::DefaultInflector}
     def inflector=(inflector)
       @inflector = inflector_from(inflector)
+      reset_transform_keys
     end
 
     # @param block [Block] resource body
@@ -144,11 +145,13 @@ module Alba
 
     # Configure Alba to symbolize keys
     def symbolize_keys!
+      reset_transform_keys unless @symbolize_keys
       @symbolize_keys = true
     end
 
     # Configure Alba to stringify (not symbolize) keys
     def stringify_keys!
+      reset_transform_keys if @symbolize_keys
       @symbolize_keys = false
     end
 
@@ -171,16 +174,19 @@ module Alba
     def transform_key(key, transform_type:)
       raise Alba::Error, 'Inflector is nil. You must set inflector before transforming keys.' unless inflector
 
-      key = key.to_s
+      @_transformed_keys[transform_type][key] ||= begin
+        key = key.to_s
 
-      k = case transform_type
-          when :camel then inflector.camelize(key)
-          when :lower_camel then inflector.camelize_lower(key)
-          when :dash then inflector.dasherize(key)
-          when :snake then inflector.underscore(key)
-          else raise Alba::Error, "Unknown transform type: #{transform_type}"
-          end
-      regularize_key(k)
+        k = case transform_type
+            when :camel then inflector.camelize(key)
+            when :lower_camel then inflector.camelize_lower(key)
+            when :dash then inflector.dasherize(key)
+            when :snake then inflector.underscore(key)
+            else raise Alba::Error, "Unknown transform type: #{transform_type}"
+            end
+
+        regularize_key(k)
+      end
     end
 
     # Register types, used for both builtin and custom types
@@ -208,6 +214,7 @@ module Alba
       @_on_error = :raise
       @_on_nil = nil
       @types = {}
+      reset_transform_keys
       register_default_types
     end
 
@@ -300,6 +307,10 @@ module Alba
       end
 
       inflector
+    end
+
+    def reset_transform_keys
+      @_transformed_keys = Hash.new { |h, k| h[k] = {} }
     end
 
     def register_default_types # rubocop:disable Metrics/AbcSize
