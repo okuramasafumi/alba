@@ -171,7 +171,7 @@ module Alba
     # @param key [String] a target key
     # @param transform_type [Symbol] a transform type, either one of `camel`, `lower_camel`, `dash` or `snake`
     # @return [String]
-    def transform_key(key, transform_type:)
+    def transform_key(key, transform_type:) # rubocop:disable Metrics/MethodLength
       raise Alba::Error, 'Inflector is nil. You must set inflector before transforming keys.' unless inflector
 
       @_transformed_keys[transform_type][key] ||= begin
