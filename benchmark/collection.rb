@@ -7,6 +7,8 @@ require_relative 'prep'
 
 require "alba"
 
+Alba.inflector = :active_support
+
 class AlbaCommentResource
   include ::Alba::Resource
   attributes :id, :body
@@ -19,6 +21,16 @@ class AlbaPostResource
     post.commenters.pluck(:name)
   end
   many :comments, resource: AlbaCommentResource
+end
+
+class AlbaCommentWithTransformationResource < AlbaCommentResource
+  transform_keys :lower_camel
+end
+
+class AlbaPostWithTransformationResource < AlbaPostResource
+  many :comments, resource: AlbaCommentWithTransformationResource
+
+  transform_keys :lower_camel
 end
 
 # --- ActiveModelSerializer serializers ---
@@ -133,7 +145,7 @@ class PostsRepresenter < Representable::Decorator
     property :id
     property :body
     property :commenter_names
-    collection :comments
+    collection :comments, decorator: CommentRepresenter
   end
 
   def commenter_names
@@ -205,6 +217,7 @@ posts = Post.all.includes(:comments, :commenters)
 # --- Store the serializers in procs ---
 
 alba = Proc.new { AlbaPostResource.new(posts).serialize }
+alba_with_transformation = Proc.new { AlbaPostWithTransformationResource.new(posts).serialize }
 alba_inline = Proc.new do
   Alba.serialize(posts) do
     attributes :id, :body
@@ -222,7 +235,7 @@ fast_serializer = Proc.new { FastSerializerPostResource.new(posts).to_json }
 jserializer = Proc.new { JserializerPostSerializer.new(posts, is_collection: true).to_json }
 panko = proc { Panko::ArraySerializer.new(posts, each_serializer: PankoPostSerializer).to_json }
 rails = Proc.new do
-  ActiveSupport::JSON.encode(posts.map{ |post| post.serializable_hash(include: :comments) })
+  posts.to_json(include: {comments: {only: [:id, :body]}}, methods: [:commenter_names])
 end
 representable = Proc.new { PostsRepresenter.new(posts).to_json }
 simple_ams = Proc.new { SimpleAMS::Renderer::Collection.new(posts, serializer: SimpleAMSPostSerializer).to_json }
@@ -254,6 +267,7 @@ end
 
 benchmark_body = lambda do |x|
   x.report(:alba, &alba)
+  x.report(:alba_with_transformation, &alba_with_transformation)
   x.report(:alba_inline, &alba_inline)
   x.report(:ams, &ams)
   x.report(:blueprinter, &blueprinter)
@@ -273,3 +287,11 @@ Benchmark.ips(&benchmark_body)
 
 require 'benchmark/memory'
 Benchmark.memory(&benchmark_body)
+
+# --- Show gem versions ---
+
+puts "Gem versions:"
+gems = %w[alba active_model_serializers blueprinter fast_serializer jserializer panko_serializer representable simple_ams turbostreamer]
+Bundler.load.specs.each do |spec|
+  puts "#{spec.name}: #{spec.version}" if gems.include?(spec.name)
+end

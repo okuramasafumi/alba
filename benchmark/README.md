@@ -1,6 +1,24 @@
 ## Benchmark for json serializers
 
-This directory contains a few different benchmark scripts. They all use inline Bundler definitions so you can run them by `ruby benchmark/collection.rb` for instance.
+This directory contains a few different benchmark scripts.
+
+## How to run
+
+```
+bundle install
+
+# with `Oj.optimize_rails`
+bundle exec ruby collection.rb
+
+# without `Oj.optimize_rails`
+NO_OJ_OPTIMIZE_RAILS=1 bundle exec ruby collection.rb
+
+# with `Oj.optimize_rails` and YJIT
+YJIT=1 bundle exec ruby collection.rb
+
+# with YJIT and without `Oj.optimize_rails`
+YJIT=1 NO_OJ_OPTIMIZE_RAILS=1 bundle exec ruby collection.rb
+```
 
 ## Result
 
@@ -65,7 +83,7 @@ Comparison:
                  ams:       14.2 i/s - 32.28x  slower
 ```
 
-`benchmark-ips` with `Oj.optimize_rail` and YJIT:
+`benchmark-ips` with `Oj.optimize_rails` and YJIT:
 
 ```
 Comparison:
@@ -82,7 +100,7 @@ Comparison:
                  ams:       20.4 i/s - 33.10x  slower
 ```
 
-`benchmark-ips` with YJIT and without `Oj.optimize_rail`:
+`benchmark-ips` with YJIT and without `Oj.optimize_rails`:
 
 ```
 Comparison:
