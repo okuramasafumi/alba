@@ -6,6 +6,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] 2025-01-01
+
+### Added
+
+-  `render_serialized_json` now works with `root_key` and `meta` [#398](https://github.com/okuramasafumi/alba/pull/398)
+
+### Improved
+
+- Add transform_keys caching [#402](https://github.com/okuramasafumi/alba/pull/402)
+
 ## [3.4.0] 2024-12-01
 
 ### Added
