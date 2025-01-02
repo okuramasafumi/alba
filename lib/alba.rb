@@ -162,8 +162,9 @@ module Alba
     # @return [Symbol, String, nil]
     def regularize_key(key)
       return if key.nil?
+      return key.to_sym if @symbolize_keys
 
-      @symbolize_keys ? key.to_sym : key.to_s
+      key.is_a?(Symbol) ? key.name : key.to_s
     end
 
     # Transform a key with given transform_type
