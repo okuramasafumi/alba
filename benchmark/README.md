@@ -28,16 +28,16 @@ Machine spec:
 
 |Key|Value|
 |---|---|
-|OS|macOS 14.7|
+|OS|macOS 15.2|
 |CPU|Apple M1 Pro|
 |RAM|16GB|
-|Ruby|ruby 3.3.5 (2024-09-03 revision ef084cc8f4) [arm64-darwin23]|
+|Ruby|ruby 3.4.1 (2024-12-25 revision 48d4efcb85) +PRISM [arm64-darwin23]|
 
 Library versions:
 
 |Library|Version|
 |---|---|
-|alba|3.2.0|
+|alba|3.5.0|
 |blueprinter|1.1.0|
 |fast_serializer_ruby|0.6.9|
 |jserializer|0.2.1|
@@ -53,68 +53,72 @@ Library versions:
 
 ```
 Comparison:
-               panko:      447.0 i/s
-         jserializer:      168.9 i/s - 2.65x  slower
-         alba_inline:      149.4 i/s - 2.99x  slower
-                alba:      146.5 i/s - 3.05x  slower
-       turbostreamer:      138.7 i/s - 3.22x  slower
-               rails:      105.6 i/s - 4.23x  slower
-     fast_serializer:       97.6 i/s - 4.58x  slower
-         blueprinter:       66.7 i/s - 6.70x  slower
-       representable:       50.6 i/s - 8.83x  slower
-          simple_ams:       35.5 i/s - 12.57x  slower
-                 ams:       14.8 i/s - 30.25x  slower
+               panko:      455.2 i/s
+         jserializer:      171.5 i/s - 2.65x  slower
+       turbostreamer:      170.4 i/s - 2.67x  slower
+alba_with_transformation:      159.9 i/s - 2.85x  slower
+                alba:      148.0 i/s - 3.08x  slower
+     fast_serializer:       99.0 i/s - 4.60x  slower
+               rails:       82.4 i/s - 5.53x  slower
+         blueprinter:       70.9 i/s - 6.42x  slower
+         alba_inline:       50.5 i/s - 9.02x  slower
+       representable:       43.8 i/s - 10.38x  slower
+          simple_ams:       39.1 i/s - 11.64x  slower
+                 ams:       15.0 i/s - 30.45x  slower
 ```
 
 `benchmark-ips` without `Oj.optimize_rails`:
 
 ```
 Comparison:
-               panko:      457.9 i/s
-         jserializer:      165.9 i/s - 2.76x  slower
-                alba:      160.1 i/s - 2.86x  slower
-         alba_inline:      158.5 i/s - 2.89x  slower
-       turbostreamer:      141.7 i/s - 3.23x  slower
-     fast_serializer:       96.2 i/s - 4.76x  slower
-               rails:       87.2 i/s - 5.25x  slower
-         blueprinter:       67.4 i/s - 6.80x  slower
-       representable:       43.4 i/s - 10.55x  slower
-          simple_ams:       34.7 i/s - 13.20x  slower
-                 ams:       14.2 i/s - 32.28x  slower
+               panko:      446.0 i/s
+         jserializer:      168.9 i/s - 2.64x  slower
+       turbostreamer:      168.8 i/s - 2.64x  slower
+alba_with_transformation:      166.0 i/s - 2.69x  slower
+                alba:      155.8 i/s - 2.86x  slower
+     fast_serializer:       98.6 i/s - 4.52x  slower
+               rails:       75.7 i/s - 5.89x  slower
+         blueprinter:       71.5 i/s - 6.24x  slower
+         alba_inline:       50.5 i/s - 8.83x  slower
+       representable:       43.8 i/s - 10.19x  slower
+          simple_ams:       36.4 i/s - 12.27x  slower
+                 ams:       14.4 i/s - 30.99x  slower
 ```
 
 `benchmark-ips` with `Oj.optimize_rails` and YJIT:
 
 ```
 Comparison:
-               panko:      676.6 i/s
-         jserializer:      285.3 i/s - 2.37x  slower
-       turbostreamer:      264.2 i/s - 2.56x  slower
-                alba:      258.9 i/s - 2.61x  slower
-     fast_serializer:      179.0 i/s - 3.78x  slower
-               rails:      150.7 i/s - 4.49x  slower
-         alba_inline:      131.5 i/s - 5.15x  slower
-         blueprinter:      110.0 i/s - 6.15x  slower
-       representable:       73.5 i/s - 9.21x  slower
-          simple_ams:       62.8 i/s - 10.77x  slower
-                 ams:       20.4 i/s - 33.10x  slower
+               panko:      677.8 i/s
+       turbostreamer:      338.7 i/s - 2.00x  slower
+         jserializer:      267.7 i/s - 2.53x  slower
+alba_with_transformation:      262.8 i/s - 2.58x  slower
+                alba:      243.7 i/s - 2.78x  slower
+     fast_serializer:      192.9 i/s - 3.51x  slower
+               rails:      133.4 i/s - 5.08x  slower
+         blueprinter:      109.8 i/s - 6.17x  slower
+       representable:       71.9 i/s - 9.43x  slower
+          simple_ams:       70.2 i/s - 9.66x  slower
+                 ams:       21.5 i/s - 31.49x  slower
+         alba_inline:       12.4 i/s - 54.78x  slower
 ```
 
 `benchmark-ips` with YJIT and without `Oj.optimize_rails`:
 
 ```
 Comparison:
-               panko:      701.9 i/s
-                alba:      311.1 i/s - 2.26x  slower
-         jserializer:      281.6 i/s - 2.49x  slower
-       turbostreamer:      240.4 i/s - 2.92x  slower
-     fast_serializer:      180.5 i/s - 3.89x  slower
-         alba_inline:      135.6 i/s - 5.18x  slower
-               rails:      131.4 i/s - 5.34x  slower
-         blueprinter:      110.7 i/s - 6.34x  slower
-       representable:       70.5 i/s - 9.96x  slower
-          simple_ams:       57.3 i/s - 12.24x  slower
-                 ams:       20.3 i/s - 34.51x  slower
+               panko:      666.6 i/s
+       turbostreamer:      310.9 i/s - 2.14x  slower
+         jserializer:      275.3 i/s - 2.42x  slower
+                alba:      266.7 i/s - 2.50x  slower
+alba_with_transformation:      266.6 i/s - 2.50x  slower
+     fast_serializer:      183.4 i/s - 3.63x  slower
+               rails:      117.2 i/s - 5.69x  slower
+         blueprinter:      109.0 i/s - 6.12x  slower
+       representable:       68.6 i/s - 9.72x  slower
+          simple_ams:       64.9 i/s - 10.27x  slower
+                 ams:       20.6 i/s - 32.38x  slower
+         alba_inline:       12.1 i/s - 54.97x  slower
 ```
 
 `benchmark-memory`:
@@ -122,16 +126,17 @@ Comparison:
 ```
 Comparison:
                panko:     259178 allocated
-       turbostreamer:     817800 allocated - 3.16x more
-         jserializer:     826425 allocated - 3.19x more
-                alba:     846465 allocated - 3.27x more
-         alba_inline:     867361 allocated - 3.35x more
-     fast_serializer:    1474345 allocated - 5.69x more
-               rails:    2265905 allocated - 8.74x more
-         blueprinter:    2469905 allocated - 9.53x more
-       representable:    4994281 allocated - 19.27x more
-                 ams:    5233265 allocated - 20.19x more
-          simple_ams:    9506817 allocated - 36.68x more
+       turbostreamer:     641720 allocated - 2.48x more
+alba_with_transformation:     650141 allocated - 2.51x more
+         jserializer:     822161 allocated - 3.17x more
+                alba:     826201 allocated - 3.19x more
+     fast_serializer:    1470001 allocated - 5.67x more
+         blueprinter:    2297641 allocated - 8.87x more
+         alba_inline:    2712001 allocated - 10.46x more
+               rails:    3151017 allocated - 12.16x more
+                 ams:    5116961 allocated - 19.74x more
+       representable:    5151321 allocated - 19.88x more
+          simple_ams:    9421433 allocated - 36.35x more
 ```
 
 Conclusion: panko is extremely fast but it's a C extension gem. As pure Ruby gems, Alba, `turbostreamer` and `jserializer` are notably faster than others, but Alba is slightly slower than other two. With `Oj.optimize_rails`, `jbuilder` and Rails standard serialization are also fast.
