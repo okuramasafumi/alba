@@ -21,7 +21,7 @@ module Alba
     private_constant :WITHIN_DEFAULT
 
     # `setup` method is meta-programmatically defined here for performance.
-    # @private
+    # @api private
     def self.included(base) # rubocop:disable Metrics/MethodLength
       super
       base.class_eval do
@@ -304,7 +304,7 @@ module Alba
         super
       end
 
-      # @private
+      # @api private
       def inherited(subclass)
         super
         INTERNAL_VARIABLES.each_key { |name| subclass.instance_variable_set(:"@#{name}", instance_variable_get(:"@#{name}").clone) }
