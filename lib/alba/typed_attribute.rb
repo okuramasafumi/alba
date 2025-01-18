@@ -4,6 +4,8 @@ module Alba
   # Representing typed attributes to encapsulate logic about types
   # @api private
   class TypedAttribute
+    attr_reader :name
+
     # @param name [Symbol, String]
     # @param type [Symbol, Class]
     # @param converter [Proc]

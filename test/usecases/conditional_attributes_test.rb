@@ -55,7 +55,7 @@ class ConditionalAttributesTest < Minitest::Test
   end
 
   class UserResource2 < UserResource
-    attribute :username, if: proc { |user| user.id == 1 } do
+    attribute :username, if: proc { |user, _username| user.id == 1 } do
       'username'
     end
   end
@@ -248,6 +248,43 @@ class ConditionalAttributesTest < Minitest::Test
     )
   end
 
+  class UserResource14 < UserResource
+    one :profile, resource: ProfileResource, key: :my_profile, if: proc { |_user, profile| profile.email.end_with?('com') }
+  end
+
+  def test_conditional_one_with_key_option
+    assert_equal(
+      '{"id":1,"my_profile":{"email":"test@example.com"}}',
+      UserResource14.new(@user).serialize
+    )
+    user = User.new(2, 'Foo')
+    profile = Profile.new(2, 'test@example.org')
+    user.profile = profile
+    assert_equal(
+      '{"id":2}',
+      UserResource14.new(user).serialize
+    )
+  end
+
+  class UserResource15 < UserResource
+    many :articles,
+         proc { |articles| articles }, # dummy
+         resource: ArticleResource,
+         if: proc { |_user, articles| !articles.empty? }
+  end
+
+  def test_conditional_many_with_condition_proc
+    assert_equal(
+      '{"id":1,"articles":[{"title":"Hello World!"}]}',
+      UserResource15.new(@user).serialize
+    )
+    user = User.new(2, 'Foo')
+    assert_equal(
+      '{"id":2}',
+      UserResource15.new(user).serialize
+    )
+  end
+
   class Foo
     attr_reader :id, :name
 
@@ -262,7 +299,7 @@ class ConditionalAttributesTest < Minitest::Test
 
     attributes :id
 
-    nested :bar, if: proc { params[:flag] } do
+    nested :bar, if: proc { |foo, _| params[:flag] || foo.id == 42 } do # dummy second parameter to test it doesn't raise an exception
       attributes :name
       attribute :baz do
         'baz'
@@ -279,6 +316,11 @@ class ConditionalAttributesTest < Minitest::Test
     assert_equal(
       '{"id":1}',
       FooResource.new(foo, params: {flag: false}).serialize
+    )
+    foo42 = Foo.new(42, 'name')
+    assert_equal(
+      '{"id":42,"bar":{"name":"name","baz":"baz"}}',
+      FooResource.new(foo42, params: {flag: false}).serialize
     )
   end
 
@@ -321,6 +363,31 @@ class ConditionalAttributesTest < Minitest::Test
     assert_equal(
       '{"id":1}',
       FooTypedResource2.new(foo, params: {flag: false}).serialize
+    )
+  end
+
+  class FooTypedResource3
+    include Alba::Resource
+
+    attributes id: Integer
+    attributes name: :String, if: proc { |foo, name| foo.id == 1 || name == 'my name' }
+  end
+
+  def test_conditional_attributes_with_type_with_two_arity_condition
+    foo1 = Foo.new(1, 'name')
+    assert_equal(
+      '{"id":1,"name":"name"}',
+      FooTypedResource3.new(foo1).serialize
+    )
+    foo2 = Foo.new(2, 'name')
+    assert_equal(
+      '{"id":2}',
+      FooTypedResource3.new(foo2).serialize
+    )
+    foo3 = Foo.new(3, 'my name')
+    assert_equal(
+      '{"id":3,"name":"my name"}',
+      FooTypedResource3.new(foo3).serialize
     )
   end
 end
