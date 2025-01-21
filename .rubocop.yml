@@ -55,6 +55,11 @@ Layout/SpaceInsideHashLiteralBraces:
 Layout/MultilineAssignmentLayout:
   EnforcedStyle: same_line
 
+# In README, there are multiple context and definging same constant multiple times should be allowed
+Lint/ConstantReassignment:
+  Exclude:
+    - 'README.md'
+
 Lint/ConstantResolution:
   Enabled: false
 

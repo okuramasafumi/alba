@@ -68,7 +68,8 @@ module Alba
       # @see #serialize
       # @see https://github.com/rails/rails/blob/7-0-stable/actionpack/lib/action_controller/metal/renderers.rb#L156
       def to_json(options = {}, root_key: nil, meta: {})
-        confusing_options = options.keys.select { |k| k.to_sym == :only || k.to_sym == :except }
+        confusing_keys = [:only, :except]
+        confusing_options = options.keys.select { |k| confusing_keys.include?(k.to_sym) }
         unless confusing_options.empty?
           confusing_options.sort!
           confusing_options.map! { |s| "\"#{s}\"" }
