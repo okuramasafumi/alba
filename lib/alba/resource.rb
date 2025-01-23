@@ -478,9 +478,7 @@ module Alba
           if @_key_transformation_cascade
             # We need to update key transformation of associations and nested attributes
             @_attributes.each_value do |attr|
-              next unless attr.is_a?(Association) || attr.is_a?(NestedAttribute)
-
-              attr.key_transformation = type
+              attr.key_transformation = type if attr.is_a?(Association) || attr.is_a?(NestedAttribute)
             end
           end
           self # Return the new class
