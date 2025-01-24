@@ -15,13 +15,9 @@ module Alba
     # @param inline [Proc] a proc returning JSON string or a Hash representing JSON
     def initialize(file:, inline:)
       @body = if file
-                raise ArgumentError, 'File layout must be a String representing filename' unless file.is_a?(String)
-
-                file
+                check_and_return(file, 'File layout must be a String representing filename', String)
               elsif inline
-                raise ArgumentError, 'Inline layout must be a Proc returning a Hash or a String' unless inline.is_a?(Proc)
-
-                inline
+                check_and_return(inline, 'Inline layout must be a Proc returning a Hash or a String', Proc)
               else
                 raise ArgumentError, 'Layout must be either String or Proc'
               end
@@ -46,6 +42,12 @@ module Alba
     private
 
     attr_reader :serialized_json
+
+    def check_and_return(obj, message, klass)
+      raise ArgumentError, message unless obj.is_a?(klass)
+
+      obj
+    end
 
     def serialize_within_string_layout(bnd)
       ERB.new(File.read(@body)).result(bnd)
