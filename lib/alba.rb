@@ -221,11 +221,26 @@ module Alba
 
     # Get a resource object from arguments
     # If block is given, it creates a resource class with the block
-    # Otherwise, it infers resource class from the object's class name
+    # Otherwise, it behaves depending on `with` argument
     #
-    # @ param object [Object] the object whose class name is used for inferring resource class
-    def resource_with(object, &block)
-      klass = block ? resource_class(&block) : infer_resource_class(object.class.name)
+    # @param object [Object] the object whose class name is used for inferring resource class
+    # @param with [:inference, Proc, Class<Alba::Resource>] determines how to get resource class for `object`
+    #   When it's `:inference`, it infers resource class from `object`'s class name
+    #   When it's a Proc, it calls the Proc with `object` as an argument
+    #   When it's a Class, it uses the Class as a resource class
+    #   Otherwise, it raises an ArgumentError
+    # @return [Alba::Resource] resource class with `object` as its target object
+    def resource_with(object, with: :inference, &block) # rubocop:disable Metrics/MethodLength
+      klass = if block
+                resource_class(&block)
+              else
+                case with
+                when :inference then infer_resource_class(object.class.name)
+                when Class then with
+                when Proc then with.call(object)
+                else raise ArgumentError, '`with` argument must be either :inference, Proc or Class'
+                end
+              end
 
       klass.new(object)
     end
@@ -284,21 +299,12 @@ module Alba
       end
     end
 
-    def hashify_collection(collection, with, &block) # rubocop:disable Metrics/MethodLength
+    def hashify_collection(collection, with, &block)
       collection.map do |obj|
-        resource = if block
-                     resource_class(&block)
-                   else
-                     case with
-                     when Class then with
-                     when :inference then infer_resource_class(obj.class.name)
-                     when Proc then with.call(obj)
-                     else raise ArgumentError, '`with` argument must be either :inference, Proc or Class'
-                     end
-                   end
+        resource = resource_with(obj, with: with, &block)
         raise Alba::Error if resource.nil?
 
-        resource.new(obj).to_h
+        resource.to_h
       end
     end
 
