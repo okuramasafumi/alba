@@ -336,7 +336,3 @@ module Alba
 
   reset!
 end
-
-# Monkey patch for TruffleRuby
-# Delete this after 24.1.2 is released
-File::SHARE_DELETE = 0 if defined?(Truffle)
