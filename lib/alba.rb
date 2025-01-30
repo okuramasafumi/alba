@@ -230,6 +230,7 @@ module Alba
     #   When it's a Class, it uses the Class as a resource class
     #   Otherwise, it raises an ArgumentError
     # @return [Alba::Resource] resource class with `object` as its target object
+    # @raise [ArgumentError] if `with` argument is not one of `:inference`, Proc or Class
     def resource_with(object, with: :inference, &block) # rubocop:disable Metrics/MethodLength
       klass = if block
                 resource_class(&block)
