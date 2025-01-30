@@ -365,6 +365,7 @@ module Alba
       # @param name [String, Symbol] name of the association, used as key when `key` param doesn't exist
       # @param condition [Proc, nil] a Proc to modify the association
       # @param resource [Class<Alba::Resource>, String, Proc, nil] representing resource for this association
+      # @param serializer [Class<Alba::Resource>, String, Proc, nil] alias for `resource`
       # @param key [String, Symbol, nil] used as key when given
       # @param params [Hash] params override for the association
       # @param options [Hash<Symbol, Proc>]
@@ -372,7 +373,8 @@ module Alba
       # @param block [Block]
       # @return [void]
       # @see Alba::Association#initialize
-      def association(name, condition = nil, resource: nil, key: nil, params: {}, **options, &block)
+      def association(name, condition = nil, resource: nil, serializer: nil, key: nil, params: {}, **options, &block)
+        resource ||= serializer
         transformation = @_key_transformation_cascade ? @_transform_type : :none
         assoc = Association.new(
           name: name, condition: condition, resource: resource, params: params, nesting: nesting, key_transformation: transformation, helper: @_helper, &block

@@ -15,6 +15,7 @@ class ResourceTest < Minitest::Test
     include Alba::Resource
     attributes :id
   end
+  BarSerializer = BarResource
 
   class FooResource
     include Alba::Resource
@@ -111,7 +112,7 @@ class ResourceTest < Minitest::Test
     include Alba::Serializer
     root_key :foo
     attributes :id, :bar_size
-    many :bars, resource: BarResource
+    has_many :bars, serializer: BarSerializer
 
     def bar_size(foo)
       foo.bars.size
