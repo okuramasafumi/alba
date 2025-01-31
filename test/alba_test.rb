@@ -425,6 +425,13 @@ class AlbaTest < Minitest::Test
     assert_raises(ArgumentError, '`with` argument must be either :inference, Proc or Class') { Alba.serialize([1, 2, 3], with: :unknown) }
   end
 
+  def test_serialize_nil_without_block_raises_argument_error
+    with_inflector(:active_support) do
+      assert_raises(ArgumentError, 'Either object or block must be given') { Alba.serialize }
+      assert_raises(ArgumentError, 'Either object or block must be given') { Alba.hashify }
+    end
+  end
+
   def test_transform_key_with_camel
     Alba.inflector = :active_support
     assert_equal(

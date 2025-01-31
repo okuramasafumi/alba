@@ -46,8 +46,10 @@ module Alba
     # @param root_key [Symbol, nil, true]
     # @param block [Block] resource block
     # @return [String] serialized JSON string
-    # @raise [ArgumentError] if block is absent or `with` argument's type is wrong
+    # @raise [ArgumentError] if both object and block are not given
     def serialize(object = nil, with: :inference, root_key: nil, &block)
+      raise ArgumentError, 'Either object or block must be given' if object.nil? && block.nil?
+
       if collection?(object)
         h = hashify_collection(object, with, &block)
         Alba.encoder.call(h)
@@ -64,8 +66,10 @@ module Alba
     # @param root_key [Symbol, nil, true]
     # @param block [Block] resource block
     # @return [String] serialized JSON string
-    # @raise [ArgumentError] if block is absent or `with` argument's type is wrong
+    # @raise [ArgumentError] if both object and block are not given
     def hashify(object = nil, with: :inference, root_key: nil, &block)
+      raise ArgumentError, 'Either object or block must be given' if object.nil? && block.nil?
+
       if collection?(object)
         hashify_collection(object, with, &block)
       else
