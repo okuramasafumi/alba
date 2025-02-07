@@ -109,6 +109,25 @@ class NestedAttributeTest < Minitest::Test
     )
   end
 
+  class Bar3Resource
+    include Alba::Resource
+
+    nested_attribute :na, if: proc { |bar, _| bar.some_value == 'foo' } do
+      attributes :some_value
+    end
+  end
+
+  def test_without_key_transformation_cascade
+    assert_equal(
+      '{"na":{"some_value":"foo"}}',
+      Bar3Resource.new(Bar.new('foo')).serialize
+    )
+    assert_equal(
+      '{}',
+      Bar3Resource.new(Bar.new('foo!')).serialize
+    )
+  end
+
   # TODO: Fix this test
   # class Bar3Resource
   #   include Alba::Resource
