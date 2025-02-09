@@ -117,7 +117,7 @@ class NestedAttributeTest < Minitest::Test
     end
   end
 
-  def test_without_key_transformation_cascade
+  def test_conditional_nested_attribute
     assert_equal(
       '{"na":{"some_value":"foo"}}',
       Bar3Resource.new(Bar.new('foo')).serialize
