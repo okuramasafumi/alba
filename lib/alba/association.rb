@@ -32,6 +32,9 @@ module Alba
     end
 
     # This is the same API in `NestedAttribute`
+    #
+    # @param type [String, Symbol] one of `snake`, `:camel`, `:lower_camel`, `:dash` and `none`
+    # @return [void]
     def key_transformation=(type)
       @resource.transform_keys(type) unless @resource.is_a?(Proc)
     end
