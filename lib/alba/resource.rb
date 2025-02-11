@@ -317,7 +317,7 @@ module Alba
       #
       # @param attrs [Array<String, Symbol>]
       # @param if [Proc] condition to decide if it should serialize these attributes
-      # @param attrs_with_types [Hash<[Symbol, String], [Array<Symbol, Proc>, Symbol]>]
+      # @param attrs_with_types [Hash{Symbol, String => Array<Symbol, Proc>, Symbol}]
       #   attributes with name in its key and type and optional type converter in its value
       # @return [void]
       def attributes(*attrs, if: nil, **attrs_with_types)
