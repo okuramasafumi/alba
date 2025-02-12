@@ -7,7 +7,7 @@ module Alba
   # Represents attribute with `if` option
   # @api private
   class ConditionalAttribute
-    # @param body [Symbol, Proc, Alba::Association, Alba::TypedAttribute] real attribute wrapped with condition
+    # @param body [Symbol, Proc, Alba::Association, Alba::TypedAttribute, Alba::NestedAttribute] real attribute wrapped with condition
     # @param condition [Symbol, Proc] condition to check
     def initialize(body:, condition:)
       @body = body
