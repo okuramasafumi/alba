@@ -7,17 +7,17 @@ This directory contains a few different benchmark scripts.
 ```
 bundle install
 
-# with `Oj.optimize_rails`
-bundle exec ruby collection.rb
+# with `Oj.optimize_rails` and without YJIT
+NO_YJIT=1 bundle exec ruby collection.rb
 
-# without `Oj.optimize_rails`
-NO_OJ_OPTIMIZE_RAILS=1 bundle exec ruby collection.rb
+# without `Oj.optimize_rails` and without YJIT
+NO_YJIT=1 NO_OJ_OPTIMIZE_RAILS=1 bundle exec ruby collection.rb
 
 # with `Oj.optimize_rails` and YJIT
-YJIT=1 bundle exec ruby collection.rb
+bundle exec ruby collection.rb
 
-# with YJIT and without `Oj.optimize_rails`
-YJIT=1 NO_OJ_OPTIMIZE_RAILS=1 bundle exec ruby collection.rb
+# without `Oj.optimize_rails` and with YJIT
+NO_OJ_OPTIMIZE_RAILS=1 bundle exec ruby collection.rb
 ```
 
 ## Result

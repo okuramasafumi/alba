@@ -1,6 +1,6 @@
 # --- Test data model setup ---
 
-RubyVM::YJIT.enable if ENV["YJIT"]
+RubyVM::YJIT.enable unless ENV["NO_YJIT"]
 require "csv"
 require "pg"
 require "active_record"
