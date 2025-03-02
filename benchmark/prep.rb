@@ -10,6 +10,10 @@ require "oj"
 require "sqlite3"
 Oj.optimize_rails unless ENV['NO_OJ_OPTIMIZE_RAILS']
 
+puts 'Running benchmark with the following configuration:'
+puts "YJIT: #{RubyVM::YJIT.enabled? ? 'enabled' : 'disabled'}"
+puts "Oj.optimize_rails: #{ENV['NO_OJ_OPTIMIZE_RAILS'] ? 'disabled' : 'enabled'}"
+
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
 # ActiveRecord::Base.logger = Logger.new($stdout)
 
