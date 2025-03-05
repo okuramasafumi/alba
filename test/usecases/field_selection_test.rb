@@ -6,7 +6,7 @@ class FieldSelectionTest < Minitest::Test
   module FieldSelection
     def field_when_selected(*attrs, key:)
       attrs.each do |attr|
-        attribute(attr, if: proc { params[:fields].nil? ? true : params[:fields][key].include?(attr.to_sym) }) do |object|
+        attribute(attr, if: proc { params[:fields].nil? || params[:fields][key].include?(attr.to_sym) }) do |object|
           object.__send__(attr)
         end
       end
