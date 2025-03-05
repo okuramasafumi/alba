@@ -216,7 +216,7 @@ module Alba
         value = fetch_attribute(obj, key, attribute)
         return unless select(key, value)
 
-        hash[key] = value unless value == Alba::REMOVE_KEY
+        hash[key] = value unless Alba::REMOVE_KEY == value # rubocop:disable Style/YodaCondition
       end
 
       def handle_error(error, obj, key, attribute, hash)
