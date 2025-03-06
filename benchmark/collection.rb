@@ -242,7 +242,6 @@ simple_ams = Proc.new { SimpleAMS::Renderer::Collection.new(posts, serializer: S
 turbostreamer = Proc.new { TurbostreamerSerializer.new(posts).to_json }
 
 # --- Execute the serializers to check their output ---
-GC.disable
 puts "Checking outputs..."
 correct = alba.call
 parsed_correct = JSON.parse(correct)
