@@ -100,11 +100,15 @@ module Alba
       #
       # @return [Hash]
       def serializable_hash
-        Alba.collection?(@object) ? serializable_hash_for_collection : converter.call(@object)
+        Alba.collection?(@object) ? serializable_hash_for_collection : attributes_to_hash(@object, {})
       end
       alias to_h serializable_hash
 
       private
+
+      def deprecated_serializable_hash
+        Alba.collection?(@object) ? serializable_hash_for_collection : converter.call(@object)
+      end
 
       def serialize_with(hash)
         serialized_json = encode(hash)
@@ -131,6 +135,18 @@ module Alba
       end
 
       def serializable_hash_for_collection
+        if @_collection_key
+          @object.to_h do |item|
+            k = item.public_send(@_collection_key)
+            key = Alba.regularize_key(k)
+            [key, attributes_to_hash(item, {})]
+          end
+        else
+          @object.map { |obj| attributes_to_hash(obj, {}) }
+        end
+      end
+
+      def deprecated_serializable_hash_for_collection
         if @_collection_key
           @object.to_h do |item|
             k = item.public_send(@_collection_key)
@@ -300,8 +316,19 @@ module Alba
       attr_reader(*INTERNAL_VARIABLES.keys)
 
       # This `method_added` is used for defining "resource methods"
-      def method_added(method_name)
-        _resource_methods << method_name.to_sym unless method_name.to_sym == :_setup
+      def method_added(method_name) # rubocop:disable Metrics/MethodLength
+        case method_name
+        when :collection_converter, :converter
+          warn "Defining ##{method_name} methods is deprecated", category: :deprecated, uplevel: 1
+          alias_method :serializable_hash_for_collection, :deprecated_serializable_hash_for_collection
+          private(:serializable_hash_for_collection)
+          alias_method :serializable_hash, :deprecated_serializable_hash
+          alias_method :to_h, :deprecated_serializable_hash
+        when :_setup # noop
+        else
+          _resource_methods << method_name.to_sym
+        end
+
         super
       end
 
