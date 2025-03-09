@@ -79,11 +79,11 @@ module Alba
     end
 
     # Detect if object is a collection or not.
-    # When object is a Struct, it's Enumerable but not a collection
+    # When object is a Struct or a Range, it's Enumerable but not a collection
     #
     # @api private
     def collection?(object)
-      object.is_a?(Enumerable) && !object.is_a?(Struct)
+      object.is_a?(Enumerable) && !object.is_a?(Struct) && !object.is_a?(Range)
     end
 
     # Enable inference for key and resource name
