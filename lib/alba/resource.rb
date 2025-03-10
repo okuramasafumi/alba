@@ -14,7 +14,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    INTERNAL_VARIABLES = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil, _resource_methods: []}.freeze # rubocop:disable Layout/LineLength
+    INTERNAL_VARIABLES = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil, _resource_methods: {}}.freeze # rubocop:disable Layout/LineLength
     private_constant :INTERNAL_VARIABLES
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -100,7 +100,7 @@ module Alba
       #
       # @return [Hash]
       def serializable_hash
-        Alba.collection?(@object) ? serializable_hash_for_collection : attributes_to_hash(@object, {})
+        Alba.collection?(@object) ? serializable_hash_for_collection : attributes_to_hash(@object)
       end
       alias to_h serializable_hash
 
@@ -139,10 +139,10 @@ module Alba
           @object.to_h do |item|
             k = item.public_send(@_collection_key)
             key = Alba.regularize_key(k)
-            [key, attributes_to_hash(item, {})]
+            [key, attributes_to_hash(item)]
           end
         else
-          @object.map { |obj| attributes_to_hash(obj, {}) }
+          @object.map { |obj| attributes_to_hash(obj) }
         end
       end
 
@@ -191,20 +191,68 @@ module Alba
 
       def converter
         lambda do |obj|
-          attributes_to_hash(obj, {})
+          attributes_to_hash(obj)
         end
       end
 
       def collection_converter
         lambda do |obj, a|
-          a << {}
-          h = a.last
-          attributes_to_hash(obj, h)
-          a
+          a << attributes_to_hash(obj)
         end
       end
 
-      def attributes_to_hash(obj, hash)
+      def attributes_to_hash(obj)
+        if @_on_error.nil? || @_on_error == :raise
+          remove_keys = false
+          hash = self.class._attributes_hash.transform_values do |attribute|
+            value = if Symbol === attribute
+              if @_resource_methods.include?(attribute)
+                __send__(attribute, obj)
+              else
+                obj.__send__(attribute)
+              end
+            else
+              fetch_attribute(obj, nil, attribute)
+            end
+            remove_keys ||= REMOVE_KEY == value
+            value
+          end
+
+          if remove_keys
+            hash.reject! do |_key, value|
+              REMOVE_KEY == value # rubocop:disable Style/YodaCondition
+            end
+          end
+
+          hash
+        else
+          hash = self.class._attributes_hash.transform_values do |attribute|
+            fetch_attribute(obj, nil, attribute)
+          rescue ::Alba::Error, FrozenError, TypeError
+            raise
+          rescue StandardError
+            case @_on_error
+            when :nullify then nil
+            when :ignore then Alba::REMOVE_KEY
+            when Proc
+              raise NotImplementedError, "Not sure how to support that interface"
+            else
+              # :nocov:
+              raise Alba::Error, 'Impossible path'
+              # :nocov:
+            end
+          end
+
+          hash.reject! do |_key, value|
+            REMOVE_KEY == value # rubocop:disable Style/YodaCondition
+          end
+
+          hash
+        end
+      end
+
+      def deprecated_attributes_to_hash(obj)
+        hash = {}
         attributes.each do |key, attribute|
           set_key_and_attribute_body_from(obj, key, attribute, hash)
         rescue ::Alba::Error, FrozenError, TypeError
@@ -268,11 +316,11 @@ module Alba
                 else raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
                   # :nocov:
                 end
-        value.nil? && nil_handler ? instance_exec(obj, key, attribute, &nil_handler) : value
-      end
-
-      def fetch_attribute_from_object_and_resource(obj, attribute)
-        _fetch_attribute_from_resource_first(obj, attribute)
+        if value.nil? && nil_handler
+          instance_exec(obj, key || self.class._reverse_attributes_hash[attribute], attribute, &nil_handler)
+        else
+          value
+        end
       end
 
       def _fetch_attribute_from_object_first(obj, attribute)
@@ -288,6 +336,8 @@ module Alba
           obj.__send__(attribute)
         end
       end
+
+      alias :fetch_attribute_from_object_and_resource :_fetch_attribute_from_resource_first
 
       def nil_handler
         @_on_nil
@@ -324,9 +374,12 @@ module Alba
           private(:serializable_hash_for_collection)
           alias_method :serializable_hash, :deprecated_serializable_hash
           alias_method :to_h, :deprecated_serializable_hash
+        when :attributes, :select
+          warn "Defining ##{method_name} methods is deprecated", category: :deprecated, uplevel: 1
+          alias_method :attributes_to_hash, :deprecated_attributes_to_hash
         when :_setup # noop
         else
-          _resource_methods << method_name.to_sym
+          _resource_methods[method_name.to_sym] = true
         end
 
         super
@@ -336,6 +389,30 @@ module Alba
       def inherited(subclass)
         super
         INTERNAL_VARIABLES.each_key { |name| subclass.instance_variable_set(:"@#{name}", instance_variable_get(:"@#{name}").clone) }
+      end
+
+      # @api private
+      def _attributes_hash
+        # FIXME: this need to be recomputed whenever `@_attributes`, `@_transform_type`
+        # anda few other properties change.
+        @_attributes_hash ||= @_attributes.transform_keys do |key|
+          if @_transform_type == :none || key.nil? || key.empty?
+            Alba.regularize_key(key) # We can skip transformation
+          else
+            Alba.transform_key(key, transform_type: @_transform_type)
+          end
+        end
+      end
+
+      # @api private
+      def _reverse_attributes_hash
+        @_reverse_attributes_hash ||= _attributes_hash.invert
+      end
+
+      # @api private
+      def _clear_cache
+        @_attributes_hash = nil
+        @_reverse_attributes_hash = nil
       end
 
       # Defining methods for DSLs and disable parameter number check since for users' benefits increasing params is fine
@@ -351,6 +428,7 @@ module Alba
         if_value = binding.local_variable_get(:if)
         assign_attributes(attrs, if_value)
         assign_attributes_with_types(attrs_with_types, if_value)
+        _clear_cache
       end
 
       def assign_attributes(attrs, if_value)
@@ -385,6 +463,7 @@ module Alba
         raise ArgumentError, 'No block given in attribute method' unless block
 
         @_attributes[name.to_sym] = options[:if] ? ConditionalAttribute.new(body: block, condition: options[:if]) : block
+        _clear_cache
       end
 
       # Set association
@@ -407,6 +486,7 @@ module Alba
           name: name, condition: condition, resource: resource, params: params, nesting: nesting, key_transformation: transformation, helper: @_helper, &block
         )
         @_attributes[key&.to_sym || name.to_sym] = options[:if] ? ConditionalAttribute.new(body: assoc, condition: options[:if]) : assoc
+        _clear_cache
       end
       alias one association
       alias many association
@@ -436,6 +516,7 @@ module Alba
         key_transformation = @_key_transformation_cascade ? @_transform_type : :none
         attribute = NestedAttribute.new(key_transformation: key_transformation, &block)
         @_attributes[name.to_sym] = options[:if] ? ConditionalAttribute.new(body: attribute, condition: options[:if]) : attribute
+        _clear_cache
       end
       alias nested nested_attribute
 
@@ -494,6 +575,7 @@ module Alba
         @_transform_type = type
         @_transforming_root_key = root
         @_key_transformation_cascade = cascade
+        _clear_cache
       end
 
       # Transform keys as specified type AFTER the class is defined
@@ -568,6 +650,7 @@ module Alba
       # DSL for alias, purely for readability
       def prefer_object_method!
         alias_method :fetch_attribute_from_object_and_resource, :_fetch_attribute_from_object_first
+        alias_method :attributes_to_hash, :deprecated_attributes_to_hash
       end
     end
   end
