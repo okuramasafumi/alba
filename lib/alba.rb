@@ -54,7 +54,7 @@ module Alba
         h = hashify_collection(object, with, &block)
         Alba.encoder.call(h)
       else
-        resource = resource_with(object, &block)
+        resource = resource_for(object, &block)
         resource.serialize(root_key: root_key)
       end
     end
@@ -73,7 +73,7 @@ module Alba
       if collection?(object)
         hashify_collection(object, with, &block)
       else
-        resource = resource_with(object, &block)
+        resource = resource_for(object, &block)
         resource.as_json(root_key: root_key)
       end
     end
@@ -223,6 +223,12 @@ module Alba
       register_default_types
     end
 
+    # @deprecated Use resource_for instead
+    def resource_with(object, with: :inference, &block)
+      Kernel.warn('Alba.resource_with is deprecated. Use `Alba.resource_for` instead.')
+      _resource_for(object, with: with, &block)
+    end
+
     # Get a resource object from arguments
     # If block is given, it creates a resource class with the block
     # Otherwise, it behaves depending on `with` argument
@@ -235,7 +241,13 @@ module Alba
     #   Otherwise, it raises an ArgumentError
     # @return [Alba::Resource] resource class with `object` as its target object
     # @raise [ArgumentError] if `with` argument is not one of `:inference`, Proc or Class
-    def resource_with(object, with: :inference, &block) # rubocop:disable Metrics/MethodLength
+    def resource_for(object, with: :inference, &block)
+      _resource_for(object, with: with, &block)
+    end
+
+    private
+
+    def _resource_for(object, with: :inference, &block) # rubocop:disable Metrics/MethodLength
       klass = if block
                 resource_class(&block)
               else
@@ -249,8 +261,6 @@ module Alba
 
       klass.new(object)
     end
-
-    private
 
     def inflector_from(name_or_module)
       case name_or_module
@@ -306,7 +316,7 @@ module Alba
 
     def hashify_collection(collection, with, &block)
       collection.map do |obj|
-        resource = resource_with(obj, with: with, &block)
+        resource = resource_for(obj, with: with, &block)
         raise Alba::Error if resource.nil?
 
         resource.to_h
