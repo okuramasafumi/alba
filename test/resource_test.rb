@@ -125,4 +125,36 @@ class ResourceTest < Minitest::Test
       FooSerializer.new(@foo).to_json
     )
   end
+
+  class DeprecatedConverterResource
+    include Alba::Resource
+    attributes :id
+
+    private
+
+    def converter
+      ->(o) { o }
+    end
+  end
+
+  def test_deprecated_converter
+    assert_equal @foo, DeprecatedConverterResource.new(@foo).as_json
+  end
+
+  class DeprecatedConverterCollectionResource
+    include Alba::Resource
+    attributes :id
+
+    private
+
+    def collection_converter
+      lambda do |obj, a|
+        a << obj
+      end
+    end
+  end
+
+  def test_deprecated_collection_converter
+    assert_equal [@foo], DeprecatedConverterCollectionResource.new([@foo]).as_json
+  end
 end
