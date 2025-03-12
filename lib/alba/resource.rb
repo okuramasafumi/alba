@@ -276,12 +276,16 @@ module Alba
       end
 
       def _fetch_attribute_from_object_first(obj, attribute)
+        return obj.fetch(attribute) if obj.is_a?(Hash)
+
         obj.__send__(attribute)
       rescue NoMethodError
         __send__(attribute, obj)
       end
 
       def _fetch_attribute_from_resource_first(obj, attribute)
+        return obj.fetch(attribute) if obj.is_a?(Hash)
+
         if @_resource_methods.include?(attribute)
           __send__(attribute, obj)
         else

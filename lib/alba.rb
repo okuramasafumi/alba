@@ -83,7 +83,7 @@ module Alba
     #
     # @api private
     def collection?(object)
-      object.is_a?(Enumerable) && !object.is_a?(Struct) && !object.is_a?(Range)
+      object.is_a?(Enumerable) && !object.is_a?(Struct) && !object.is_a?(Range) && !object.is_a?(Hash)
     end
 
     # Enable inference for key and resource name

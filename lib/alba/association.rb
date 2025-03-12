@@ -47,7 +47,7 @@ module Alba
     # @return [Hash]
     def to_h(target, within: nil, params: {})
       params = params.merge(@params)
-      object = target.__send__(@name)
+      object = target.is_a?(Hash) ? target.fetch(@name) : target.__send__(@name)
       object = @condition.call(object, params, target) if @condition
       return if object.nil?
 
