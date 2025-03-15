@@ -333,8 +333,12 @@ class AlbaTest < Minitest::Test
         Alba.serialize([foo1, foo2])
       )
       assert_equal(
-        '[{"id":1,"name":"foo1"},{"id":2,"name":"foo2"}]',
-        Alba.serialize([foo1, foo2], with: FooResource)
+        '[{"id":1},{"id":2}]',
+        Alba.serialize([foo1, foo2], with: CustomFooResource)
+      )
+      assert_equal(
+        '{"foos":[{"id":1,"name":"foo1"}]}',
+        Alba.serialize([foo1], root_key: :foos)
       )
     end
   end

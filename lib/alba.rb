@@ -51,7 +51,7 @@ module Alba
       raise ArgumentError, 'Either object or block must be given' if object.nil? && block.nil?
 
       if collection?(object)
-        h = hashify_collection(object, with, &block)
+        h = hashify_collection(object, with, root_key, &block)
         Alba.encoder.call(h)
       else
         resource = resource_for(object, &block)
@@ -71,7 +71,7 @@ module Alba
       raise ArgumentError, 'Either object or block must be given' if object.nil? && block.nil?
 
       if collection?(object)
-        hashify_collection(object, with, &block)
+        hashify_collection(object, with, root_key, &block)
       else
         resource = resource_for(object, &block)
         resource.as_json(root_key: root_key)
@@ -314,13 +314,14 @@ module Alba
       end
     end
 
-    def hashify_collection(collection, with, &block)
-      collection.map do |obj|
+    def hashify_collection(collection, with, root_key, &block)
+      array = collection.map do |obj|
         resource = resource_for(obj, with: with, &block)
         raise Alba::Error if resource.nil?
 
         resource.to_h
       end
+      root_key ? {root_key => array} : array
     end
 
     def validate_inflector(inflector)
