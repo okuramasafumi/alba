@@ -13,7 +13,7 @@ gem 'railties', require: false # For Rails integration testing
 gem 'rake', '~> 13.0' # For test and automation
 gem 'rubocop', '~> 1.74.0', require: false # For lint
 gem 'rubocop-gem_dev', '>= 0.3.0', require: false # For lint
-gem 'rubocop-md', '~> 1.0', require: false # For lint
+gem 'rubocop-md', '~> 2.0', require: false # For lint
 gem 'rubocop-minitest', '~> 0.37.0', require: false # For lint
 gem 'rubocop-performance', '~> 1.23.0', require: false # For lint
 gem 'rubocop-rake', '~> 0.6.0', require: false # For lint
