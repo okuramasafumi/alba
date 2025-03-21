@@ -334,6 +334,9 @@ module Alba
 
     def reset_transform_keys
       @_transformed_keys = Hash.new { |h, k| h[k] = {} }
+      # FIXME: when inflector is changed, all resources `_attributes_hash` would need to be invalidated
+      # ObjectSpace.each_object works but is really dirty.
+      ObjectSpace.each_object(Class) { |k| k._clear_cache if k < Alba::Resource }
     end
 
     def register_default_types # rubocop:disable Metrics/AbcSize
