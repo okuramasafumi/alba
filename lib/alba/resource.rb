@@ -217,6 +217,8 @@ module Alba
 
       # This is default behavior for getting attributes for serialization
       # Override this method to filter certain attributes
+      #
+      # @deprecated in favor of `select`
       def attributes
         @_attributes
       end
@@ -328,6 +330,8 @@ module Alba
           private(:serializable_hash_for_collection)
           alias_method :serializable_hash, :deprecated_serializable_hash
           alias_method :to_h, :deprecated_serializable_hash
+        when :attributes
+          warn 'Overriding `attributes` is deprecated, use `select` instead.', category: :deprecated, uplevel: 1
         when :_setup # noop
         else
           _resource_methods << method_name.to_sym

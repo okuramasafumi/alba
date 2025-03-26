@@ -157,4 +157,19 @@ class ResourceTest < Minitest::Test
   def test_deprecated_collection_converter
     assert_equal [@foo], DeprecatedConverterCollectionResource.new([@foo]).as_json
   end
+
+  def test_deprecated_attributes
+    assert_output('', /Overriding `attributes` is deprecated, use `select` instead./) do
+      Class.new do
+        include Alba::Resource
+        attributes :id
+
+        private
+
+        def attributes # rubocop:disable Lint/UselessMethodDefinition
+          super
+        end
+      end
+    end
+  end
 end
