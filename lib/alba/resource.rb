@@ -14,7 +14,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    INTERNAL_VARIABLES = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil, _resource_methods: []}.freeze # rubocop:disable Layout/LineLength
+    INTERNAL_VARIABLES = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil, _resource_methods: [], _select_arity: nil}.freeze # rubocop:disable Layout/LineLength
     private_constant :INTERNAL_VARIABLES
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -225,14 +225,20 @@ module Alba
 
       # Default implementation for selecting attributes
       # Override this method to filter attributes based on key and value
-      def select(_key, _value)
+      def select(_key, _value, _attribute)
         true
       end
 
       def set_key_and_attribute_body_from(obj, key, attribute, hash)
         key = transform_key(key)
         value = fetch_attribute(obj, key, attribute)
-        return unless select(key, value)
+        # When `select` is not overridden, skip calling it for better performance
+        unless @_select_arity.nil?
+          # `select` can be overridden with both 2 and 3 parameters
+          # Here we check the arity and build arguments accordingly
+          args = @_select_arity == 3 ? [key, value, attribute] : [key, value]
+          return unless select(*args)
+        end
 
         hash[key] = value unless Alba::REMOVE_KEY == value # rubocop:disable Style/YodaCondition
       end
@@ -332,6 +338,8 @@ module Alba
           alias_method :to_h, :deprecated_serializable_hash
         when :attributes
           warn 'Overriding `attributes` is deprecated, use `select` instead.', category: :deprecated, uplevel: 1
+        when :select
+          @_select_arity = instance_method(:select).arity
         when :_setup # noop
         else
           _resource_methods << method_name.to_sym

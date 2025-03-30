@@ -840,7 +840,7 @@ To filter attributes, you can use `select` instance method. Using `attributes` i
 
 #### Filtering attributes with `select`
 
-`select` takes two parameters, the name of an attribute and the value of an attribute. If it returns false that attribute is rejected.
+`select` takes two or three parameters, the name of an attribute, the value of an attribute and the attribute object (`Alba::Association`, for example). If it returns false that attribute is rejected.
 
 ```ruby
 class Foo
@@ -863,6 +863,9 @@ class RestrictedFooResource < GenericFooResource
   def select(_key, value)
     !value.nil?
   end
+
+  # This is also possible
+  # def select(_key, _value, _attribute)
 end
 
 foo = Foo.new(1, nil, 'body')
