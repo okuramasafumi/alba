@@ -6,6 +6,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.0] 2025-03-11
+
+### Added
+
+- Add serializer keyword argument as an alias for resource [#408](https://github.com/okuramasafumi/alba/pull/408)
+- `Alba.resource_for` as a replacement to `resource_with`
+- Hash serialization [#427](https://github.com/okuramasafumi/alba/pull/427)
+
+### Changed
+
+- Performance improvements [#421](https://github.com/okuramasafumi/alba/pull/421) and [#423](https://github.com/okuramasafumi/alba/pull/423)
+
+### Fixed
+
+- Range is not a collection [#417](https://github.com/okuramasafumi/alba/issues/417)
+
+### Deprecated
+
+- `Alba.resource_with` is deprecated in favor of `Alba.resource_for`
+- Overriding `Alba::Resource#attributes` is now deprecated in favor of `Alba::Resource#select`
+
 ## [3.5.0] 2025-01-01
 
 ### Added
