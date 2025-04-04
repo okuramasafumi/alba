@@ -1807,6 +1807,20 @@ Here, we override `serialize` method with `prepend`. In overridden method we pri
 
 Don't forget calling `super` in this way.
 
+## Tips and Tricks
+
+### Treating specific classes as non-collection
+
+Sometimes we need to serialize an object that's `Enumerable` but not a collection. By default, Alba treats `Hash`, `Range` and `Struct` as non-collection object, but if we want to add some classes to this list, we can override `Alba.collection?` method like following:
+
+```ruby
+Alba.singleton_class.prepend(Module.new do
+  def collection?(object)
+    super && !object.is_a?(SomeClass)
+  end
+end)
+```
+
 ## Rails
 
 When you use Alba in Rails, you can create an initializer file with the line below for compatibility with Rails JSON encoder.
