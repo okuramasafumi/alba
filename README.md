@@ -1814,11 +1814,13 @@ Don't forget calling `super` in this way.
 Sometimes we need to serialize an object that's `Enumerable` but not a collection. By default, Alba treats `Hash`, `Range` and `Struct` as non-collection object, but if we want to add some classes to this list, we can override `Alba.collection?` method like following:
 
 ```ruby
-Alba.singleton_class.prepend(Module.new do
-  def collection?(object)
-    super && !object.is_a?(SomeClass)
+Alba.singleton_class.prepend(
+  Module.new do
+    def collection?(object)
+      super && !object.is_a?(SomeClass)
+    end
   end
-end)
+)
 ```
 
 ## Rails
