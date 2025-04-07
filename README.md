@@ -122,7 +122,7 @@ Alba supports CRuby 3.0 and higher and latest JRuby and TruffleRuby.
 
 ## Documentation
 
-You can find the documentation on [RubyDoc](https://rubydoc.info/github/okuramasafumi/alba).
+You can find the documentation on [GitHub Pages](https://okuramasafumi.github.io/alba/).
 
 ## Features
 
