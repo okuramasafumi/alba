@@ -1823,6 +1823,42 @@ Alba.singleton_class.prepend(
 )
 ```
 
+### Adding indexes to `many` association
+
+Let's say an author has many books. We want returned JSON to include indexes of each book. In this case, we can reduce the number of executed SQL by fetching indexes ahead and push indexes into `param`.
+
+```ruby
+Author = Data.define(:id, :books)
+Book = Data.define(:id, :name)
+
+book1 = Book.new(1, 'book1')
+book2 = Book.new(2, 'book2')
+book3 = Book.new(3, 'book3')
+
+author = Author.new(2, [book2, book3, book1])
+
+class AuthorResource
+  include Alba::Resource
+
+  attributes :id
+  many :books do
+    attributes :id, :name
+    attribute :index do |bar|
+      params[:index][bar.id]
+    end
+  end
+end
+
+AuthorResource.new(
+  author,
+  params: {
+    index: author.books.map.with_index { [_1.id, _2] }
+    .to_h
+  }
+).serialize
+# => {"id":2,"books":[{"id":2,"name":"book2","index":0},{"id":3,"name":"book3","index":1},{"id":1,"name":"book1","index":2}]}
+```
+
 ## Rails
 
 When you use Alba in Rails, you can create an initializer file with the line below for compatibility with Rails JSON encoder.
