@@ -1852,7 +1852,7 @@ end
 AuthorResource.new(
   author,
   params: {
-    index: author.books.map.with_index { [_1.id, _2] }
+    index: author.books.map.with_index { |book, index| [book.id, index] }
     .to_h
   }
 ).serialize
