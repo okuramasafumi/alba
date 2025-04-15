@@ -7,7 +7,7 @@ inherit_mode:
   merge:
     - Exclude
 
-require:
+plugins:
   - rubocop-md
   - rubocop-minitest
   - rubocop-performance
