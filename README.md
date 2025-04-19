@@ -1892,6 +1892,10 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 Thank you for begin interested in contributing to Alba! Please see [contributors guide](https://github.com/okuramasafumi/alba/blob/main/CONTRIBUTING.md) before start contributing. If you have any questions, please feel free to ask in [Discussions](https://github.com/okuramasafumi/alba/discussions).
 
+## Versioning
+
+Alba follows [Semver 2.0.0](https://semver.org/spec/v2.0.0.html).
+
 ## License
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
