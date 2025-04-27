@@ -14,7 +14,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    INTERNAL_VARIABLES = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil, _resource_methods: [], _select_arity: nil}.freeze # rubocop:disable Layout/LineLength
+    INTERNAL_VARIABLES = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil, _resource_methods: [], _select_arity: nil, _traits: {}}.freeze # rubocop:disable Layout/LineLength
     private_constant :INTERNAL_VARIABLES
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -46,10 +46,12 @@ module Alba
       # @param object [Object] the object to be serialized
       # @param params [Hash] user-given Hash for arbitrary data
       # @param within [Object, nil, false, true] determines what associations to be serialized. If not set, it serializes all associations.
-      def initialize(object, params: {}, within: WITHIN_DEFAULT)
+      # @param with_traits [Symbol, Array<Symbol>, nil] specified traits
+      def initialize(object, params: {}, within: WITHIN_DEFAULT, with_traits: nil)
         @object = object
         @params = params
         @within = within
+        @with_traits = with_traits
         _setup
       end
 
@@ -105,6 +107,20 @@ module Alba
       alias to_h serializable_hash
 
       private
+
+      def hash_from_traits(obj)
+        h = {}
+        return h if @with_traits.nil?
+
+        Array(@with_traits).each do |trait|
+          body = @_traits.fetch(trait) { raise Alba::Error, "Trait not found: #{trait}" }
+
+          resource_class = Alba.resource_class
+          resource_class.class_eval(&body)
+          h.merge!(resource_class.new(obj, params: params, within: @within).serializable_hash)
+        end
+        h
+      end
 
       def deprecated_serializable_hash
         Alba.collection?(@object) ? serializable_hash_for_collection : converter.call(@object)
@@ -212,7 +228,7 @@ module Alba
         rescue StandardError => e
           handle_error(e, obj, key, attribute, hash)
         end
-        hash
+        @with_traits.nil? ? hash : hash.merge!(hash_from_traits(obj))
       end
 
       # This is default behavior for getting attributes for serialization
@@ -454,6 +470,19 @@ module Alba
         @_attributes[name.to_sym] = options[:if] ? ConditionalAttribute.new(body: attribute, condition: options[:if]) : attribute
       end
       alias nested nested_attribute
+
+      # Set a trait
+      #
+      # @param name [String, Symbol] name of the trait
+      # @param block [Block] the "content" of the trait
+      # @raise [ArgumentError] if block is absent
+      # @return [void]
+      def trait(name, &block)
+        raise ArgumentError, 'No block given in trait method' unless block
+
+        name = name.to_sym
+        @_traits[name] = block
+      end
 
       # Set root key
       #
