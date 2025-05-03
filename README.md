@@ -1073,6 +1073,40 @@ class UserResource2
 end
 ```
 
+### Traits
+
+Traits is an easy way to a group of attributes and apply it to the resource.
+
+```ruby
+class User
+  attr_accessor :id, :name, :email
+
+  def initialize(id, name, email)
+    @id = id
+    @name = name
+    @email = email
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  attributes :id
+
+  trait :additional do
+    attributes :name, :email
+  end
+end
+
+user = User.new(1, 'Foo', 'foo@example.org')
+UserResource.new(user).serialize # => '{"id":1}'
+UserResource.new(user, with_traits: :additional).serialize # => '{"id":1,"name":"Foo","email":"foo@example.com"}'
+```
+
+This way, we can keep the resource class simple and inject conditions from outside. We can get the same result with the combination of `if` and `params`, but using `traits` DSL can make the resource class readable.
+
+We can specify multiple traits at once with `with_traits: []` keyword argument.
+
 ### Default
 
 Alba doesn't support default value for attributes, but it's easy to set a default value.
