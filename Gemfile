@@ -23,16 +23,6 @@ gem 'simplecov-cobertura', require: false # For test coverage
 # gem 'typeprof', require: false # For language server and typing
 gem 'yard', require: false # For documentation
 
-# FIXME: There is an upstream JRuby 9.4.9.0 issue with `psych` and the latest
-# version of `jar-dependencies`. The issue will be resolved with the release of
-# 9.4.10.0. Then, we can remove this `jar-dependencies` dependency lock.
-#
-# For more information, see: https://github.com/jruby/jruby/issues/8488
-#
-if defined?(JRUBY_VERSION) && Gem::Version.new(JRUBY_VERSION) < Gem::Version.new('9.4.10.0')
-  gem 'jar-dependencies', '< 0.5' # Fix
-end
-
 platforms :ruby do
   gem 'oj', '~> 3.11', require: false # For backend
   gem 'ruby-prof', require: false # For performance profiling
