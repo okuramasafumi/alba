@@ -167,8 +167,9 @@ class OneTest < Minitest::Test
   end
 
   def test_it_raises_error_when_no_resource_or_block_given_without_inference
-    Alba.inflector = nil
-    assert_raises(ArgumentError) { create_resource_class.call }
+    with_inflector(nil) do
+      assert_raises(ArgumentError) { create_resource_class.call }
+    end
   end
 
   Alba.inflector = :active_support

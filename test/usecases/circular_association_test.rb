@@ -87,6 +87,7 @@ class CircularAssociationTest < Minitest::Test
   end
 
   def setup
+    @original_inflector = Alba.inflector
     Alba.inflector = :active_support
 
     @authors = Array.new(100) do
@@ -124,7 +125,7 @@ class CircularAssociationTest < Minitest::Test
   end
 
   def teardown
-    Alba.inflector = nil
+    Alba.inflector = @original_inflector
   end
 
   def test_within_option_works_for_serialize

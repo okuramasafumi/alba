@@ -28,6 +28,7 @@ class NestedAttributeTest < Minitest::Test
   end
 
   def setup
+    @original_inflector = Alba.inflector
     Alba.backend = nil
     Alba.inflector = :active_support
 
@@ -35,7 +36,7 @@ class NestedAttributeTest < Minitest::Test
   end
 
   def teardown
-    Alba.inflector = nil
+    Alba.inflector = @original_inflector
   end
 
   def test_nested_attribute_becomes_nested_hash

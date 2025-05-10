@@ -65,6 +65,7 @@ class WithInferenceTest < Minitest::Test
   end
 
   def setup
+    @original_inflector = Alba.inflector
     Alba.inflector = :active_support
     @user = User.new(1)
     @user.articles << Article.new(1, 'The title')
@@ -72,7 +73,7 @@ class WithInferenceTest < Minitest::Test
   end
 
   def teardown
-    Alba.inflector = nil
+    Alba.inflector = @original_inflector
   end
 
   def test_it_infers_resource_name

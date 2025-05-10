@@ -68,6 +68,7 @@ class KeyTransformTest < Minitest::Test
   end
 
   def setup
+    @original_inflector = Alba.inflector
     Alba.inflector = :active_support
 
     @bank_account = BankAccount.new(123_456_789)
@@ -75,7 +76,7 @@ class KeyTransformTest < Minitest::Test
   end
 
   def teardown
-    Alba.inflector = nil
+    Alba.inflector = @original_inflector
   end
 
   def test_alba_error_is_raised_in_the_code_load_phase_if_key_transforms_setting_is_not_known
@@ -151,11 +152,12 @@ class KeyTransformTest < Minitest::Test
   end
 
   def test_custom_inflector_is_used_if_defined
-    Alba.inflector = CustomInflector
-    assert_equal(
-      '{"camelized_id":1,"camelized_first_name":"Masafumi","camelized_last_name":"Okura"}',
-      UserResourceCamel.new(@user).serialize
-    )
+    with_inflector(CustomInflector) do
+      assert_equal(
+        '{"camelized_id":1,"camelized_first_name":"Masafumi","camelized_last_name":"Okura"}',
+        UserResourceCamel.new(@user).serialize
+      )
+    end
   end
 
   class UserResourceCamelChild < UserResourceCamel
@@ -173,9 +175,10 @@ class KeyTransformTest < Minitest::Test
   end
 
   def test_error_is_raised_when_inflector_is_nil
-    Alba.inflector = nil
-    assert_raises(Alba::Error) do
-      UserResourceCamel.new(@user).serialize
+    with_inflector(nil) do
+      assert_raises(Alba::Error) do
+        UserResourceCamel.new(@user).serialize
+      end
     end
   end
 

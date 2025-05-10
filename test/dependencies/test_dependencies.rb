@@ -21,11 +21,14 @@ class DependenciesTest < Minitest::Test
 
   def setup
     @user = User.new('Masafumi', 'Okura')
+
+    @original_inflector = Alba.inflector
+    @original_backend = Alba.backend
   end
 
   def teardown
-    Alba.inflector = nil
-    Alba.backend = nil
+    Alba.inflector = @original_inflector
+    Alba.backend = @original_backend
   end
 
   if ENV['BUNDLE_GEMFILE'] == File.expand_path('gemfiles/without_active_support.gemfile')

@@ -226,30 +226,31 @@ class AlbaTest < Minitest::Test
   end
 
   def test_it_serializes_object_with_inferred_resource_when_inference_is_enabled
-    Alba.inflector = :active_support
-    assert_equal(
-      '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}',
-      Alba.serialize(@user)
-    )
-    assert_equal(
-      '{"user":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
-      Alba.serialize(@user, root_key: :user)
-    )
-    Alba.inflector = nil
+    with_inflector(:active_support) do
+      assert_equal(
+        '{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}',
+        Alba.serialize(@user)
+      )
+      assert_equal(
+        '{"user":{"id":1,"articles":[{"title":"Hello World!","body":"Hello World!!!"}]}}',
+        Alba.serialize(@user, root_key: :user)
+      )
+    end
   end
 
   def test_it_raises_error_when_trying_to_infer_resource_when_inference_is_disabled
-    Alba.inflector = nil
-    assert_raises(Alba::Error) { Alba.serialize(@user) }
+    with_inflector(nil) do
+      assert_raises(Alba::Error) { Alba.serialize(@user) }
+    end
   end
 
   class Empty # rubocop:disable Lint/EmptyClass
   end
 
   def test_it_raises_error_when_inferred_resource_does_not_exist_even_when_infernce_is_enabled
-    Alba.inflector = :active_support
-    assert_raises(NameError) { Alba.serialize(Empty.new) }
-    Alba.inflector = nil
+    with_inflector(:active_support) do
+      assert_raises(NameError) { Alba.serialize(Empty.new) }
+    end
   end
 
   # Deprecated methods
@@ -344,72 +345,71 @@ class AlbaTest < Minitest::Test
   end
 
   def test_serialize_collection_with_different_types
-    original = Alba.inflector
-    Alba.inflector = :active_support
-
     foo1 = Foo.new(1, 'foo1')
     foo2 = Foo.new(2, 'foo2')
     bar1 = Bar.new(1, 'bar1')
     bar2 = Bar.new(2, 'bar2')
 
-    assert_equal(
-      '[{"id":1,"name":"foo1"},{"id":1,"address":"bar1"},{"id":2,"name":"foo2"},{"id":2,"address":"bar2"}]',
-      Alba.serialize([foo1, bar1, foo2, bar2], with: :inference)
-    )
-    assert_equal(
-      '[{"id":1},{"id":1,"address":"bar1"},{"id":2},{"id":2,"address":"bar2"}]',
-      Alba.serialize(
-        [foo1, bar1, foo2, bar2],
-        with: lambda do |obj|
-                case obj
-                when Foo
-                  CustomFooResource
-                when Bar
-                  BarResource
-                else
-                  raise # Impossible in this case
-                end
-              end
+    with_inflector(:active_support) do
+      assert_equal(
+        '[{"id":1,"name":"foo1"},{"id":1,"address":"bar1"},{"id":2,"name":"foo2"},{"id":2,"address":"bar2"}]',
+        Alba.serialize([foo1, bar1, foo2, bar2], with: :inference)
       )
-    )
-    Alba.inflector = nil
-    assert_raises(Alba::Error) { Alba.serialize([foo1, bar1, foo2, bar2]) }
-    Alba.inflector = original
+      assert_equal(
+        '[{"id":1},{"id":1,"address":"bar1"},{"id":2},{"id":2,"address":"bar2"}]',
+        Alba.serialize(
+          [foo1, bar1, foo2, bar2],
+          with: lambda do |obj|
+            case obj
+            when Foo
+              CustomFooResource
+            when Bar
+              BarResource
+            else
+              raise # Impossible in this case
+            end
+          end
+        )
+      )
+    end
+
+    with_inflector(nil) do
+      assert_raises(Alba::Error) { Alba.serialize([foo1, bar1, foo2, bar2]) }
+    end
   end
 
   # rubocop:disable Style/StringHashKeys
   def test_hashify_collection_with_different_types
-    original = Alba.inflector
-    Alba.inflector = :active_support
-
     foo1 = Foo.new(1, 'foo1')
     foo2 = Foo.new(2, 'foo2')
     bar1 = Bar.new(1, 'bar1')
     bar2 = Bar.new(2, 'bar2')
 
-    assert_equal(
-      [{'id' => 1, 'name' => 'foo1'}, {'id' => 1, 'address' => 'bar1'}, {'id' => 2, 'name' => 'foo2'}, {'id' => 2, 'address' => 'bar2'}],
-      Alba.hashify([foo1, bar1, foo2, bar2], with: :inference)
-    )
-    assert_equal(
-      [{'id' => 1}, {'id' => 1, 'address' => 'bar1'}, {'id' => 2}, {'id' => 2, 'address' => 'bar2'}],
-      Alba.hashify(
-        [foo1, bar1, foo2, bar2],
-        with: lambda do |obj|
-                case obj
-                when Foo
-                  CustomFooResource
-                when Bar
-                  BarResource
-                else
-                  raise # Impossible in this case
-                end
-              end
+    with_inflector(:active_support) do
+      assert_equal(
+        [{'id' => 1, 'name' => 'foo1'}, {'id' => 1, 'address' => 'bar1'}, {'id' => 2, 'name' => 'foo2'}, {'id' => 2, 'address' => 'bar2'}],
+        Alba.hashify([foo1, bar1, foo2, bar2], with: :inference)
       )
-    )
-    Alba.inflector = nil
-    assert_raises(Alba::Error) { Alba.hashify([foo1, bar1, foo2, bar2]) }
-    Alba.inflector = original
+      assert_equal(
+        [{'id' => 1}, {'id' => 1, 'address' => 'bar1'}, {'id' => 2}, {'id' => 2, 'address' => 'bar2'}],
+        Alba.hashify(
+          [foo1, bar1, foo2, bar2],
+          with: lambda do |obj|
+            case obj
+            when Foo
+              CustomFooResource
+            when Bar
+              BarResource
+            else
+              raise # Impossible in this case
+            end
+          end
+        )
+      )
+    end
+    with_inflector(nil) do
+      assert_raises(Alba::Error) { Alba.hashify([foo1, bar1, foo2, bar2]) }
+    end
   end
   # rubocop:enable Style/StringHashKeys
 
@@ -437,46 +437,46 @@ class AlbaTest < Minitest::Test
   end
 
   def test_transform_key_with_camel
-    Alba.inflector = :active_support
-    assert_equal(
-      'FooBar',
-      Alba.transform_key(:foo_bar, transform_type: :camel)
-    )
-    Alba.inflector = nil
+    with_inflector(:active_support) do
+      assert_equal(
+        'FooBar',
+        Alba.transform_key(:foo_bar, transform_type: :camel)
+      )
+    end
   end
 
   def test_transform_key_with_lower_camel
-    Alba.inflector = :active_support
-    assert_equal(
-      'fooBar',
-      Alba.transform_key('foo_bar', transform_type: :lower_camel)
-    )
-    Alba.inflector = nil
+    with_inflector(:active_support) do
+      assert_equal(
+        'fooBar',
+        Alba.transform_key('foo_bar', transform_type: :lower_camel)
+      )
+    end
   end
 
   def test_transform_key_with_dash
-    Alba.inflector = :active_support
-    assert_equal(
-      'foo-bar',
-      Alba.transform_key(:foo_bar, transform_type: :dash)
-    )
-    Alba.inflector = nil
+    with_inflector(:active_support) do
+      assert_equal(
+        'foo-bar',
+        Alba.transform_key(:foo_bar, transform_type: :dash)
+      )
+    end
   end
 
   def test_transform_key_with_snake
-    Alba.inflector = :active_support
-    assert_equal(
-      'foo_bar',
-      Alba.transform_key('FooBar', transform_type: :snake)
-    )
-    Alba.inflector = nil
+    with_inflector(:active_support) do
+      assert_equal(
+        'foo_bar',
+        Alba.transform_key('FooBar', transform_type: :snake)
+      )
+    end
   end
 
   def test_transform_key_with_unknown
-    Alba.inflector = :active_support
-    assert_raises(Alba::Error) do
-      Alba.transform_key(:foo_bar, transform_type: :this_is_an_error)
+    with_inflector(:active_support) do
+      assert_raises(Alba::Error) do
+        Alba.transform_key(:foo_bar, transform_type: :this_is_an_error)
+      end
     end
-    Alba.inflector = nil
   end
 end
