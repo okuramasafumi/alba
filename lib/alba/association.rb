@@ -47,8 +47,7 @@ module Alba
     # @return [Hash]
     def to_h(target, within: nil, params: {})
       params = params.merge(@params)
-      object = target.is_a?(Hash) ? target.fetch(@name) : target.__send__(@name)
-      object = @condition.call(object, params, target) if @condition
+      object = object_from(target, params)
       return if object.nil?
 
       if @resource.is_a?(Proc)
@@ -61,6 +60,12 @@ module Alba
     end
 
     private
+
+    def object_from(target, params)
+      o = target.is_a?(Hash) ? target.fetch(@name) : target.__send__(@name)
+      o = @condition.call(o, params, target) if @condition
+      o
+    end
 
     def constantize(resource)
       case resource
