@@ -32,11 +32,11 @@ In `Alba::Resource` module there are some things to note.
 
 `@object` is an object for serialization. It's either a singular object or a collection.
 
-Attribute object can be either `Symbol`, `Proc`, `Alba::Association` or `Alba::TypedAttribute`.
+Attribute object can be either `Symbol`, `Proc`, `Alba::Association`, `Alba::TypedAttribute`, `Alba::NestedAttribute` and `Alba::ConditionalAttribute`.
 
 * `Symbol` attributes come from `attributes` method and are sent to `__send__` as method name
 * `Proc` attributes come from `attribute` method and are `instance_exec`uted
 * `Alba::Association` attributes come from `association` method and `to_h` method on the object is called
 * `Alba::TypedAttribute` attributes come when users specify `type` option and `value` method on the object is called
-
-When users provide `if` option, the attribute object becomes an `Array`. It contains two element, attribute itself and condition.
+* `Alba::NestedAttribute` attributes come from `nested` and `nested_attribute`
+* `Alba::ConditionalAttribute` attributes come when users specify `if` option
