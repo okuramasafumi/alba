@@ -47,11 +47,15 @@ module Alba
       # @param params [Hash] user-given Hash for arbitrary data
       # @param within [Object, nil, false, true] determines what associations to be serialized. If not set, it serializes all associations.
       # @param with_traits [Symbol, Array<Symbol>, nil] specified traits
-      def initialize(object, params: {}, within: WITHIN_DEFAULT, with_traits: nil)
+      # @param select [Method] select method object used with `nested_attribute` and `trait`
+      def initialize(object, params: {}, within: WITHIN_DEFAULT, with_traits: nil, select: nil)
         @object = object
         @params = params
         @within = within
         @with_traits = with_traits
+        # select override to share the same method with `trait` and `nested_attribute`
+        # Trait and NestedAttribute generates anonymous class so it checks if it's anonymous class to prevent accidental overriding
+        self.class.define_method(:select, &select) if select && self.class.name.nil?
         _setup
       end
 
@@ -117,7 +121,7 @@ module Alba
 
           resource_class = Alba.resource_class
           resource_class.class_eval(&body)
-          h.merge!(resource_class.new(obj, params: params, within: @within).serializable_hash)
+          h.merge!(resource_class.new(obj, params: params, within: @within, select: method(:select)).serializable_hash)
         end
         h
       end
@@ -249,14 +253,16 @@ module Alba
         key = transform_key(key)
         value = fetch_attribute(obj, key, attribute)
         # When `select` is not overridden, skip calling it for better performance
-        unless @_select_arity.nil?
-          # `select` can be overridden with both 2 and 3 parameters
-          # Here we check the arity and build arguments accordingly
-          args = @_select_arity == 3 ? [key, value, attribute] : [key, value]
-          return unless select(*args)
-        end
+        return if !@_select_arity.nil? && !do_select(key, value, attribute)
 
         hash[key] = value unless Alba::REMOVE_KEY == value # rubocop:disable Style/YodaCondition
+      end
+
+      def do_select(key, value, attribute)
+        # `select` can be overridden with both 2 and 3 parameters
+        # Here we check the arity and build arguments accordingly
+        args = @_select_arity == 3 ? [key, value, attribute] : [key, value]
+        select(*args)
       end
 
       def handle_error(error, obj, key, attribute, hash)
@@ -286,7 +292,7 @@ module Alba
                 when Proc then instance_exec(obj, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(obj, params: params, within: within) }
                 when TypedAttribute then attribute.value { |attr| fetch_attribute(obj, key, attr) }
-                when NestedAttribute then attribute.value(object: obj, params: params, within: @within)
+                when NestedAttribute then attribute.value(object: obj, params: params, within: @within, select: method(:select))
                 when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: obj) { |attr| fetch_attribute(obj, key, attr) }
                   # :nocov:
                 else raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
