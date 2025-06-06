@@ -50,6 +50,37 @@ class KeyTransformTest < Minitest::Test
     transform_keys :none # Reset
   end
 
+  class UserWithTraitResource
+    include Alba::Resource
+
+    attributes :id, :first_name
+
+    trait :with_last_name do
+      attributes :last_name
+    end
+  end
+
+  class UserWithTraitResourceCamel < UserWithTraitResource
+    transform_keys :camel
+  end
+
+  class UserWithTraitResourceLowerCamel < UserWithTraitResource
+    transform_keys :lower_camel
+  end
+
+  class UserWithTraitResourceDash < UserWithTraitResource
+    transform_keys :dash
+  end
+
+  class UserWithTraitResourceSnake < UserWithTraitResource
+    transform_keys :snake
+  end
+
+  class UserWithTraitResourceNone < UserWithTraitResource
+    transform_keys :dash
+    transform_keys :none # Reset
+  end
+
   class BankAccountResource
     include Alba::Resource
 
@@ -134,6 +165,53 @@ class KeyTransformTest < Minitest::Test
     assert_equal(
       '{"id":1,"first_name":"Masafumi","last_name":"Okura"}',
       UserResourceCamel.transform_keys!(:snake).new(@user).serialize
+    )
+  end
+
+  def test_transform_key_to_camel_with_trait
+    assert_equal(
+      '{"Id":1,"FirstName":"Masafumi","LastName":"Okura"}',
+      UserWithTraitResourceCamel.new(@user, with_traits: :with_last_name).serialize
+    )
+  end
+
+  def test_transform_key_to_dash_with_trait
+    assert_equal(
+      '{"id":1,"first-name":"Masafumi","last-name":"Okura"}',
+      UserWithTraitResourceDash.new(@user, with_traits: :with_last_name).serialize
+    )
+  end
+
+  def test_transform_key_to_snake_with_trait
+    assert_equal(
+      '{"id":1,"first_name":"Masafumi","last_name":"Okura"}',
+      UserWithTraitResourceSnake.new(@user, with_traits: :with_last_name).serialize
+    )
+  end
+
+  def test_transform_key_to_none_with_trait
+    assert_equal(
+      '{"id":1,"first_name":"Masafumi","last_name":"Okura"}',
+      UserWithTraitResourceNone.new(@user, with_traits: :with_last_name).serialize
+    )
+  end
+
+  def test_transform_key_bang_with_trait
+    assert_equal(
+      '{"Id":1,"FirstName":"Masafumi","LastName":"Okura"}',
+      UserWithTraitResourceNone.transform_keys!(:camel).new(@user, with_traits: :with_last_name).serialize
+    )
+    assert_equal(
+      '{"id":1,"first_name":"Masafumi","last_name":"Okura"}',
+      UserWithTraitResourceCamel.transform_keys!(:snake).new(@user, with_traits: :with_last_name).serialize
+    )
+  end
+
+  # rake test TEST=test/usecases/key_transform_test.rb TESTOPTS="--name=test_transform_key_with_trait -v"
+  def test_transform_key_lower_camel_with_trait
+    assert_equal(
+      '{"id":1,"firstName":"Masafumi","lastName":"Okura"}',
+      UserWithTraitResourceLowerCamel.new(@user, with_traits: :with_last_name).serialize
     )
   end
 

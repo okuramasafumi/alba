@@ -121,6 +121,7 @@ module Alba
 
           resource_class = Alba.resource_class
           resource_class.class_eval(&body)
+          resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
           h.merge!(resource_class.new(obj, params: params, within: @within, select: method(:select)).serializable_hash)
         end
         h
