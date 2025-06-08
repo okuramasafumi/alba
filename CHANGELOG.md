@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.2] 2025-06-08
+
+### Fixed
+
+- apply transform_keys directive for traits [#438](https://github.com/okuramasafumi/alba/pull/436)
+  - Thank you, @elShiaLabeouf
+
 ## [3.7.1] 2025-05-27
 
 ### Fixed
