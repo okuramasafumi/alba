@@ -18,7 +18,7 @@ class FilteringTest < Minitest::Test
 
     attributes :id, :name, :email
 
-    def select(_k, v) # rubocop:disable Naming/MethodParameterName
+    def select(_k, v)
       !v.nil?
     end
   end
@@ -99,7 +99,7 @@ class FilteringTest < Minitest::Test
       attributes :email
     end
 
-    def select(_k, v) # rubocop:disable Naming/MethodParameterName
+    def select(_k, v)
       !v.nil?
     end
   end
@@ -136,7 +136,7 @@ class FilteringTest < Minitest::Test
       attributes :email
     end
 
-    def select(_k, v) # rubocop:disable Naming/MethodParameterName
+    def select(_k, v)
       !v.nil?
     end
   end

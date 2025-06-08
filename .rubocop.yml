@@ -97,6 +97,14 @@ Minitest/NoTestCases:
   Exclude:
     - 'test/dependencies/test_dependencies.rb'
 
+Naming:
+  Exclude:
+    - 'test/**/*'
+
+Naming/PredicateMethod:
+  AllowedMethods:
+    - select
+
 # We need to eval resource code to test errors on resource classes
 Security/Eval:
   Exclude:
