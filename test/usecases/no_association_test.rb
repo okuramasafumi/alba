@@ -130,14 +130,17 @@ class NoAssociationTest < Minitest::Test
   end
 
   def test_it_raises_argument_error_with_attribute_without_block
-    resource = <<~RUBY
-      class InvalidResource
+    assert_raises(ArgumentError) do
+      Class.new do
         include Alba::Resource
+
+        def self.name
+          'InvalidResource'
+        end
 
         attribute :without_block
       end
-    RUBY
-    assert_raises(ArgumentError) { eval(resource) }
+    end
   end
 
   class UserFilteringResource

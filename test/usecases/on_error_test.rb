@@ -103,28 +103,28 @@ class OnErrorTest < Minitest::Test
   end
 
   def test_on_error_both_handler_and_block_provided
-    resource = <<~RUBY
-      class UserResource7 < UserResource
+    assert_raises ArgumentError do
+      Class.new(UserResource) do
+        def self.name
+          'UserResource7'
+        end
+
         on_error :both do |error|
           p error
         end
       end
-    RUBY
-
-    assert_raises ArgumentError do
-      eval(resource)
     end
   end
 
   def test_on_error_without_handler_and_block
-    resource = <<~RUBY
-      class UserResource8 < UserResource
+    assert_raises ArgumentError do
+      Class.new(UserResource) do
+        def self.name
+          'UserResource8'
+        end
+
         on_error
       end
-    RUBY
-
-    assert_raises ArgumentError do
-      eval(resource)
     end
   end
 

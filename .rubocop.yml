@@ -97,11 +97,6 @@ Minitest/NoTestCases:
   Exclude:
     - 'test/dependencies/test_dependencies.rb'
 
-# We need to eval resource code to test errors on resource classes
-Security/Eval:
-  Exclude:
-    - 'test/**/*.rb'
-
 Style/ConstantVisibility:
   Exclude:
     - 'lib/alba/version.rb'

@@ -137,16 +137,19 @@ class ManyTest < Minitest::Test
 
   def test_it_raises_error_when_no_resource_or_block_given_without_inference
     with_inflector(nil) do
-      resource = <<~RUBY
-        class UserResourceRaise
+      assert_raises(ArgumentError) do
+        Class.new do
           include Alba::Resource
+
+          def self.name
+            'UserResourceRaise'
+          end
 
           attributes :id
 
           many :articles
         end
-      RUBY
-      assert_raises(ArgumentError) { eval(resource) }
+      end
     end
   end
 
