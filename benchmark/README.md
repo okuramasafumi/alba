@@ -59,6 +59,7 @@ Comparison:
        turbostreamer:      207.8 i/s - 2.41x  slower
                 alba:      201.0 i/s - 2.50x  slower
 alba_with_transformation:      189.4 i/s - 2.65x  slower
+            jbuilder:      150.8 i/s - 3.41x  slower
                rails:      115.7 i/s - 4.33x  slower
          blueprinter:      109.1 i/s - 4.60x  slower
      fast_serializer:      106.4 i/s - 4.71x  slower
@@ -78,6 +79,7 @@ Comparison:
          jserializer:      215.5 i/s - 2.30x  slower
        turbostreamer:      207.2 i/s - 2.39x  slower
 alba_with_transformation:      203.9 i/s - 2.43x  slower
+            jbuilder:      121.5 i/s - 4.20x  slower
          blueprinter:      106.4 i/s - 4.66x  slower
      fast_serializer:      106.0 i/s - 4.67x  slower
                rails:       97.2 i/s - 5.10x  slower
@@ -92,19 +94,20 @@ alba_with_transformation:      203.9 i/s - 2.43x  slower
 
 ```
 Comparison:
-               panko:      786.7 i/s
-       turbostreamer:      546.0 i/s - 1.44x  slower
-                alba:      532.6 i/s - 1.48x  slower
-         jserializer:      413.6 i/s - 1.90x  slower
-alba_with_transformation:      358.9 i/s - 2.19x  slower
-     fast_serializer:      226.3 i/s - 3.48x  slower
-         blueprinter:      207.8 i/s - 3.79x  slower
-               rails:      203.2 i/s - 3.87x  slower
-                rabl:      180.1 i/s - 4.37x  slower
-       representable:       99.4 i/s - 7.91x  slower
-          simple_ams:       79.2 i/s - 9.94x  slower
-                 ams:       26.4 i/s - 29.76x  slower
-         alba_inline:       13.5 i/s - 58.26x  slower
+               panko:      721.4 i/s
+       turbostreamer:      537.0 i/s - 1.34x  slower
+                alba:      501.1 i/s - 1.44x  slower
+         jserializer:      388.2 i/s - 1.86x  slower
+alba_with_transformation:      354.8 i/s - 2.03x  slower
+            jbuilder:      267.6 i/s - 2.70x  slower
+     fast_serializer:      219.3 i/s - 3.29x  slower
+               rails:      199.4 i/s - 3.62x  slower
+         blueprinter:      197.0 i/s - 3.66x  slower
+                rabl:      178.2 i/s - 4.05x  slower
+       representable:       99.0 i/s - 7.29x  slower
+          simple_ams:       77.5 i/s - 9.31x  slower
+                 ams:       26.0 i/s - 27.75x  slower
+         alba_inline:       13.7 i/s - 52.68x  slower
 ```
 
 `benchmark-ips` with YJIT and without `Oj.optimize_rails`:

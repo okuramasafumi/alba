@@ -210,6 +210,31 @@ Rabl.configure do |config|
   config.view_paths = "views"
 end
 
+# --- JBuilder serializers ---
+
+require "jbuilder"
+require "jbuilder/jbuilder_template"
+
+class JBuilderSerializer
+  attr_reader :json
+
+  def initialize
+    @json = JbuilderTemplate.new(view_paths: ["views"])
+  end
+
+  def render(posts)
+    json.array!(posts) do |post|
+      json.id post.id
+      json.body post.body
+      json.commenter_names post.commenters.pluck(:name)
+      json.comments post.comments do |comment|
+        json.id comment.id
+        json.body comment.body
+      end
+    end.to_json
+  end
+end
+
 # --- Test data creation ---
 
 100.times do |i|
@@ -251,6 +276,7 @@ representable = Proc.new { PostsRepresenter.new(posts).to_json }
 simple_ams = Proc.new { SimpleAMS::Renderer::Collection.new(posts, serializer: SimpleAMSPostSerializer).to_json }
 turbostreamer = Proc.new { TurbostreamerSerializer.new(posts).to_json }
 rabl = Proc.new { Rabl::Renderer.json(posts, "index") }
+jbuilder = Proc.new { JBuilderSerializer.new.render(posts) }
 
 # --- Execute the serializers to check their output ---
 puts "Checking outputs..."
@@ -267,7 +293,8 @@ parsed_correct = JSON.parse(correct)
   representable: representable,
   simple_ams: simple_ams,
   turbostreamer: turbostreamer,
-  rabl: rabl
+  rabl: rabl,
+  jbuilder: jbuilder
 }.each do |name, serializer|
   result = serializer.call
   parsed_result = JSON.parse(result)
@@ -278,18 +305,19 @@ end
 
 benchmark_body = lambda do |x|
   x.report(:alba, &alba)
-  x.report(:alba_with_transformation, &alba_with_transformation)
-  x.report(:alba_inline, &alba_inline)
-  x.report(:ams, &ams)
-  x.report(:blueprinter, &blueprinter)
-  x.report(:fast_serializer, &fast_serializer)
-  x.report(:jserializer, &jserializer)
+  # x.report(:alba_with_transformation, &alba_with_transformation)
+  # x.report(:alba_inline, &alba_inline)
+  # x.report(:ams, &ams)
+  # x.report(:blueprinter, &blueprinter)
+  # x.report(:fast_serializer, &fast_serializer)
+  # x.report(:jserializer, &jserializer)
   x.report(:panko, &panko)
   x.report(:rails, &rails)
-  x.report(:representable, &representable)
-  x.report(:simple_ams, &simple_ams)
-  x.report(:turbostreamer, &turbostreamer)
+  # x.report(:representable, &representable)
+  # x.report(:simple_ams, &simple_ams)
+  # x.report(:turbostreamer, &turbostreamer)
   x.report(:rabl, &rabl)
+  x.report(:jbuilder, &jbuilder)
 
   x.compare!
 end
@@ -298,7 +326,7 @@ require 'benchmark/ips'
 Benchmark.ips(&benchmark_body)
 
 require 'benchmark/memory'
-Benchmark.memory(&benchmark_body)
+# Benchmark.memory(&benchmark_body)
 
 # --- Show gem versions ---
 
