@@ -116,6 +116,7 @@ class PankoPostSerializer < Panko::Serializer
 end
 
 # --- Primalize serializers ---
+require "primalize"
 
 class PrimalizeCommentResource < Primalize::Single
   attributes id: integer, body: string
@@ -205,6 +206,16 @@ class TurbostreamerSerializer
   end
 end
 
+# --- Rabl serializers ---
+
+require "rabl"
+
+Rabl.configure do |config|
+  config.include_json_root = false
+  config.include_child_root = false
+  config.view_paths = "views"
+end
+
 # --- Test data creation ---
 
 post = Post.create!(body: 'post')
@@ -239,6 +250,7 @@ rails = Proc.new { ActiveSupport::JSON.encode(post.serializable_hash(include: :c
 representable = Proc.new { PostRepresenter.new(post).to_json }
 simple_ams = Proc.new { SimpleAMS::Renderer.new(post, serializer: SimpleAMSPostSerializer).to_json }
 turbostreamer = Proc.new { TurbostreamerSerializer.new(post).to_json }
+rabl = Proc.new { Rabl::Renderer.json(post, "post") }
 
 # --- Execute the serializers to check their output ---
 
@@ -255,7 +267,8 @@ puts "Serializer outputs ----------------------------------"
   rails: rails,
   representable: representable,
   simple_ams: simple_ams,
-  turbostreamer: turbostreamer
+  turbostreamer: turbostreamer,
+  rabl: rabl
 }.each do |name, serializer|
   puts "#{name.to_s.ljust(24, ' ')} #{serializer.call}"
 end
@@ -276,6 +289,7 @@ Benchmark.ips do |x|
   x.report(:representable, &representable)
   x.report(:simple_ams, &simple_ams)
   x.report(:turbostreamer, &turbostreamer)
+  x.report(:rabl, &rabl)
 
   x.compare!
 end
@@ -295,6 +309,7 @@ Benchmark.memory do |x|
   x.report(:representable, &representable)
   x.report(:simple_ams, &simple_ams)
   x.report(:turbostreamer, &turbostreamer)
+  x.report(:rabl, &rabl)
 
   x.compare!
 end
