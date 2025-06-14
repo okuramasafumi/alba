@@ -305,17 +305,17 @@ end
 
 benchmark_body = lambda do |x|
   x.report(:alba, &alba)
-  # x.report(:alba_with_transformation, &alba_with_transformation)
-  # x.report(:alba_inline, &alba_inline)
-  # x.report(:ams, &ams)
-  # x.report(:blueprinter, &blueprinter)
-  # x.report(:fast_serializer, &fast_serializer)
-  # x.report(:jserializer, &jserializer)
+  x.report(:alba_with_transformation, &alba_with_transformation)
+  x.report(:alba_inline, &alba_inline)
+  x.report(:ams, &ams)
+  x.report(:blueprinter, &blueprinter)
+  x.report(:fast_serializer, &fast_serializer)
+  x.report(:jserializer, &jserializer)
   x.report(:panko, &panko)
   x.report(:rails, &rails)
-  # x.report(:representable, &representable)
-  # x.report(:simple_ams, &simple_ams)
-  # x.report(:turbostreamer, &turbostreamer)
+  x.report(:representable, &representable)
+  x.report(:simple_ams, &simple_ams)
+  x.report(:turbostreamer, &turbostreamer)
   x.report(:rabl, &rabl)
   x.report(:jbuilder, &jbuilder)
 
@@ -326,7 +326,7 @@ require 'benchmark/ips'
 Benchmark.ips(&benchmark_body)
 
 require 'benchmark/memory'
-# Benchmark.memory(&benchmark_body)
+Benchmark.memory(&benchmark_body)
 
 # --- Show gem versions ---
 
