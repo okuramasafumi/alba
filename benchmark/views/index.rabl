@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 collection @posts
 attributes :id, :body
 child(:comments) { attributes :id, :body }
