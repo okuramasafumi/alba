@@ -102,19 +102,6 @@ Style/ConstantVisibility:
     - 'lib/alba/version.rb'
     - 'test/**/*.rb'
 
-# Copyright is in README
-Style/Copyright:
-  Enabled: false
-
-# I know what I do :)
-Style/DisableCopsWithinSourceCodeDirective:
-  Enabled: false
-
-# Test files doesn't need to have documentation
-Style/Documentation:
-  Exclude:
-    - 'test/**/*'
-
 # In README it's so obvious
 Style/DocumentationMethod:
   Exclude:
@@ -124,10 +111,6 @@ Style/DocumentationMethod:
 Style/ImplicitRuntimeError:
   Exclude:
     - 'README.md'
-
-# We use it, don't we?
-Style/InlineComment:
-  Enabled: false
 
 Style/MethodCallWithArgsParentheses:
   AllowedMethods: ['require', 'require_relative', 'include', 'extend', 'puts', 'p', 'warn', 'raise', 'send', 'public_send', 'alias_method']
