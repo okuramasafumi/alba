@@ -53,6 +53,25 @@ class AMSPostSerializer < ActiveModel::Serializer
   end
 end
 
+
+# --- Barley serializers ---
+
+require "barley"
+
+class BarleyCommentSerializer < Barley::Serializer
+  attributes :id, :body
+end
+
+class BarleyPostSerializer < Barley::Serializer
+  attributes :id, :body
+  attribute :commenter_names
+  many :comments, serializer: BarleyCommentSerializer
+
+  def commenter_names
+    object.commenters.pluck(:name)
+  end
+end
+
 # --- Blueprint serializers ---
 
 require "blueprinter"
@@ -265,6 +284,8 @@ alba_inline = Proc.new do
   end
 end
 ams = Proc.new { ActiveModelSerializers::SerializableResource.new(posts, {each_serializer: AMSPostSerializer}).to_json }
+barley = Proc.new { posts.map { |post| BarleyPostSerializer.new(post).serializable_hash.to_json } }
+barley_cache = Proc.new { posts.map { |post| BarleyPostSerializer.new(post, cache: true).serializable_hash.to_json } }
 blueprinter = Proc.new { PostBlueprint.render(posts) }
 fast_serializer = Proc.new { FastSerializerPostResource.new(posts).to_json }
 jserializer = Proc.new { JserializerPostSerializer.new(posts, is_collection: true).to_json }
@@ -285,6 +306,8 @@ parsed_correct = JSON.parse(correct)
 {
   alba_inline: alba_inline,
   ams: ams,
+  barley: barley,
+  barley_cache: barley_cache,
   blueprinter: blueprinter,
   fast_serializer: fast_serializer,
   jserializer: jserializer,
@@ -308,6 +331,8 @@ benchmark_body = lambda do |x|
   x.report(:alba_with_transformation, &alba_with_transformation)
   x.report(:alba_inline, &alba_inline)
   x.report(:ams, &ams)
+  x.report(:barley, &barley)
+  x.report(:barley_cache, &barley_cache)
   x.report(:blueprinter, &blueprinter)
   x.report(:fast_serializer, &fast_serializer)
   x.report(:jserializer, &jserializer)
@@ -331,7 +356,7 @@ Benchmark.memory(&benchmark_body)
 # --- Show gem versions ---
 
 puts "Gem versions:"
-gems = %w[alba active_model_serializers blueprinter fast_serializer jserializer panko_serializer representable simple_ams turbostreamer]
+gems = %w[alba active_model_serializers barley barley_cache blueprinter fast_serializer jserializer panko_serializer representable simple_ams turbostreamer]
 Bundler.load.specs.each do |spec|
   puts "#{spec.name}: #{spec.version}" if gems.include?(spec.name)
 end
