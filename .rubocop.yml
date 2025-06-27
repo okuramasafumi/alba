@@ -84,6 +84,7 @@ Metrics/ModuleLength:
 # Resource class includes DSLs, which tend to accept long list of parameters
 Metrics/ParameterLists:
   Max: 7
+  CountKeywordArgs: false
   Exclude:
     - 'test/**/*.rb'
 

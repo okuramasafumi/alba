@@ -3,15 +3,8 @@
 require_relative '../test_helper'
 
 class TraitTest < Minitest::Test
-  class User
-    attr_accessor :id, :name, :email
-
-    def initialize(id, name, email)
-      @id = id
-      @name = name
-      @email = email
-    end
-  end
+  User = Struct.new(:id, :name, :email, :profile)
+  Profile = Struct.new(:user_id, :bio, :status)
 
   class UserResource
     include Alba::Resource
@@ -23,8 +16,19 @@ class TraitTest < Minitest::Test
     end
   end
 
+  class ProfileResource
+    include Alba::Resource
+
+    attributes :bio
+
+    trait :with_status do
+      attributes :status
+    end
+  end
+
   def setup
     @user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
+    @user.profile = Profile.new(1, 'Software Engineer at Example Corp', :active)
   end
 
   def test_it_does_not_return_in_trait_if_not_specified
@@ -87,5 +91,18 @@ class TraitTest < Minitest::Test
     assert_raises(Alba::Error, 'Trait not found: not_found') do
       UserResource.new(@user, with_traits: :not_found).serialize
     end
+  end
+
+  class UserResourceWithProfile < UserResource
+    trait :with_profile do
+      one :profile, resource: ProfileResource, with_traits: :with_status
+    end
+  end
+
+  def test_it_works_with_association_with_traits
+    assert_equal(
+      '{"id":1,"profile":{"bio":"Software Engineer at Example Corp","status":"active"}}',
+      UserResourceWithProfile.new(@user, with_traits: :with_profile).serialize
+    )
   end
 end

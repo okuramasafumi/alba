@@ -16,15 +16,17 @@ module Alba
     # @param condition [Proc, nil] a proc filtering data
     # @param resource [Class<Alba::Resource>, Proc, String, Symbol, nil]
     #   a resource class for the association, a proc returning a resource class or a name of the resource
+    # @param with_traits [Symbol, Array<Symbol>, nil] specified traits
     # @param params [Hash] params override for the association
     # @param nesting [String] a namespace where source class is inferred with
     # @param key_transformation [Symbol] key transformation type
     # @param helper [Module] helper module to include
     # @param block [Block] used to define resource when resource arg is absent
-    def initialize(name:, condition: nil, resource: nil, params: {}, nesting: nil, key_transformation: :none, helper: nil, &block)
+    def initialize(name:, condition: nil, resource: nil, with_traits: nil, params: {}, nesting: nil, key_transformation: :none, helper: nil, &block)
       @name = name
       @condition = condition
       @resource = resource
+      @with_traits = with_traits
       @params = params
       return if @resource
 
@@ -53,7 +55,7 @@ module Alba
       if @resource.is_a?(Proc)
         return to_h_with_each_resource(object, within, params) if object.is_a?(Enumerable)
 
-        @resource.call(object).new(object, within: within, params: params).to_h
+        @resource.call(object).new(object, within: within, params: params, with_traits: @with_traits).to_h
       else
         to_h_with_constantize_resource(object, within, params)
       end
@@ -100,13 +102,13 @@ module Alba
 
     def to_h_with_each_resource(object, within, params)
       object.map do |item|
-        @resource.call(item).new(item, within: within, params: params).to_h
+        @resource.call(item).new(item, within: within, params: params, with_traits: @with_traits).to_h
       end
     end
 
     def to_h_with_constantize_resource(object, within, params)
       @resource = constantize(@resource)
-      @resource.new(object, params: params, within: within).to_h
+      @resource.new(object, params: params, within: within, with_traits: @with_traits).to_h
     end
   end
 end
