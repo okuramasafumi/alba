@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.7.3] 2025-06-28
+
+### Fixed
+
+- Enable to apply traits for associations [Issue #444](https://github.com/okuramasafumi/alba/issues/444)
+  - Thank you for reporting, @rainerborene
+
 ## [3.7.2] 2025-06-08
 
 ### Fixed
