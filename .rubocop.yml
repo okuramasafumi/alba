@@ -98,6 +98,14 @@ Minitest/NoTestCases:
   Exclude:
     - 'test/dependencies/test_dependencies.rb'
 
+Naming:
+  Exclude:
+    - 'test/**/*'
+
+Naming/PredicateMethod:
+  AllowedMethods:
+    - select
+
 Style/ConstantVisibility:
   Exclude:
     - 'lib/alba/version.rb'
