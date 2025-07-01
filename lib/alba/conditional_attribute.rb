@@ -23,7 +23,7 @@ module Alba
       return Alba::REMOVE_KEY unless condition_passes?(resource, object)
 
       fetched_attribute = yield(@body)
-      return fetched_attribute unless with_two_arity_proc_condition
+      return fetched_attribute unless with_two_arity_proc_condition?
 
       return Alba::REMOVE_KEY unless resource.instance_exec(object, second_object(object), &@condition)
 
@@ -46,7 +46,7 @@ module Alba
       end
     end
 
-    def with_two_arity_proc_condition
+    def with_two_arity_proc_condition?
       @condition.is_a?(Proc) && @condition.arity >= 2
     end
 
