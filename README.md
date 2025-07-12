@@ -432,6 +432,8 @@ UserResource.new(user).serialize
 # => '{"id":1,"articles":[{"title":"Hello World!"},{"title":"Super nice"}]}'
 ```
 
+#### Inline associations
+
 You can define associations inline if you don't need a class for association.
 
 ```ruby
@@ -460,6 +462,8 @@ class AnotherUserResource
   end
 end
 ```
+
+#### Filtering associations
 
 You can "filter" association using second proc argument. This proc takes association object, `params` and initial object.
 
@@ -519,6 +523,8 @@ UserResource.new(user, params: {filter: :even?}).serialize
 # => '{"id":1,"articles":[{"title":"Super nice"}]}'
 ```
 
+#### Changing a key
+
 You can change a key for association with `key` option.
 
 ```ruby
@@ -534,6 +540,8 @@ end
 UserResource.new(user).serialize
 # => '{"id":1,"my_articles":[{"title":"Hello World!"}]}'
 ```
+
+#### Determining a resource for the association
 
 You can omit the resource option if you enable Alba's [inference](#inference-configuration) feature.
 
