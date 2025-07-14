@@ -57,6 +57,12 @@ class OnErrorTest < Minitest::Test
     end
   end
 
+  class UserResourceForProcIgnoreKey < UserResource
+    on_error do |_error|
+      Alba::REMOVE_KEY
+    end
+  end
+
   def setup
     @user = User.new(1, 'Masafumi OKURA', 'masafumi@example.com')
   end
@@ -132,6 +138,13 @@ class OnErrorTest < Minitest::Test
     assert_equal(
       '{"user":{"id":1,"name":"Masafumi OKURA","error":"Error!"}}',
       UserResourceToChangeErrorKey.new(@user).serialize
+    )
+  end
+
+  def test_on_error_proc_ignore
+    assert_equal(
+      '{"user":{"id":1,"name":"Masafumi OKURA"}}',
+      UserResourceForProcIgnoreKey.new(@user).serialize
     )
   end
 end

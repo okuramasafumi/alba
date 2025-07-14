@@ -273,7 +273,7 @@ module Alba
         when :ignore then nil
         when Proc
           key, value = on_error.call(error, obj, key, attribute, self.class)
-          hash[key] = value
+          hash[key] = value unless Alba::REMOVE_KEY == key # rubocop:disable Style/YodaCondition
         else
           # :nocov:
           raise Alba::Error, 'Impossible path'
