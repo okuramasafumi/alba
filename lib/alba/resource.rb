@@ -113,18 +113,27 @@ module Alba
       private
 
       def hash_from_traits(obj)
-        h = {}
-        return h if @with_traits.nil?
+        return {} if @with_traits.nil?
 
-        Array(@with_traits).each do |trait|
+        Array(@with_traits).each_with_object({}) do |trait, hash|
           body = @_traits.fetch(trait) { raise Alba::Error, "Trait not found: #{trait}" }
-
-          resource_class = Alba.resource_class
-          resource_class.class_eval(&body)
-          resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
-          h.merge!(resource_class.new(obj, params: params, within: @within, select: method(:select)).serializable_hash)
+          resource_class = cached_trait_class(trait, body)
+          hash.merge!(resource_class.new(obj, params: params, within: @within, select: method(:select)).serializable_hash)
         end
-        h
+      end
+
+      def cached_trait_class(trait, body)
+        cache_key = [self.class.object_id, trait, @_transform_type].freeze
+
+        @_trait_class_cache ||= {}
+        @_trait_class_cache[cache_key] ||= build_trait_class(body)
+      end
+
+      def build_trait_class(body)
+        klass = Class.new(self.class)
+        klass.class_eval(&body)
+        klass.transform_keys(@_transform_type) unless @_transform_type == :none
+        klass
       end
 
       def deprecated_serializable_hash
