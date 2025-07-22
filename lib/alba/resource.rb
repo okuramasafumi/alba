@@ -120,6 +120,7 @@ module Alba
           body = @_traits.fetch(trait) { raise Alba::Error, "Trait not found: #{trait}" }
 
           resource_class = Alba.resource_class
+          resource_class.helper(@_helper) if @_helper
           resource_class.class_eval(&body)
           resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
           h.merge!(resource_class.new(obj, params: params, within: @within, select: method(:select)).serializable_hash)
@@ -611,6 +612,7 @@ module Alba
       # @param mod [Module] a module to extend
       def helper(mod = @_helper || Module.new, &block)
         mod.module_eval(&block) if block
+        include mod
         extend mod
         @_helper = mod
       end
