@@ -117,23 +117,11 @@ module Alba
 
         Array(@with_traits).each_with_object({}) do |trait, hash|
           body = @_traits.fetch(trait) { raise Alba::Error, "Trait not found: #{trait}" }
-          resource_class = cached_trait_class(trait, body)
+          resource_class = Class.new(self.class)
+          resource_class.class_eval(&body)
+          resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
           hash.merge!(resource_class.new(obj, params: params, within: @within, select: method(:select)).serializable_hash)
         end
-      end
-
-      def cached_trait_class(trait, body)
-        cache_key = [self.class.object_id, trait, @_transform_type].freeze
-
-        @_trait_class_cache ||= {}
-        @_trait_class_cache[cache_key] ||= build_trait_class(body)
-      end
-
-      def build_trait_class(body)
-        klass = Class.new(self.class)
-        klass.class_eval(&body)
-        klass.transform_keys(@_transform_type) unless @_transform_type == :none
-        klass
       end
 
       def deprecated_serializable_hash
