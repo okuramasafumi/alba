@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 3.7.4 2025-07-24
+
+### Fixed
+
+- Fix trait instance method access [#452](https://github.com/okuramasafumi/alba/pull/452)
+  - Thank you, @ether-moon
+
 ## [3.7.3] 2025-06-28
 
 ### Fixed
