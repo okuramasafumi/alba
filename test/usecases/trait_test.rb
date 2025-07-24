@@ -105,4 +105,48 @@ class TraitTest < Minitest::Test
       UserResourceWithProfile.new(@user, with_traits: :with_profile).serialize
     )
   end
+
+  class UserResourceWithInstanceMethod < UserResource
+    trait :formatted_name do
+      attribute :formatted_name do
+        format_name
+      end
+    end
+
+    private
+
+    def format_name
+      "Mr./Ms. #{object.name}"
+    end
+  end
+
+  def test_it_works_with_instance_method_in_trait
+    assert_equal(
+      '{"id":1,"formatted_name":"Mr./Ms. Masafumi OKURA"}',
+      UserResourceWithInstanceMethod.new(@user, with_traits: :formatted_name).serialize
+    )
+  end
+
+  module FormatNameExtension
+    def format_name
+      "Mr./Ms. #{object.name}"
+    end
+  end
+
+  class UserResourceWithExtension < UserResource
+    include FormatNameExtension
+
+    trait :formatted_name do
+      attribute :formatted_name do
+        format_name
+      end
+    end
+  end
+
+  def test_it_works_with_extension_in_trait
+    assert_equal(
+      '{"id":1,"formatted_name":"Mr./Ms. Masafumi OKURA"}',
+      UserResourceWithExtension.new(@user, with_traits: :formatted_name).serialize
+    )
+  end
 end
