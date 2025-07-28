@@ -3,7 +3,8 @@
 [![Gem Version](https://badge.fury.io/rb/alba.svg)](https://badge.fury.io/rb/alba)
 [![CI](https://github.com/okuramasafumi/alba/actions/workflows/main.yml/badge.svg)](https://github.com/okuramasafumi/alba/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/okuramasafumi/alba/branch/main/graph/badge.svg?token=3D3HEZ5OXT)](https://codecov.io/gh/okuramasafumi/alba)
-[![Maintainability](https://api.codeclimate.com/v1/badges/fdab4cc0de0b9addcfe8/maintainability)](https://codeclimate.com/github/okuramasafumi/alba/maintainability)
+[![Maintainability](https://qlty.sh/gh/okuramasafumi/projects/alba/maintainability.svg)](https://qlty.sh/gh/okuramasafumi/projects/alba)
+
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/okuramasafumi/alba)
 ![GitHub](https://img.shields.io/github/license/okuramasafumi/alba)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
