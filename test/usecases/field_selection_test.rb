@@ -24,6 +24,7 @@ class FieldSelectionTest < Minitest::Test
 
     one :bar do
       extend FieldSelection
+
       field_when_selected :id, :name, key: :bar
     end
   end

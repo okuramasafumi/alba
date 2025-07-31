@@ -371,6 +371,7 @@ You can pass a Hash to the resource for internal use. It can be used as "flags" 
 ```ruby
 class UserResource
   include Alba::Resource
+
   attribute :name do |user|
     params[:upcase] ? user.name.upcase : user.name
   end
@@ -1229,6 +1230,7 @@ The block receives five arguments, `error`, `object`, `key`, `attribute` and `re
 ```ruby
 class ExampleResource
   include Alba::Resource
+
   on_error do |error, object, key, attribute, resource_class|
     if resource_class == MyResource
       ['error_fallback', object.error_fallback]
@@ -1526,6 +1528,7 @@ Alba supports serializing JSON in a layout. You need a file for layout and then 
 ```ruby
 class FooResource
   include Alba::Resource
+
   layout file: 'my_layout.json.erb'
 end
 ```
@@ -1543,6 +1546,7 @@ In case you don't want to have a file for layout, Alba lets you define and apply
 ```ruby
 class FooResource
   include Alba::Resource
+
   layout inline: proc {
     {
       header: 'my header',
@@ -1559,6 +1563,7 @@ You can also use a Proc which returns String, not a Hash, for an inline layout.
 ```ruby
 class FooResource
   include Alba::Resource
+
   layout inline: proc {
     %({
       "header": "my header",
@@ -1659,6 +1664,7 @@ In `attribute` block we can call instance method so we can improve the code belo
 ```ruby
 class FooResource
   include Alba::Resource
+
   # other attributes
   attribute :created_at do |foo|
     foo.created_at.strftime('%m/%d/%Y')
@@ -1671,6 +1677,7 @@ end
 
 class BarResource
   include Alba::Resource
+
   # other attributes
   attribute :created_at do |bar|
     bar.created_at.strftime('%m/%d/%Y')
@@ -1694,6 +1701,7 @@ end
 class FooResource
   include Alba::Resource
   include SharedLogic
+
   # other attributes
   attribute :created_at do |foo|
     format_time(foo.created_at)
@@ -1707,6 +1715,7 @@ end
 class BarResource
   include Alba::Resource
   include SharedLogic
+
   # other attributes
   attribute :created_at do |bar|
     format_time(bar.created_at)
@@ -1738,6 +1747,7 @@ end
 class FooResource
   include Alba::Resource
   extend AlbaExtension
+
   # other attributes
   formatted_time_attributes :created_at, :updated_at
 end
@@ -1745,6 +1755,7 @@ end
 class BarResource
   include Alba::Resource
   extend AlbaExtension
+
   # other attributes
   formatted_time_attributes :created_at, :updated_at
 end
@@ -1760,6 +1771,7 @@ When we `extend AlbaExtension` like above, it's not available in inline associat
 class BarResource
   include Alba::Resource
   extend AlbaExtension
+
   # other attributes
   formatted_time_attributes :created_at, :updated_at
 
@@ -1775,6 +1787,7 @@ In this case, we can use [helper](#helper) instead of `extend`.
 ```ruby
 class BarResource
   include Alba::Resource
+
   helper AlbaExtension # HERE!
   # other attributes
   formatted_time_attributes :created_at, :updated_at
@@ -1811,6 +1824,7 @@ The typical code looks like this:
 ```ruby
 class FooResource
   include Alba::Resource
+
   attributes :id
 end
 FooResource.new(foo).serialize
