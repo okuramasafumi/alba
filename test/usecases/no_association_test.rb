@@ -118,6 +118,7 @@ class NoAssociationTest < Minitest::Test
 
   class UserResourceWithKey
     include Alba::Resource
+
     attributes :id
     root_key :not_user
   end

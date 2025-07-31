@@ -13,12 +13,14 @@ class ResourceTest < Minitest::Test
 
   class BarResource
     include Alba::Resource
+
     attributes :id
   end
   BarSerializer = BarResource
 
   class FooResource
     include Alba::Resource
+
     root_key :foo
     attributes :id, :bar_size
     many :bars, resource: BarResource
@@ -110,6 +112,7 @@ class ResourceTest < Minitest::Test
 
   class FooSerializer
     include Alba::Serializer
+
     root_key :foo
     attributes :id, :bar_size
     has_many :bars, serializer: BarSerializer
@@ -128,6 +131,7 @@ class ResourceTest < Minitest::Test
 
   class DeprecatedConverterResource
     include Alba::Resource
+
     attributes :id
 
     private
@@ -143,6 +147,7 @@ class ResourceTest < Minitest::Test
 
   class DeprecatedConverterCollectionResource
     include Alba::Resource
+
     attributes :id
 
     private
@@ -162,6 +167,7 @@ class ResourceTest < Minitest::Test
     assert_output('', /Overriding `attributes` is deprecated, use `select` instead./) do
       Class.new do
         include Alba::Resource
+
         attributes :id
 
         private

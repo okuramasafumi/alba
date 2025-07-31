@@ -609,6 +609,7 @@ module Alba
       def helper(mod = @_helper || Module.new, &block)
         mod.module_eval(&block) if block
         extend mod
+
         @_helper = mod
       end
 
