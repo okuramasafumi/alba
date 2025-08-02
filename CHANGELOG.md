@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 3.8.0 2025-08-02
+
+### Added
+
+- add support for ignoring key when using proc for on_error [#450](https://github.com/okuramasafumi/alba/pull/450)
+  - Thank you, @mainmethod 
+
+### Note
+
+This change is supposed to be released as 3.8.0 with the change in 3.7.4, but I overlooked this commit. So 3.8.0 is essentially the same as 3.7.4, just making it clear that this version adds a new feature.
+
 ## 3.7.4 2025-07-24
 
 ### Fixed
