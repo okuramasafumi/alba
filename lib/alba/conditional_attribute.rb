@@ -25,7 +25,7 @@ module Alba
       fetched_attribute = yield(@body)
       return fetched_attribute unless with_two_arity_proc_condition?
 
-      return Alba::REMOVE_KEY unless resource.instance_exec(object, second_object(object), &@condition)
+      return Alba::REMOVE_KEY unless resource.instance_exec(object, second_object(object, resource), &@condition)
 
       fetched_attribute
     end
@@ -50,14 +50,14 @@ module Alba
       @condition.is_a?(Proc) && @condition.arity >= 2
     end
 
-    def second_object(object)
+    def second_object(object, resource)
       case @body
       when Symbol, Alba::Association, Alba::TypedAttribute
         object.__send__(@body.name)
       when Alba::NestedAttribute
         nil
       when Proc
-        @body.call(object)
+        resource.instance_exec(object, &@body)
       else raise Alba::Error, "Unreachable code, @body is: #{@body.inspect}"
       end
     end

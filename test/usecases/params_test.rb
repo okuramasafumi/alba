@@ -206,4 +206,29 @@ class ParamsTest < Minitest::Test
       UserResourceWithNestedAttribute.new(user, params: {timezone_offset: '-18:00'}).serialize
     )
   end
+
+  class BlockSerializer
+    include Alba::Serializer
+
+    attribute :links, if: ->(_object, _attr) { params[:current_user_is_admin] } do |object|
+      {
+        self: "#{params[:api_root]}/blocks/#{object.id}",
+        edit: "#{params[:admin_root]}/avo/resources/blocks/#{object.id}/edit"
+      }
+    end
+  end
+
+  def test_params_in_attribute_block_with_two_arity_condition_proc
+    assert_equal(
+      '{"links":{"self":"https://example.com/api/blocks/1","edit":"https://example.com/admin/avo/resources/blocks/1/edit"}}',
+      BlockSerializer.new(
+        @user,
+        params: {
+          current_user_is_admin: true,
+          api_root: 'https://example.com/api',
+          admin_root: 'https://example.com/admin'
+        }
+      ).serialize
+    )
+  end
 end
