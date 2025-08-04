@@ -47,7 +47,7 @@ class UserSerializer < ActiveModel::Serializer
   attributes :id, :created_at, :updated_at
 end
 
-# serialze
+# serialize
 user = User.create!
 ActiveModelSerializers::SerializableResource.new(
   user
@@ -71,7 +71,7 @@ class UserResource
   attributes :id, :created_at, :updated_at
 end
 
-# serialze
+# serialize
 user = User.create!
 UserResource.new(user).serializable_hash
 # => {
@@ -87,7 +87,7 @@ class UserResource
   attributes :id, :created_at, :updated_at
 end
 
-# serialze
+# serialize
 user = User.create!
 JSON.parse UserResource.new(user).serialize # ！！！！serializable_hash does not support root key！！！ Must use JSON.parse and serialize
 # => {
@@ -253,7 +253,7 @@ class CustomUserSerializer < ActiveModel::Serializer
   end
 end
 
-# serialze
+# serialize
 user = User.create!
 user.craete_profile! email: email
 ActiveModelSerializers::SerializableResource.new(
@@ -278,7 +278,7 @@ class CustomUserResource
   end
 end
 
-# serialze
+# serialize
 user = User.create!
 user.craete_profile! email: email
 CustomUserResource.new(user).serializable_hash
@@ -302,7 +302,7 @@ class UserSerializer < ApplicationSerializer
   end
 end
 
-# serialze
+# serialize
 user = User.create!
 ActiveModelSerializers::SerializableResource.new(
   user,
@@ -334,7 +334,7 @@ class UserResource
   end
 end
 
-# serialze
+# serialize
 user = User.create!
 UserResource.new(
   user,
