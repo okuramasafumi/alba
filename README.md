@@ -616,6 +616,34 @@ FooResource.new(foo, params: {expose_secret: true}).serialize # => '{"foo":{"bar
 FooResourceWithParamsOverride.new(foo, params: {expose_secret: true}).serialize # => '{"foo":{"bar":{"baz":{"data":1}}}}'
 ```
 
+#### Custom association source
+
+You can specify a custom source for associations using the `source` option with a proc. The `source` proc is executed in the context of the target object and can receive `params` for dynamic behavior. This allows you to retrieve association data from methods other than the association name or access instance variables.
+
+```ruby
+class User
+  attr_accessor :id, :name, :metadata
+
+  def custom_profile
+    {profile: {email: "#{name.downcase}@example.com"}}
+  end
+end
+
+class UserResource
+  include Alba::Resource
+
+  attributes :id, :name
+
+  # Use a custom method as source
+  one :profile, source: proc { custom_profile[:profile] }
+
+  # Access instance variables
+  one :user_metadata, source: proc { @metadata }
+end
+```
+
+
+
 ### Nested Attribute
 
 Alba supports nested attributes that makes it easy to build complex data structure from single object.
@@ -777,15 +805,15 @@ Alba.serialize(
   [foo1, bar1, foo2, bar2],
   # `with` option takes a lambda to return resource class
   with: lambda do |obj|
-          case obj
-          when Foo
-            CustomFooResource
-          when Bar
-            BarResource
-          else
-            raise # Impossible in this case
-          end
-        end
+    case obj
+    when Foo
+      CustomFooResource
+    when Bar
+      BarResource
+    else
+      raise # Impossible in this case
+    end
+  end
 )
 # => '[{"id":1},{"id":1,"address":"bar1"},{"id":2},{"id":2,"address":"bar2"}]'
 # Note `CustomFooResource` is used here
@@ -1518,8 +1546,8 @@ Alba supports serializing JSON in a layout. You need a file for layout and then 
 
 ```erb
 {
-  "header": "my_header",
-  "body": <%= serialized_json %>
+"header": "my_header",
+"body": <%= serialized_json %>
 }
 ```
 
@@ -1895,7 +1923,7 @@ AuthorResource.new(
   author,
   params: {
     index: author.books.map.with_index { |book, index| [book.id, index] }
-    .to_h
+                 .to_h
   }
 ).serialize
 # => {"id":2,"books":[{"id":2,"name":"book2","index":0},{"id":3,"name":"book3","index":1},{"id":1,"name":"book1","index":2}]}
