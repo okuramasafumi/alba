@@ -1253,7 +1253,7 @@ There are four possible arguments `on_error` method accepts.
 * `:nullify` sets the attribute with the error to `nil`.
 * Block gives you more control over what to be returned.
 
-The block receives five arguments, `error`, `object`, `key`, `attribute` and `resource class` and must return a two-element array. Below is an example.
+The block receives five arguments, `error`, `object`, `key`, `attribute` and `resource class` and must return a two-element array. You can also ignore the given key with returning `Alba::REMOVE_KEY`, so that you can get even finer control over errors. Below is an example.
 
 ```ruby
 class ExampleResource
@@ -1263,11 +1263,11 @@ class ExampleResource
     if resource_class == MyResource
       ['error_fallback', object.error_fallback]
     else
-      [key, error.message]
+      Alba::REMOVE_KEY
     end
   end
 end
-```
+
 
 ### Nil handling
 
