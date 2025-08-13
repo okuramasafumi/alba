@@ -1267,7 +1267,9 @@ class ExampleResource
     end
   end
 end
+```
 
+For more information, consult to [test code](https://github.com/okuramasafumi/alba/blob/main/test/usecases/on_error_test.rb).
 
 ### Nil handling
 
