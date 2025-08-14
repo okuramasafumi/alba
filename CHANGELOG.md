@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 3.9.0 2025-08-14
+
+### Added
+
+- Add source option to associations [#459](https://github.com/okuramasafumi/alba/pull/459)
+  - Thank you, @skryukov
+
+### Fixed
+
+- `params` isn't available in `attribute` with two-arity condition [#456](https://github.com/okuramasafumi/alba/issues/456)
+
 ## 3.8.0 2025-08-02
 
 ### Added
