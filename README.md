@@ -725,6 +725,10 @@ Alba.serialize(something)
 
 Although this might be useful sometimes, it's generally recommended to define a class for Resource. Defining a class is often more readable and more maintainable, and inline definitions cannot levarage the benefit of YJIT (it's the slowest with the benchmark YJIT enabled).
 
+#### Alba.hashify
+
+`Alba.hashify` is similar to `Alba.serialize`, but returns a Hash instead of JSON string.
+
 #### Inline definition for multiple root keys
 
 While Alba doesn't directly support multiple root keys, you can simulate it with `Alba.serialize`.
