@@ -227,7 +227,7 @@ module Alba
       end
 
       def attributes_to_hash(obj, hash)
-        attributes.each do |key, attribute|
+        @_attributes.each do |key, attribute|
           set_key_and_attribute_body_from(obj, key, attribute, hash)
         rescue ::Alba::Error, FrozenError, TypeError
           raise
@@ -235,14 +235,6 @@ module Alba
           handle_error(e, obj, key, attribute, hash)
         end
         @with_traits.nil? ? hash : hash.merge!(hash_from_traits(obj))
-      end
-
-      # This is default behavior for getting attributes for serialization
-      # Override this method to filter certain attributes
-      #
-      # @deprecated in favor of `select`
-      def attributes
-        @_attributes
       end
 
       # Default implementation for selecting attributes
