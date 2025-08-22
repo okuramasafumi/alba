@@ -26,7 +26,7 @@ jobs:
     env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
       BUNDLE_GEMFILE: ${{ (matrix.gemfile == 'without_active_support' && 'gemfiles/without_active_support.gemfile') || (matrix.gemfile == 'without_oj' && 'gemfiles/without_oj.gemfile') || null }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
