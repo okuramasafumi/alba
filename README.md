@@ -100,6 +100,26 @@ While Alba's core is simple, it provides additional features when you need them.
 - Well tested, the test coverage is 99%
 - Well maintained, getting frequent update and new releases (see [version history](https://rubygems.org/gems/alba/versions))
 
+## Comparison with other serializers
+
+Alba aims to provide a well-balanced combination of simplicity, performance, and features. Here's how it compares to other popular Ruby JSON serializers:
+
+| Feature | Alba | [AMS](https://github.com/rails-api/active_model_serializers) | [Blueprinter](https://github.com/procore/blueprinter) | [JSONAPI::Serializer](https://github.com/jsonapi-serializer/jsonapi-serializer) | [JBuilder](https://github.com/rails/jbuilder) |
+|---------|------|-----|-------------|---------------------|----------|
+| **Dependencies** | [None](https://github.com/okuramasafumi/alba#other-reasons) | ActiveSupport | Minimal | Minimal | Rails |
+| **JSON:API Compliance** | Manual | [Planned](https://github.com/rails-api/active_model_serializers#status-of-ams) | Via extension | [Full support](https://github.com/jsonapi-serializer/jsonapi-serializer#json-api-serializer) | Manual |
+| **Caching** | [Not built-in](https://github.com/okuramasafumi/alba#caching) | Yes | Via extension | [Supported](https://github.com/jsonapi-serializer/jsonapi-serializer) | [Fragment caching](https://github.com/rails/jbuilder#caching) |
+| **Key Transformation** | [Yes](https://github.com/okuramasafumi/alba#key-transformation) | Yes | [Yes](https://github.com/procore/blueprinter) | [Yes](https://goithub.com/jsonapi-serializer/jsonapi-serializer) | [Yes](https://github.com/rails/jbuilder#key-formatting) |
+| **Conditional Attributes** | [Yes](https://github.com/okuramasafumi/alba#conditional-attributes) | Yes | [Yes](https://github.com/procore/blueprinter) | [Yes](https://github.com/jsonapi-serializer/jsonapi-serializer) | [Yes](https://github.com/rails/jbuilder) |
+| **Type Validation & Coercion** | [Yes](https://github.com/okuramasafumi/alba#types) | No | No | No | No |
+| **Custom Type System** | [Yes](https://github.com/okuramasafumi/alba#custom-types) | No | No | No | No |
+| **Nested Attributes** | [Yes](https://github.com/okuramasafumi/alba#nested-attribute) | No | No | No | Partial |
+| **Circular Reference Control** | [Yes with `within`](https://github.com/okuramasafumi/alba#circular-associations-control) | Limited | No | No | No |
+| **Error Handling Strategies** | [Flexible](https://github.com/okuramasafumi/alba#error-handling) | Limited | Limited | Basic | Basic |
+| **Nil Handling** | [Yes](https://github.com/okuramasafumi/alba#nil-handling) | No | No | No | No |
+| **Layout System** | [Yes](https://github.com/okuramasafumi/alba#layout) | No | No | No | No |
+| **Maintenance Status** | Active | [Minimal](https://github.com/rails-api/active_model_serializers#status-of-ams) | Active | Active | Active |
+
 ## Installation
 
 Add this line to your application's Gemfile:
