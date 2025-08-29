@@ -15,7 +15,7 @@ jobs:
 
     environment:
       name: rubygems.org
-      url: https://rubygems.org/gems/rdoc
+      url: https://rubygems.org/gems/alba
 
     permissions:
       contents: write
