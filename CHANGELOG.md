@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - add support for ignoring key when using proc for on_error [#450](https://github.com/okuramasafumi/alba/pull/450)
-  - Thank you, @mainmethod 
+  - Thank you, @mainmethod
 
 ### Note
 
