@@ -1,0 +1,13 @@
+module Alba
+  # Adapter module for ActiveSupport inflector
+  # Note: This is already defined in alba.rbs but moved here for consistency
+  module DefaultInflector
+    def self.camelize: (String key) -> String
+    def self.camelize_lower: (String key) -> String
+    def self.dasherize: (String key) -> String
+    def self.underscore: (String key) -> String
+    def self.classify: (String key) -> String
+    def self.demodulize: (String key) -> String
+    def self.pluralize: (String key) -> String
+  end
+end

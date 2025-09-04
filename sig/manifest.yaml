@@ -1,0 +1,4 @@
+dependencies:
+  - name: rbs
+  - name: logger
+  - name: json

@@ -1,0 +1,21 @@
+module Alba
+  # Representing typed attributes to encapsulate logic about types
+  class TypedAttribute
+    attr_reader name: Symbol | String
+    
+    @name: Symbol | String
+    @type: Alba::Type
+    
+    def initialize: (
+      name: Symbol | String,
+      type: Symbol | Class,
+      converter: Proc | bool | nil
+    ) -> void
+    
+    def value: () { (Symbol | String) -> untyped } -> untyped
+    
+    private
+    
+    def display_value_for: (untyped value) -> String
+  end
+end

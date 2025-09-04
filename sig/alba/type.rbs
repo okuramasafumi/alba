@@ -1,0 +1,23 @@
+module Alba
+  # Representing type itself, combined with TypedAttribute
+  class Type
+    attr_reader name: Symbol | String
+    attr_writer auto_convert: bool
+    
+    @name: Symbol | String
+    @check: Proc | false
+    @converter: Proc
+    @auto_convert: bool
+    
+    def initialize: (
+      Symbol | String name,
+      check: Proc | false,
+      converter: Proc,
+      ?auto_convert: bool
+    ) -> void
+    
+    def check: (untyped value) -> bool
+    def convert: (untyped obj) -> untyped
+    def auto_convert_with: (Proc converter) -> void
+  end
+end

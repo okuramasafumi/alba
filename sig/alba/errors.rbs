@@ -1,0 +1,13 @@
+module Alba
+  # Base error class for Alba
+  class Error < StandardError
+  end
+
+  # Raised when an unsupported backend is specified
+  class UnsupportedBackend < Error
+  end
+
+  # Raised when an unknown type is specified
+  class UnsupportedType < Error
+  end
+end

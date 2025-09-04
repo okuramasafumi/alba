@@ -1,0 +1,4 @@
+module Alba
+  # A constant to remove key from serialized JSON
+  REMOVE_KEY: Object
+end

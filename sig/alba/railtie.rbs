@@ -1,0 +1,9 @@
+module Alba
+  # Rails integration via Railtie
+  # This class is only loaded when Rails is present
+  # Note: Rails::Railtie type needs to be loaded via rails gem
+  class Railtie
+    # Railtie initializer to set up Alba with Rails defaults
+    def self.initializer: (String name) { () -> void } -> void
+  end
+end

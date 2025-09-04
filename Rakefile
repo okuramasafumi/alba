@@ -14,4 +14,24 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = file_list
 end
 
+desc 'Run Steep type checking'
+task :steep do
+  require 'steep'
+  require 'steep/cli'
+
+  puts 'Running Steep type check...'
+  result = system('bundle', 'exec', 'steep', 'check')
+  exit(1) unless result
+end
+
+desc 'Run RBS validation'
+task :rbs do
+  puts 'Validating RBS signatures...'
+  result = system('bundle', 'exec', 'rbs', 'validate')
+  exit(1) unless result
+end
+
+desc 'Run all type checks'
+task typecheck: [:rbs, :steep]
+
 task default: :test

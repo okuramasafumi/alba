@@ -1,0 +1,4 @@
+module Alba
+  # Current version of Alba
+  VERSION: String
+end

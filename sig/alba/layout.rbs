@@ -1,0 +1,33 @@
+module Alba
+  # Layout serialization
+  class Layout
+    @body: String | Proc
+    @resource: untyped
+    @serialized_json: String
+    
+    def object: () -> untyped
+    def params: () -> Hash[untyped, untyped]
+    def serializable_hash: () -> Hash[untyped, untyped]
+    def to_h: () -> Hash[untyped, untyped]
+    
+    def initialize: (
+      file: String?,
+      inline: Proc?
+    ) -> void
+    
+    def serialize: (
+      resource: untyped,
+      serialized_json: String,
+      binding: Binding
+    ) -> String
+    
+    private
+    
+    attr_reader serialized_json: String
+    
+    def check_and_return: (untyped obj, String message, Class klass) -> untyped
+    def serialize_within_string_layout: (Binding bnd) -> String
+    def serialize_within_inline_layout: () -> String
+    def encode: (Hash[untyped, untyped] hash) -> String
+  end
+end

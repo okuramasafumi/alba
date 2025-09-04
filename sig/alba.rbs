@@ -1,0 +1,65 @@
+# Type definitions for Alba JSON serialization library
+module Alba
+  # Type aliases for common patterns
+  type key_type = Symbol | String | nil
+  type transform_type = :camel | :lower_camel | :dash | :snake | :none
+  type backend_type = :oj | :oj_strict | :oj_rails | :oj_default | :active_support | :default | :json | :custom | nil
+  type encoder_type = ^(Hash[untyped, untyped]) -> String
+  type inflector_type = _Inflector | nil
+  type resource_class = singleton(Resource) | Class
+  
+  # Inflector interface
+  interface _Inflector
+    def camelize: (String) -> String
+    def camelize_lower: (String) -> String
+    def dasherize: (String) -> String
+    def underscore: (String) -> String
+    def classify: (String) -> String
+  end
+
+  # Type registry
+  interface _Type
+    def check: (untyped) -> bool
+    def convert: (untyped) -> untyped
+    def auto_convert?: () -> bool
+  end
+
+  # Main Alba singleton methods
+  def self.backend: () -> backend_type
+  def self.backend=: (backend_type) -> encoder_type
+  
+  def self.encoder: () -> encoder_type
+  def self.encoder=: (encoder_type) -> void
+  
+  def self.inflector: () -> inflector_type
+  def self.inflector=: (Symbol | inflector_type) -> void
+  
+  # Serialization methods
+  def self.serialize: (untyped object, ?with: :inference | Proc | resource_class, ?root_key: key_type) ?{ () -> void } -> String
+  def self.hashify: (untyped object, ?with: :inference | Proc | resource_class, ?root_key: key_type) ?{ () -> void } -> Hash[untyped, untyped]
+  
+  # Resource management
+  def self.resource_class: () { () -> void } -> Class
+  def self.resource_for: (untyped object, ?with: :inference | Proc | resource_class) ?{ () -> void } -> Resource
+  def self.infer_resource_class: (String name, ?nesting: String?) -> resource_class
+  
+  # Key configuration
+  def self.symbolize_keys!: () -> void
+  def self.stringify_keys!: () -> void
+  def self.regularize_key: (key_type) -> key_type
+  def self.transform_key: (String | Symbol key, transform_type: transform_type) -> (String | Symbol)
+  
+  # Type registration
+  def self.register_type: (Symbol | Class name, ?check: ^(untyped) -> bool | false, ?converter: ^(untyped) -> untyped | nil, ?auto_convert: bool) -> void
+  def self.find_type: (Symbol | Class name) -> _Type
+  
+  # Utility methods
+  def self.collection?: (untyped object) -> bool
+  def self.reset!: () -> void
+  
+  # Deprecated methods
+  def self.enable_inference!: (with: Symbol | inflector_type) -> void
+  def self.disable_inference!: () -> void
+  def self.inferring: () -> bool
+  def self.resource_with: (untyped object, ?with: :inference | Proc | resource_class) ?{ () -> void } -> Resource
+end

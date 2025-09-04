@@ -1,0 +1,162 @@
+module Alba
+  # Main Resource module that gets included into resource classes
+  module Resource
+    # Type for serialization options
+    type serialization_opts = {
+      root_key: Alba::key_type,
+      meta: Hash[untyped, untyped]
+    }
+
+    type attribute = Symbol | Proc | ::Alba::Association | ::Alba::TypedAttribute | ::Alba::NestedAttribute | ::Alba::ConditionalAttribute
+
+    # Module inclusion hook
+    def self.included: (Class base) -> void
+
+    # Instance methods available when Resource is included
+    module InstanceMethods
+      attr_reader object: untyped
+      attr_reader params: Hash[untyped, untyped]
+
+      # Initialization
+      def initialize: (
+        untyped object,
+        ?params: Hash[untyped, untyped],
+        ?within: untyped,
+        ?with_traits: Symbol | Array[Symbol] | nil,
+        ?select: Method?
+      ) -> void
+
+      # Serialization methods
+      def serialize: (?root_key: Alba::key_type, ?meta: Hash[untyped, untyped]) -> String
+      def to_json: (?Hash[untyped, untyped] options, ?root_key: Alba::key_type, ?meta: Hash[untyped, untyped]) -> String
+      def as_json: (?Hash[untyped, untyped] options, ?root_key: Alba::key_type, ?meta: Hash[untyped, untyped]) -> Hash[untyped, untyped]
+      def to_h: () -> Hash[untyped, untyped]
+      def serializable_hash: () -> Hash[untyped, untyped]
+
+      private
+
+      def encode: (Hash[untyped, untyped]) -> String
+      def serialize_with: (Hash[untyped, untyped]) -> String
+      def hash_with_metadata: (Hash[untyped, untyped], Hash[untyped, untyped]) -> Hash[untyped, untyped]
+      def fetch_key: () -> Alba::key_type
+      def transformable_root?: () -> bool
+      def transform_key: (Alba::key_type) -> Alba::key_type
+      def transform_keys: (Hash[untyped, untyped]) -> Hash[untyped, untyped]
+      def fetch_attribute: (untyped object, Symbol | String key, attribute attribute) -> untyped
+      def attributes_from_association: (Association association, untyped obj) -> [Alba::key_type, untyped]
+      def association_editor: () -> Module?
+      def assoc_name_from_params: (Symbol | String name) -> (Symbol | String)
+      def handle_error: (StandardError error, Symbol? on_error, Symbol | String key, attribute attribute, ::Alba::Resource resource_class) -> untyped
+      def on_nil: (untyped object, Symbol | String key) -> untyped
+      def conditional_attribute?: (untyped object, ConditionalAttribute attribute) -> bool
+      def _setup: () -> void
+      def select: (Symbol | String key, untyped value, attribute attribute) -> bool
+    end
+
+    # Class methods added when Resource is included
+    module ClassMethods
+      # DSL Methods for defining attributes
+      def attributes: (*(Symbol | String) attrs, ?if: Proc | Symbol | nil, **untyped opts) -> void
+      def attribute: (Symbol | String name, **untyped opts) ?{ (untyped, untyped) -> untyped } -> void
+      def root_key: (Symbol | String | true | nil key) -> void
+      def root_key_for_collection: (Symbol | String | nil key) -> void
+      def root_key!: (Symbol | String | true | nil key, ?Symbol | String | true | nil key_for_collection) -> void
+
+      # Association DSL methods
+      def association: (
+        Symbol | String name,
+        ?resource: Alba::resource_class | nil,
+        ?key: Alba::key_type,
+        ?condition: Proc | Symbol | nil,
+        **untyped opts
+      ) ?{ () -> void } -> void
+
+      def one: (
+        Symbol | String name,
+        ?resource: Alba::resource_class | nil,
+        ?key: Alba::key_type,
+        **untyped opts
+      ) ?{ () -> void } -> void
+
+      def many: (
+        Symbol | String name,
+        ?resource: Alba::resource_class | nil,
+        ?key: Alba::key_type,
+        **untyped opts
+      ) ?{ () -> void } -> void
+
+      def belongs_to: (
+        Symbol | String name,
+        ?resource: Alba::resource_class | nil,
+        ?key: Alba::key_type,
+        **untyped opts
+      ) ?{ () -> void } -> void
+
+      def has_one: (
+        Symbol | String name,
+        ?resource: Alba::resource_class | nil,
+        ?key: Alba::key_type,
+        **untyped opts
+      ) ?{ () -> void } -> void
+
+      def has_many: (
+        Symbol | String name,
+        ?resource: Alba::resource_class | nil,
+        ?key: Alba::key_type,
+        **untyped opts
+      ) ?{ () -> void } -> void
+
+      # Nested attributes
+      def nested_attribute: (Symbol | String name, **untyped opts) { () -> void } -> void
+      def nested: (Symbol | String name, **untyped opts) { () -> void } -> void
+
+      # Meta and params
+      def meta: (?Symbol | Proc | nil meta) ?{ () -> Hash[untyped, untyped] } -> void
+      def collection_key: (Symbol | String key) -> void
+
+      # Transform and configuration
+      def transform_keys: (Alba::transform_type type, ?root: bool, ?cascade: bool) -> void
+      def on_error: (:raise | :ignore | :nullify | nil handler) -> void
+      def on_nil: (:ignore | nil handler) -> void
+      def layout: (?file: String | nil, ?inline: Proc | nil) -> void
+
+      # Helper methods
+      def helper: (Module helper_module) -> void
+      def prefer_resource_method!: () -> void
+      def prefer_object_method!: () -> void
+
+      # Traits
+      def trait: (Symbol name) { () -> void } -> void
+
+      # Type checking
+      def typed_attribute: (Symbol | String name, Symbol | Class type, **untyped opts) -> void
+
+      # Ignoring attributes
+      def ignoring: (Symbol | String attr) { () -> void } -> void
+
+      # Selecting attributes
+      def select: (*Symbol attrs) -> bool
+
+      # Internal attribute accessors
+      attr_accessor _attributes: Hash[Symbol | String, untyped]
+      attr_accessor _key: Alba::key_type
+      attr_accessor _key_for_collection: Alba::key_type
+      attr_accessor _meta: untyped
+      attr_accessor _transform_type: Alba::transform_type
+      attr_accessor _transforming_root_key: bool
+      attr_accessor _key_transformation_cascade: bool
+      attr_accessor _on_error: Symbol | nil
+      attr_accessor _on_nil: Symbol | nil
+      attr_accessor _layout: untyped
+      attr_accessor _collection_key: Alba::key_type
+      attr_accessor _helper: Module | nil
+      attr_accessor _resource_methods: Array[Symbol]
+      attr_accessor _select_arity: Integer | nil
+      attr_accessor _traits: Hash[Symbol, untyped]
+    end
+
+    # Include both instance and class methods
+    include InstanceMethods
+    extend ClassMethods
+  end
+end

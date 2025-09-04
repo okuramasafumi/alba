@@ -1,0 +1,20 @@
+module Alba
+  # Representing nested attribute
+  class NestedAttribute
+    attr_writer key_transformation: Alba::transform_type
+    
+    @key_transformation: Alba::transform_type
+    @block: Proc
+    
+    def initialize: (
+      ?key_transformation: Alba::transform_type
+    ) { () -> void } -> void
+    
+    def value: (
+      object: untyped,
+      params: Hash[untyped, untyped],
+      within: untyped,
+      ?select: Method?
+    ) -> Hash[untyped, untyped]
+  end
+end

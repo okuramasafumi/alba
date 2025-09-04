@@ -1,0 +1,6 @@
+module Alba
+  # Module for printing deprecation warning
+  module Deprecation
+    def warn: (_ToS message) -> nil
+  end
+end
