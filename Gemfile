@@ -20,7 +20,7 @@ gem 'rubocop-performance', '~> 1.25.0', require: false # For lint
 gem 'rubocop-rake', '~> 0.7.1', require: false # For lint
 gem 'simplecov', '~> 0.22.0', require: false # For test coverage
 gem 'simplecov-cobertura', require: false # For test coverage
-gem 'steep', '~> 1.8', require: false # For type checking
+gem 'steep', '~> 1.7.0', require: false # For type checking
 gem 'yard', require: false # For documentation
 
 platforms :ruby do
