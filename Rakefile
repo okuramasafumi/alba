@@ -14,8 +14,12 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = file_list
 end
 
-require 'steep'
-require 'rbs'
+begin
+  require 'steep'
+  require 'rbs'
+rescue LoadError
+  puts 'Steep or RBS is not installed. Skipping type check tasks.'
+end
 
 desc 'Run Steep type checking'
 task :steep do
