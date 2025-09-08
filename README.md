@@ -1998,6 +1998,23 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+### Type Checking
+
+Alba uses RBS for type signatures and Steep for type checking.
+To run type checking:
+
+```bash
+# Install type checking dependencies (CRuby only)
+bundle install --with type
+
+# Run all type checks
+bundle exec rake typecheck
+
+# Or run individual checks
+bundle exec rake rbs    # Validate RBS signatures
+bundle exec rake steep  # Run Steep type checker
+```
+
 ## Contributing
 
 Thank you for begin interested in contributing to Alba! Please see [contributors guide](https://github.com/okuramasafumi/alba/blob/main/CONTRIBUTING.md) before start contributing. If you have any questions, please feel free to ask in [Discussions](https://github.com/okuramasafumi/alba/discussions).

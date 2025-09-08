@@ -14,11 +14,11 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = file_list
 end
 
+require 'steep'
+require 'rbs'
+
 desc 'Run Steep type checking'
 task :steep do
-  require 'steep'
-  require 'steep/cli'
-
   puts 'Running Steep type check...'
   result = system('bundle', 'exec', 'steep', 'check')
   exit(1) unless result

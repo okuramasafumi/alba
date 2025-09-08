@@ -25,6 +25,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
       BUNDLE_GEMFILE: ${{ (matrix.gemfile == 'without_active_support' && 'gemfiles/without_active_support.gemfile') || (matrix.gemfile == 'without_oj' && 'gemfiles/without_oj.gemfile') || null }}
+      BUNDLE_WITHOUT: type
     steps:
     - uses: actions/checkout@v5
     - name: Set up Ruby
@@ -40,3 +41,20 @@ jobs:
       with:
         files: ./coverage/coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
+
+  typecheck:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: [3.4]
+    steps:
+    - uses: actions/checkout@v5
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+    - name: Run type check
+      run: |
+        bundle exec rake typecheck
