@@ -2,9 +2,9 @@ module Alba
   # Representing association
   class Association
     # Class methods
-    @const_cache: Hash[untyped, untyped]
+    @const_cache: Hash[String, Class]
     
-    def self.const_cache: () -> Hash[untyped, untyped]
+    def self.const_cache: () -> Hash[String, Class]
     
     # Instance variables and methods
     attr_reader name: Symbol | String
@@ -15,7 +15,7 @@ module Alba
       ?resource: (Class | Proc | String | Symbol)?,
       ?source: Proc?,
       ?with_traits: (Symbol | Array[Symbol])?,
-      ?params: Hash[untyped, untyped],
+      ?params: Hash[Symbol | String, untyped],
       ?nesting: String?,
       ?key_transformation: Alba::transform_type,
       ?helper: Module?
@@ -25,17 +25,17 @@ module Alba
     
     def to_h: (
       untyped target,
-      ?within: untyped,
-      ?params: Hash[untyped, untyped]
-    ) -> (Hash[untyped, untyped] | Array[Hash[untyped, untyped]] | nil)
+      ?within: nil | bool | Object,
+      ?params: Hash[Symbol | String, untyped]
+    ) -> (Hash[Symbol | String, untyped] | Array[Hash[Symbol | String, untyped]] | nil)
     
     private
     
-    def object_from: (untyped target, Hash[untyped, untyped] params) -> untyped
+    def object_from: (untyped target, Hash[Symbol | String, untyped] params) -> untyped
     def constantize: (Class | Symbol | String resource) -> Class
     def assign_resource: (String? nesting, Alba::transform_type key_transformation, Proc? block, Module? helper) -> void
     def charged_resource_class: (Module? helper, Alba::transform_type key_transformation, Proc block) -> Class
-    def to_h_with_each_resource: (Enumerable[untyped] object, untyped within, Hash[untyped, untyped] params) -> Array[Hash[untyped, untyped]]
-    def to_h_with_constantize_resource: (untyped object, untyped within, Hash[untyped, untyped] params) -> Hash[untyped, untyped]
+    def to_h_with_each_resource: (Enumerable[untyped] object, nil | bool | Object within, Hash[Symbol | String, untyped] params) -> Array[Hash[Symbol | String, untyped]]
+    def to_h_with_constantize_resource: (untyped object, nil | bool | Object within, Hash[Symbol | String, untyped] params) -> Hash[Symbol | String, untyped]
   end
 end

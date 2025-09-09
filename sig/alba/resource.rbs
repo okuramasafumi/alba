@@ -4,7 +4,7 @@ module Alba
     # Type for serialization options
     type serialization_opts = {
       root_key: Alba::key_type,
-      meta: Hash[untyped, untyped]
+      meta: Hash[Symbol | String, untyped]
     }
 
     type attribute = Symbol | Proc | ::Alba::Association | ::Alba::TypedAttribute | ::Alba::NestedAttribute | ::Alba::ConditionalAttribute
@@ -15,33 +15,33 @@ module Alba
     # Instance methods available when Resource is included
     module InstanceMethods
       attr_reader object: untyped
-      attr_reader params: Hash[untyped, untyped]
+      attr_reader params: Hash[Symbol | String, untyped]
 
       # Initialization
       def initialize: (
         untyped object,
-        ?params: Hash[untyped, untyped],
-        ?within: untyped,
+        ?params: Hash[Symbol | String, untyped],
+        ?within: nil | bool | Object,
         ?with_traits: Symbol | Array[Symbol] | nil,
         ?select: Method?
       ) -> void
 
       # Serialization methods
-      def serialize: (?root_key: Alba::key_type, ?meta: Hash[untyped, untyped]) -> String
-      def to_json: (?Hash[untyped, untyped] options, ?root_key: Alba::key_type, ?meta: Hash[untyped, untyped]) -> String
-      def as_json: (?Hash[untyped, untyped] options, ?root_key: Alba::key_type, ?meta: Hash[untyped, untyped]) -> Hash[untyped, untyped]
-      def to_h: () -> Hash[untyped, untyped]
-      def serializable_hash: () -> Hash[untyped, untyped]
+      def serialize: (?root_key: Alba::key_type, ?meta: Hash[Symbol | String, untyped]) -> String
+      def to_json: (?Hash[Symbol | String, untyped] options, ?root_key: Alba::key_type, ?meta: Hash[Symbol | String, untyped]) -> String
+      def as_json: (?Hash[Symbol | String, untyped] options, ?root_key: Alba::key_type, ?meta: Hash[Symbol | String, untyped]) -> Hash[Symbol | String, untyped]
+      def to_h: () -> Hash[Symbol | String, untyped]
+      def serializable_hash: () -> Hash[Symbol | String, untyped]
 
       private
 
-      def encode: (Hash[untyped, untyped]) -> String
-      def serialize_with: (Hash[untyped, untyped]) -> String
-      def hash_with_metadata: (Hash[untyped, untyped], Hash[untyped, untyped]) -> Hash[untyped, untyped]
+      def encode: (Hash[Symbol | String, untyped]) -> String
+      def serialize_with: (Hash[Symbol | String, untyped]) -> String
+      def hash_with_metadata: (Hash[Symbol | String, untyped], Hash[Symbol | String, untyped]) -> Hash[Symbol | String, untyped]
       def fetch_key: () -> Alba::key_type
       def transformable_root?: () -> bool
       def transform_key: (Alba::key_type) -> Alba::key_type
-      def transform_keys: (Hash[untyped, untyped]) -> Hash[untyped, untyped]
+      def transform_keys: (Hash[Symbol | String, untyped]) -> Hash[Symbol | String, untyped]
       def fetch_attribute: (untyped object, Symbol | String key, attribute attribute) -> untyped
       def attributes_from_association: (Association association, untyped obj) -> [Alba::key_type, untyped]
       def association_editor: () -> Module?
@@ -111,7 +111,7 @@ module Alba
       def nested: (Symbol | String name, **untyped opts) { () -> void } -> void
 
       # Meta and params
-      def meta: (?Symbol | Proc | nil meta) ?{ () -> Hash[untyped, untyped] } -> void
+      def meta: (?Symbol | Proc | nil meta) ?{ () -> Hash[Symbol | String, untyped] } -> void
       def collection_key: (Symbol | String key) -> void
 
       # Transform and configuration

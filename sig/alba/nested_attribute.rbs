@@ -12,9 +12,9 @@ module Alba
     
     def value: (
       object: untyped,
-      params: Hash[untyped, untyped],
-      within: untyped,
+      params: Hash[Symbol | String, untyped],
+      within: nil | bool | Object,
       ?select: Method?
-    ) -> Hash[untyped, untyped]
+    ) -> Hash[Symbol | String, untyped]
   end
 end
