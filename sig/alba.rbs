@@ -1,12 +1,14 @@
 # Type definitions for Alba JSON serialization library
 module Alba
   # Type aliases for common patterns
+  type generic_hash = Hash[Symbol | String, untyped]
   type key_type = Symbol | String | nil
   type transform_type = :camel | :lower_camel | :dash | :snake | :none
   type backend_type = :oj | :oj_strict | :oj_rails | :oj_default | :active_support | :default | :json | :custom | nil
-  type encoder_type = ^(Hash[Symbol | String, uBetterntyped]) -> String
+  type encoder_type = ^(generic_hash) -> String
   type inflector_type = _Inflector | nil
   type resource_class = singleton(Resource) | Class
+  type within = generic_hash | Array[:_to_sym] | Symbol | true | false | nil
 
   # Inflector interface
   interface _Inflector
@@ -36,7 +38,7 @@ module Alba
 
   # Serialization methods
   def self.serialize: (untyped object, ?with: :inference | Proc | resource_class, ?root_key: key_type) ?{ () -> void } -> String
-  def self.hashify: (untyped object, ?with: :inference | Proc | resource_class, ?root_key: key_type) ?{ () -> void } -> Hash[Symbol | String, untyped]
+  def self.hashify: (untyped object, ?with: :inference | Proc | resource_class, ?root_key: key_type) ?{ () -> void } -> generic_hash
 
   # Resource management
   def self.resource_class: () { () -> void } -> Class

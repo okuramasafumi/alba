@@ -3,39 +3,39 @@ module Alba
   class Association
     # Class methods
     @const_cache: Hash[String, Class]
-    
+
     def self.const_cache: () -> Hash[String, Class]
-    
+
     # Instance variables and methods
     attr_reader name: Symbol | String
-    
+
     def initialize: (
       name: Symbol | String,
       ?condition: Proc?,
       ?resource: (Class | Proc | String | Symbol)?,
       ?source: Proc?,
       ?with_traits: (Symbol | Array[Symbol])?,
-      ?params: Hash[Symbol | String, untyped],
+      ?params: generic_hash,
       ?nesting: String?,
       ?key_transformation: Alba::transform_type,
       ?helper: Module?
     ) ?{ () -> void } -> void
-    
+
     def key_transformation=: (Alba::transform_type type) -> void
-    
+
     def to_h: (
       untyped target,
-      ?within: nil | bool | Object,
-      ?params: Hash[Symbol | String, untyped]
-    ) -> (Hash[Symbol | String, untyped] | Array[Hash[Symbol | String, untyped]] | nil)
-    
+      ?within: within,
+      ?params: generic_hash
+    ) -> (generic_hash | Array[generic_hash] | nil)
+
     private
-    
-    def object_from: (untyped target, Hash[Symbol | String, untyped] params) -> untyped
+
+    def object_from: (untyped target, generic_hash params) -> untyped
     def constantize: (Class | Symbol | String resource) -> Class
     def assign_resource: (String? nesting, Alba::transform_type key_transformation, Proc? block, Module? helper) -> void
     def charged_resource_class: (Module? helper, Alba::transform_type key_transformation, Proc block) -> Class
-    def to_h_with_each_resource: (Enumerable[untyped] object, nil | bool | Object within, Hash[Symbol | String, untyped] params) -> Array[Hash[Symbol | String, untyped]]
-    def to_h_with_constantize_resource: (untyped object, nil | bool | Object within, Hash[Symbol | String, untyped] params) -> Hash[Symbol | String, untyped]
+    def to_h_with_each_resource: (Enumerable[untyped] object, within within, generic_hash params) -> Array[generic_hash]
+    def to_h_with_constantize_resource: (untyped object, within within, generic_hash params) -> generic_hash
   end
 end

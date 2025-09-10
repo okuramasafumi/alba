@@ -4,30 +4,30 @@ module Alba
     @body: String | Proc
     @resource: Alba::Resource
     @serialized_json: String
-    
+
     def object: () -> untyped
-    def params: () -> Hash[Symbol | String, untyped]
-    def serializable_hash: () -> Hash[Symbol | String, untyped]
-    def to_h: () -> Hash[Symbol | String, untyped]
-    
+    def params: () -> generic_hash
+    def serializable_hash: () -> generic_hash
+    def to_h: () -> generic_hash
+
     def initialize: (
       file: String?,
       inline: Proc?
     ) -> void
-    
+
     def serialize: (
       resource: Alba::Resource,
       serialized_json: String,
       binding: Binding
     ) -> String
-    
+
     private
-    
+
     attr_reader serialized_json: String
-    
+
     def check_and_return: (untyped obj, String message, Class klass) -> untyped
     def serialize_within_string_layout: (Binding bnd) -> String
     def serialize_within_inline_layout: () -> String
-    def encode: (Hash[Symbol | String, untyped] hash) -> String
+    def encode: (generic_hash hash) -> String
   end
 end
