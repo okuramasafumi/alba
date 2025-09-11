@@ -8,7 +8,7 @@ module Alba
 
     # @param name [Symbol, String]
     # @param type [Symbol, Class]
-    # @param converter [Proc]
+    # @param converter [Proc, true, false, nil]
     def initialize(name:, type:, converter:)
       @name = name
       t = Alba.find_type(type)

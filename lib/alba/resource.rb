@@ -45,7 +45,7 @@ module Alba
 
       # @param object [Object] the object to be serialized
       # @param params [Hash] user-given Hash for arbitrary data
-      # @param within [Object, nil, false, true] determines what associations to be serialized. If not set, it serializes all associations.
+      # @param within [Alba::WITHIN_DEFAULT, Hash, Array, nil, false, true] determines what associations to be serialized. If not set, it serializes all associations.
       # @param with_traits [Symbol, Array<Symbol>, nil] specified traits
       # @param select [Method] select method object used with `nested_attribute` and `trait`
       def initialize(object, params: {}, within: WITHIN_DEFAULT, with_traits: nil, select: nil)
@@ -61,7 +61,7 @@ module Alba
 
       # Serialize object into JSON string
       #
-      # @param root_key [Symbol, nil, true]
+      # @param root_key [Symbol, nil]
       # @param meta [Hash] metadata for this serialization
       # @return [String] serialized JSON string
       def serialize(root_key: nil, meta: {})
@@ -88,7 +88,7 @@ module Alba
       # Returns a Hash corresponding {#serialize}
       #
       # @param _options [Hash] dummy parameter for Rails compatibility
-      # @param root_key [Symbol, nil, true]
+      # @param root_key [Symbol, nil]
       # @param meta [Hash] metadata for this serialization
       # @return [Hash]
       def as_json(_options = {}, root_key: nil, meta: {})
@@ -434,7 +434,9 @@ module Alba
       # @param with_traits [Symbol, Array<Symbol>, nil] specified traits
       # @param params [Hash] params override for the association
       # @param options [Hash<Symbol, Proc>]
-      # @option options [Proc] if a condition to decide if this association should be serialized
+      # @option options [Proc, Symbol, nil] if a condition to decide if this association should be serialized
+      #   When it's Proc, it's called to check condition
+      #   When it's Symbol, it's treated as a method name on the Resource and the method is called
       # @param block [Block]
       # @return [void]
       # @see Alba::Association#initialize
@@ -497,6 +499,7 @@ module Alba
       # @param key [String, Symbol]
       # @param key_for_collection [String, Symbol]
       # @raise [NoMethodError] when key doesn't respond to `to_sym` method
+      # @return [void]
       def root_key(key, key_for_collection = nil)
         @_key = key.to_sym
         @_key_for_collection = key_for_collection&.to_sym
@@ -506,18 +509,21 @@ module Alba
       #
       # @param key [String, Symbol]
       # @raise [NoMethodError] when key doesn't respond to `to_sym` method
+      # @return [void]
       def root_key_for_collection(key)
         @_key = true
         @_key_for_collection = key.to_sym
       end
 
       # Set root key to true
+      # @return [void]
       def root_key!
         @_key = true
         @_key_for_collection = true
       end
 
       # Set metadata
+      # @return [void]
       def meta(key = :meta, &block)
         @_meta = [key, block]
       end
@@ -526,6 +532,7 @@ module Alba
       #
       # @param file [String] name of the layout file
       # @param inline [Proc] a proc returning JSON string or a Hash representing JSON
+      # @return [void]
       def layout(file: nil, inline: nil)
         @_layout = Layout.new(file: file, inline: inline)
       end
@@ -537,6 +544,7 @@ module Alba
       # @param cascade [Boolean] decides if key transformation cascades into inline association
       #   Default is true but can be set false for old (v1) behavior
       # @raise [Alba::Error] when type is not supported
+      # @return [void]
       def transform_keys(type, root: true, cascade: true)
         type = type.to_sym
         unless %i[none snake camel lower_camel dash].include?(type)
@@ -570,6 +578,7 @@ module Alba
       # Sets key for collection serialization
       #
       # @param key [String, Symbol]
+      # @return [void]
       def collection_key(key)
         @_collection_key = key.to_sym
       end
@@ -579,6 +588,7 @@ module Alba
       #
       # @param handler [Symbol] `:raise`, `:ignore` or `:nullify`
       # @param block [Block]
+      # @return [void]
       def on_error(handler = nil, &block)
         raise ArgumentError, 'You cannot specify error handler with both Symbol and block' if handler && block
         raise ArgumentError, 'You must specify error handler with either Symbol or block' unless handler || block
@@ -600,6 +610,7 @@ module Alba
       # Set nil handler
       #
       # @param block [Block]
+      # @return [void]
       def on_nil(&block)
         @_on_nil = block
       end
@@ -607,6 +618,7 @@ module Alba
       # Define helper methods
       #
       # @param mod [Module] a module to extend
+      # @return [void]
       def helper(mod = @_helper || Module.new, &block)
         mod.module_eval(&block) if block
         extend mod
@@ -615,11 +627,13 @@ module Alba
       end
 
       # DSL for alias, purely for readability
+      # @return [void]
       def prefer_resource_method!
         alias_method :fetch_attribute_from_object_and_resource, :_fetch_attribute_from_resource_first
       end
 
       # DSL for alias, purely for readability
+      # @return [void]
       def prefer_object_method!
         alias_method :fetch_attribute_from_object_and_resource, :_fetch_attribute_from_object_first
       end
