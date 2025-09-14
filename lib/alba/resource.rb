@@ -45,7 +45,8 @@ module Alba
 
       # @param object [Object] the object to be serialized
       # @param params [Hash] user-given Hash for arbitrary data
-      # @param within [Alba::WITHIN_DEFAULT, Hash, Array, nil, false, true] determines what associations to be serialized. If not set, it serializes all associations.
+      # @param within [Alba::WITHIN_DEFAULT, Hash, Array, nil, false, true]
+      #   determines what associations to be serialized. If not set, it serializes all associations.
       # @param with_traits [Symbol, Array<Symbol>, nil] specified traits
       # @param select [Method] select method object used with `nested_attribute` and `trait`
       def initialize(object, params: {}, within: WITHIN_DEFAULT, with_traits: nil, select: nil)
