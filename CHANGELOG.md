@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 3.9.1 2025-09-27
+
+### Added
+
+- RBS types
+  - This change itself is just an addition, but not feature addition. Here I picked `3.9.1`, but I don't know how semver works in this case...
+
 ## 3.9.0 2025-08-14
 
 ### Added
