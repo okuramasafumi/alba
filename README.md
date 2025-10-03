@@ -1,5 +1,6 @@
 ![alba card](https://raw.githubusercontent.com/okuramasafumi/alba/main/logo/alba-card.png)
 ----------
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/369f5da56a2d4e9fb3b9ace407981af0)](https://app.codacy.com/gh/okuramasafumi/alba?utm_source=github.com&utm_medium=referral&utm_content=okuramasafumi/alba&utm_campaign=Badge_Grade)
 [![Gem Version](https://badge.fury.io/rb/alba.svg)](https://badge.fury.io/rb/alba)
 [![CI](https://github.com/okuramasafumi/alba/actions/workflows/main.yml/badge.svg)](https://github.com/okuramasafumi/alba/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/okuramasafumi/alba/branch/main/graph/badge.svg?token=3D3HEZ5OXT)](https://codecov.io/gh/okuramasafumi/alba)
