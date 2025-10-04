@@ -189,7 +189,7 @@ This change is supposed to be released as 3.8.0 with the change in 3.7.4, but I 
 
 ## [2.4.1] 2023-08-02
 
-#### Fixed
+### Fixed
 
 - Fix the bug of resource name inference for classes whose name end with "Serializer" [No PR](https://github.com/okuramasafumi/alba/commit/1695af4351981725231fd071aaef5b2e4174fb26)
 
