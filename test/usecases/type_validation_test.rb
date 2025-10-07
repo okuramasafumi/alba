@@ -88,4 +88,47 @@ class TypeValidationTest < Minitest::Test
       AnotherUserResource.new(@user).serialize
     )
   end
+
+  class CorrectlyTypedResource
+    include Alba::Resource
+
+    attribute typed_attribute: :String do |object| # rubocop:disable Style/SymbolProc
+      object.name
+    end
+  end
+
+  def test_it_allows_to_use_type_with_attribute
+    assert_equal(
+      '{"typed_attribute":"Masafumi OKURA"}',
+      CorrectlyTypedResource.new(@user).serialize
+    )
+  end
+
+  class WronglyTypedResource
+    include Alba::Resource
+
+    attribute typed_attribute: :String do |_object|
+      123
+    end
+  end
+
+  def test_it_raises_error_when_type_with_attribute_is_wrong
+    error = assert_raises(TypeError) { WronglyTypedResource.new(@user).serialize }
+    assert_equal 'Attribute typed_attribute is expected to be String but actually Integer.', error.message
+  end
+
+  class ConversionTypedResource
+    include Alba::Resource
+
+    attribute typed_attribute: [String, true] do |_object|
+      42
+    end
+  end
+
+  def test_it_allows_to_use_type_with_attribute_and_convert_it
+    assert_equal(
+      '{"typed_attribute":"42"}',
+      ConversionTypedResource.new(@user).serialize
+    )
+  end
 end

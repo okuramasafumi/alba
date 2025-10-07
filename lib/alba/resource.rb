@@ -290,7 +290,7 @@ module Alba
                 when Symbol then fetch_attribute_from_object_and_resource(obj, attribute)
                 when Proc then instance_exec(obj, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(obj, params: params, within: within) }
-                when TypedAttribute then attribute.value { |attr| fetch_attribute(obj, key, attr) }
+                when TypedAttribute then attribute.value(object: obj) { |attr| fetch_attribute(obj, key, attr) }
                 when NestedAttribute then attribute.value(object: obj, params: params, within: @within, select: method(:select))
                 when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: obj) { |attr| fetch_attribute(obj, key, attr) }
                   # :nocov:
@@ -399,11 +399,11 @@ module Alba
       end
       private :assign_attributes
 
-      def assign_attributes_with_types(attrs_with_types, if_value)
+      def assign_attributes_with_types(attrs_with_types, if_value, &block)
         attrs_with_types.each do |attr_name, type_and_converter|
           attr_name = attr_name.to_sym
           type, type_converter = type_and_converter
-          typed_attr = TypedAttribute.new(name: attr_name, type: type, converter: type_converter)
+          typed_attr = TypedAttribute.new(name: attr_name, type: type, converter: type_converter, &block)
           attr = if_value ? ConditionalAttribute.new(body: typed_attr, condition: if_value) : typed_attr
           @_attributes[attr_name] = attr
         end
@@ -413,15 +413,21 @@ module Alba
       # Set an attribute with the given block
       #
       # @param name [String, Symbol] key name
-      # @param options [Hash<Symbol, Proc>]
-      # @option options [Proc] if a condition to decide if this attribute should be serialized
+      # @param if [Proc] condition to decide if it should serialize these attributes
       # @param block [Block] the block called during serialization
       # @raise [ArgumentError] if block is absent
       # @return [void]
-      def attribute(name, **options, &block)
+      def attribute(name = nil, if: nil, **name_with_type, &block)
+        if_value = binding.local_variable_get(:if)
         raise ArgumentError, 'No block given in attribute method' unless block
+        raise ArgumentError, 'You must specify either name or name with type' if name.nil? && name_with_type.empty?
 
-        @_attributes[name.to_sym] = options[:if] ? ConditionalAttribute.new(body: block, condition: options[:if]) : block
+        if name.nil?
+          assign_attributes_with_types(name_with_type, if_value, &block)
+        else # Symbol
+          attr = if_value ? ConditionalAttribute.new(body: block, condition: if_value) : block
+          @_attributes[name.to_sym] = attr
+        end
       end
 
       # Set association
