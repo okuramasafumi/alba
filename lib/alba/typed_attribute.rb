@@ -9,7 +9,7 @@ module Alba
     # @param name [Symbol, String]
     # @param type [Symbol, Class]
     # @param converter [Proc, true, false, nil]
-    def initialize(name:, type:, converter:)
+    def initialize(name:, type:, converter:, &block)
       @name = name
       t = Alba.find_type(type)
       @type = case converter
@@ -18,11 +18,12 @@ module Alba
               else
                 t.dup.tap { _1.auto_convert_with(converter) }
               end
+      @block = block
     end
 
     # @return [String, Integer, Boolean] type-checked or type-converted object
-    def value
-      v = yield(@name)
+    def value(object: nil)
+      v = @block ? @block.call(object) : yield(@name)
       result = @type.check(v)
       result ? v : @type.convert(v)
     rescue TypeError
