@@ -20,6 +20,9 @@ module Alba
     WITHIN_DEFAULT = Object.new.freeze
     private_constant :WITHIN_DEFAULT
 
+    EMPTY_HASH = {}.freeze
+    private_constant :EMPTY_HASH
+
     # `setup` method is meta-programmatically defined here for performance.
     # @api private
     def self.included(base) # rubocop:disable Metrics/MethodLength
@@ -49,7 +52,7 @@ module Alba
       #   determines what associations to be serialized. If not set, it serializes all associations.
       # @param with_traits [Symbol, Array<Symbol>, nil] specified traits
       # @param select [Method] select method object used with `nested_attribute` and `trait`
-      def initialize(object, params: {}, within: WITHIN_DEFAULT, with_traits: nil, select: nil)
+      def initialize(object, params: EMPTY_HASH, within: WITHIN_DEFAULT, with_traits: nil, select: nil)
         @object = object
         @params = params
         @within = within
@@ -65,7 +68,7 @@ module Alba
       # @param root_key [Symbol, nil]
       # @param meta [Hash] metadata for this serialization
       # @return [String] serialized JSON string
-      def serialize(root_key: nil, meta: {})
+      def serialize(root_key: nil, meta: EMPTY_HASH)
         serialize_with(as_json(root_key: root_key, meta: meta))
       end
 
@@ -74,7 +77,7 @@ module Alba
       #
       # @see #serialize
       # @see https://github.com/rails/rails/blob/7-0-stable/actionpack/lib/action_controller/metal/renderers.rb#L156
-      def to_json(options = {}, root_key: nil, meta: {})
+      def to_json(options = EMPTY_HASH, root_key: nil, meta: EMPTY_HASH)
         confusing_keys = [:only, :except]
         confusing_options = options.keys.select { |k| confusing_keys.include?(k.to_sym) }
         unless confusing_options.empty?
@@ -92,7 +95,7 @@ module Alba
       # @param root_key [Symbol, nil]
       # @param meta [Hash] metadata for this serialization
       # @return [Hash]
-      def as_json(_options = {}, root_key: nil, meta: {})
+      def as_json(_options = EMPTY_HASH, root_key: nil, meta: EMPTY_HASH)
         key = root_key.nil? ? fetch_key : root_key
         key = Alba.regularize_key(key)
         if key && !key.empty?
@@ -447,7 +450,7 @@ module Alba
       # @param block [Block]
       # @return [void]
       # @see Alba::Association#initialize
-      def association(name, condition = nil, resource: nil, serializer: nil, source: nil, key: nil, with_traits: nil, params: {}, **options, &block)
+      def association(name, condition = nil, resource: nil, serializer: nil, source: nil, key: nil, with_traits: nil, params: EMPTY_HASH, **options, &block)
         resource ||= serializer
         transformation = @_key_transformation_cascade ? @_transform_type : :none
         assoc = Association.new(
