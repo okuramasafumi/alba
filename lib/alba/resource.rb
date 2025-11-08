@@ -311,7 +311,7 @@ module Alba
         return obj.fetch(attribute) if obj.is_a?(Hash)
 
         obj.__send__(attribute)
-      rescue NoMethodError
+      rescue NoMethodError, KeyError
         __send__(attribute, obj)
       end
 
@@ -323,6 +323,8 @@ module Alba
         else
           obj.__send__(attribute)
         end
+      rescue KeyError
+        __send__(attribute, obj)
       end
 
       def nil_handler

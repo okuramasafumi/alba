@@ -36,4 +36,22 @@ class HashSerializationTest < Minitest::Test
       ManyHashResource.new(hash).serialize
     )
   end
+
+  class InstanceMethodHashResource
+    include Alba::Resource
+
+    attributes :id, :name, :id_name
+
+    def id_name(hash)
+      "#{hash[:id]}#{hash[:name]}"
+    end
+  end
+
+  def test_hash_serialization_with_instance_method
+    hash = {id: 1, name: 'test'}
+    assert_equal(
+      '{"id":1,"name":"test","id_name":"1test"}',
+      InstanceMethodHashResource.new(hash).serialize
+    )
+  end
 end
