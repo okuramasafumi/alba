@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 3.10.0 2025-11-11
+
+### Added
+
+- Support type validation and coercion for a single attribute method [#470](https://github.com/okuramasafumi/alba/pull/470)
+  - Thank you [@denblackstache](https://github.com/denblackstache) for requesting the feature
+- Fix hash object resource methods [#475](https://github.com/okuramasafumi/alba/pull/475)
+  - Thank you, [@jkmcrg](https://github.com/jkmcrg)
+
 ## 3.9.1 2025-09-27
 
 ### Added
