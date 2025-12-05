@@ -349,7 +349,7 @@ end
 class FooResource
   include Alba::Resource
 
-  attributes :bar
+  attributes :format
 
   # Here, `format` method is available
 end
