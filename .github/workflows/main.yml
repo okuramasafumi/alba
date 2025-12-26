@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        ruby: ['3.0', 3.1, 3.2, 3.3, 3.4, head, jruby, truffleruby]
+        ruby: ['3.0', '3.1', '3.2', '3.3', '3.4', '4.0', head, jruby, truffleruby]
         gemfile: [all, without_active_support, without_oj]
         exclude:
           - os: windows-latest
