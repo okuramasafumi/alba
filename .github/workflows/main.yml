@@ -19,6 +19,9 @@ jobs:
             ruby: jruby
           - os: windows-latest
             ruby: truffleruby
+          # Not yet available, we need to wait https://github.com/ruby/setup-ruby/pull/846
+          - os: windows-latest
+            ruby: '4.0'
           # Because of kaminari
           - os: windows-latest
             ruby: head
