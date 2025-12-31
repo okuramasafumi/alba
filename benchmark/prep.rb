@@ -2,9 +2,7 @@
 
 RubyVM::YJIT.enable unless ENV["NO_YJIT"]
 require "csv"
-require "pg"
 require "active_record"
-require "active_record/connection_adapters/postgresql_adapter"
 require "logger"
 require "oj"
 require "sqlite3"
