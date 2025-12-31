@@ -114,6 +114,11 @@ module Alba
       end
       alias to_h serializable_hash
 
+      # A hook method to override so that attributes can be filtered
+      def attributes
+        @_attributes
+      end
+
       private
 
       def hash_from_traits(obj)
@@ -196,7 +201,7 @@ module Alba
       end
 
       def attributes_to_hash(obj, hash)
-        @_attributes.each do |key, attribute|
+        attributes.each do |key, attribute|
           set_key_and_attribute_body_from(obj, key, attribute, hash)
         rescue ::Alba::Error, FrozenError, TypeError
           raise

@@ -897,7 +897,7 @@ In this example we add `baz` attribute and change `root_key`. This way, you can 
 
 ### Filtering attributes
 
-To filter attributes, you can use `select` instance method. Using `attributes` instance method is deprecated and will be removed in the future.
+To filter attributes, you can use `select` instance method. Using `attributes` instance method is also possible.
 
 #### Filtering attributes with `select`
 
