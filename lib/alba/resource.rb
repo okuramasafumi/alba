@@ -657,6 +657,8 @@ module Alba
       # @api private
       # @return [void]
       def _compile
+        return if @_compiled
+
         @_compiled = true
         @_attributes.freeze
         @_traits.freeze

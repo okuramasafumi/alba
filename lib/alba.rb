@@ -241,7 +241,7 @@ module Alba
     def compile
       @_resources ||= []
       @_resources.each do |resource|
-        resource._compile unless resource._attributes.frozen?
+        resource._compile unless resource._compiled
       end
       @_resources.dup
     end
