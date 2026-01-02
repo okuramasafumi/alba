@@ -1,0 +1,18 @@
+AllCops:
+  TargetRubyVersion: 2.6
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Layout/LineLength:
+  Max: 120
+
+# We don't want to deepen nestings for classes
+Style/ClassAndModuleChildren:
+  Exclude:
+    - 'test/**/*'
