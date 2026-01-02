@@ -356,7 +356,7 @@ Benchmark.memory(&benchmark_body)
 # --- Show gem versions ---
 
 puts "Gem versions:"
-gems = %w[alba active_model_serializers barley barley_cache blueprinter fast_serializer jserializer panko_serializer representable simple_ams turbostreamer]
+gems = %w[alba active_model_serializers barley blueprinter fast_serializer jserializer panko_serializer representable simple_ams turbostreamer rabl jbuilder]
 Bundler.load.specs.each do |spec|
   puts "#{spec.name}: #{spec.version}" if gems.include?(spec.name)
 end
