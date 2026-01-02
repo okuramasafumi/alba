@@ -170,23 +170,21 @@ class CompileTest < Minitest::Test
     assert_equal '{"id":1,"name":"Test"}', resource_class.new(user, with_traits: [:detailed]).serialize
   end
 
-  # Test 9: Optimization generates specialized method
-  def test_compile_generates_optimized_fetch_attribute_method
+  # Test 9: Compile sets _compiled flag
+  def test_compile_sets_compiled_flag
     resource_class = Class.new do
       include Alba::Resource
 
       attributes :id, :name
     end
 
+    refute_predicate resource_class, :_compiled
     Alba.compile
-
-    # After compile, a specialized _fetch_attribute method should be defined
-    assert resource_class.method_defined?(:_fetch_attribute_id)
-    assert resource_class.method_defined?(:_fetch_attribute_name)
+    assert_predicate resource_class, :_compiled
   end
 
-  # Test 10: Optimization still produces correct output
-  def test_optimized_resources_produce_correct_output
+  # Test 10: Resources produce correct output after compile
+  def test_resources_produce_correct_output_after_compile
     resource_class = Class.new do
       include Alba::Resource
 

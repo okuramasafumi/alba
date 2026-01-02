@@ -14,7 +14,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    INTERNAL_VARIABLES = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil, _resource_methods: [], _select_arity: nil, _traits: {}}.freeze # rubocop:disable Layout/LineLength
+    INTERNAL_VARIABLES = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil, _resource_methods: [], _select_arity: nil, _traits: {}, _compiled: false}.freeze # rubocop:disable Layout/LineLength
     private_constant :INTERNAL_VARIABLES
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -291,13 +291,7 @@ module Alba
 
       def fetch_attribute(obj, key, attribute) # rubocop:disable Metrics
         value = case attribute
-                when Symbol
-                  optimized_method = :"_fetch_attribute_#{attribute}"
-                  if respond_to?(optimized_method, true)
-                    __send__(optimized_method, obj)
-                  else
-                    fetch_attribute_from_object_and_resource(obj, attribute)
-                  end
+                when Symbol then fetch_attribute_from_object_and_resource(obj, attribute)
                 when Proc then instance_exec(obj, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(obj, params: params, within: within) }
                 when TypedAttribute then attribute.value(object: obj) { |attr| fetch_attribute(obj, key, attr) }
@@ -663,30 +657,9 @@ module Alba
       # @api private
       # @return [void]
       def _compile
-        _generate_optimized_methods
+        @_compiled = true
         @_attributes.freeze
         @_traits.freeze
-      end
-
-      private
-
-      # Generate optimized fetch methods for Symbol attributes
-      # This eliminates __send__ overhead for simple attributes
-      #
-      # @api private
-      # @return [void]
-      def _generate_optimized_methods
-        @_attributes.each do |key, attribute|
-          next unless attribute.is_a?(Symbol) && !@_resource_methods.include?(attribute)
-
-          method_name = :"_fetch_attribute_#{key}"
-          next if method_defined?(method_name)
-
-          # Generate a method that directly calls the attribute on the object
-          define_method(method_name) do |obj|
-            obj.is_a?(Hash) ? obj.fetch(attribute) : obj.__send__(attribute)
-          end
-        end
       end
     end
   end
