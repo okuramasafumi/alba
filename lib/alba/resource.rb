@@ -40,6 +40,7 @@ module Alba
       end
       base.include InstanceMethods
       base.extend ClassMethods
+      Alba.register_resource(base)
     end
 
     # Instance methods
@@ -377,7 +378,7 @@ module Alba
       # @api private
       def inherited(subclass)
         super
-        INTERNAL_VARIABLES.each_key { |name| subclass.instance_variable_set(:"@#{name}", instance_variable_get(:"@#{name}").clone) }
+        INTERNAL_VARIABLES.each_key { |name| subclass.instance_variable_set(:"@#{name}", instance_variable_get(:"@#{name}").dup) }
       end
 
       # Defining methods for DSLs and disable parameter number check since for users' benefits increasing params is fine
@@ -648,6 +649,16 @@ module Alba
       # @return [void]
       def prefer_object_method!
         alias_method :fetch_attribute_from_object_and_resource, :_fetch_attribute_from_object_first
+      end
+
+      # Compile the resource by freezing its attributes and traits
+      # This is called by Alba.compile and should not be called directly
+      #
+      # @api private
+      # @return [void]
+      def _compile
+        @_attributes.freeze
+        @_traits.freeze
       end
     end
   end
