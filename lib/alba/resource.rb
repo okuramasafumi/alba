@@ -14,7 +14,7 @@ module Alba
   module Resource
     # @!parse include InstanceMethods
     # @!parse extend ClassMethods
-    INTERNAL_VARIABLES = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil, _resource_methods: [], _select_arity: nil, _traits: {}}.freeze # rubocop:disable Layout/LineLength
+    INTERNAL_VARIABLES = {_attributes: {}, _key: nil, _key_for_collection: nil, _meta: nil, _transform_type: :none, _transforming_root_key: false, _key_transformation_cascade: true, _on_error: nil, _on_nil: nil, _layout: nil, _collection_key: nil, _helper: nil, _resource_methods: [], _select_arity: nil, _traits: {}, _compiled: false}.freeze # rubocop:disable Layout/LineLength
     private_constant :INTERNAL_VARIABLES
 
     WITHIN_DEFAULT = Object.new.freeze
@@ -40,6 +40,7 @@ module Alba
       end
       base.include InstanceMethods
       base.extend ClassMethods
+      Alba.register_resource(base)
     end
 
     # Instance methods
@@ -290,7 +291,7 @@ module Alba
 
       def fetch_attribute(obj, key, attribute) # rubocop:disable Metrics
         value = case attribute
-                when Symbol then fetch_attribute_from_object_and_resource(obj, attribute)
+                when Symbol then fetch_symbol_attribute(obj, key, attribute)
                 when Proc then instance_exec(obj, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(obj, params: params, within: within) }
                 when TypedAttribute then attribute.value(object: obj) { |attr| fetch_attribute(obj, key, attr) }
@@ -301,6 +302,10 @@ module Alba
                   # :nocov:
                 end
         value.nil? && nil_handler ? instance_exec(obj, key, attribute, &nil_handler) : value
+      end
+
+      def fetch_symbol_attribute(obj, _key, attribute)
+        fetch_attribute_from_object_and_resource(obj, attribute)
       end
 
       def fetch_attribute_from_object_and_resource(obj, attribute)
@@ -377,7 +382,7 @@ module Alba
       # @api private
       def inherited(subclass)
         super
-        INTERNAL_VARIABLES.each_key { |name| subclass.instance_variable_set(:"@#{name}", instance_variable_get(:"@#{name}").clone) }
+        INTERNAL_VARIABLES.each_key { |name| subclass.instance_variable_set(:"@#{name}", instance_variable_get(:"@#{name}").dup) }
       end
 
       # Defining methods for DSLs and disable parameter number check since for users' benefits increasing params is fine
@@ -648,6 +653,82 @@ module Alba
       # @return [void]
       def prefer_object_method!
         alias_method :fetch_attribute_from_object_and_resource, :_fetch_attribute_from_object_first
+      end
+
+      # Compile the resource by freezing its attributes and traits
+      # This is called by Alba.compile and should not be called directly
+      #
+      # @api private
+      # @return [void]
+      def _compile
+        return if @_compiled
+
+        _prepend_optimized_module
+        @_compiled = true
+        @_attributes.freeze
+        @_traits.freeze
+      end
+
+      private
+
+      # Validate that a symbol is safe to use in code generation
+      SAFE_METHOD_NAME_PATTERN = /\A[a-z_][a-zA-Z0-9_]*[?!=]?\z/
+      private_constant :SAFE_METHOD_NAME_PATTERN
+
+      # Generate an optimized module and prepend it to the class
+      # The module contains fetch_symbol_attribute method with direct method calls
+      # This eliminates __send__ overhead entirely
+      #
+      # @api private
+      # @return [void]
+      def _prepend_optimized_module # rubocop:disable Metrics/MethodLength
+        # Collect symbol attributes that can be optimized
+        optimizable_attrs = @_attributes.select do |key, attribute|
+          attribute.is_a?(Symbol) && safe_method_name?(key) && safe_method_name?(attribute)
+        end
+
+        return if optimizable_attrs.empty?
+
+        resource_methods = @_resource_methods
+        # Build the case statement body
+        cases = build_optimized_cases(optimizable_attrs, resource_methods)
+
+        # Define optimized fetch_symbol_attribute directly on the class
+        # This is faster than prepending a module because it avoids module lookup overhead
+        # def fetch_symbol_attribute(obj, key, attribute)
+        #   case key
+        #   when :id then obj.is_a?(Hash) ? obj.fetch(:id) : obj.id
+        #   when :name then obj.is_a?(Hash) ? obj.fetch(:name) : obj.name
+        #   else fetch_attribute_from_object_and_resource(obj, attribute)
+        #   end
+        # end
+        class_eval(<<~RUBY, __FILE__, __LINE__ + 1) # rubocop:disable Style/DocumentDynamicEvalDefinition
+          def fetch_symbol_attribute(obj, key, attribute)
+            case key
+            #{cases}
+            else fetch_attribute_from_object_and_resource(obj, attribute)
+            end
+          end
+        RUBY
+      end
+
+      def build_optimized_cases(optimizable_attrs, resource_methods)
+        cases = optimizable_attrs.map { |key, attribute| build_single_case(key, attribute, resource_methods) }
+        cases.join("\n          ")
+      end
+
+      def build_single_case(key, attribute, resource_methods)
+        if resource_methods.include?(attribute)
+          # For resource methods, call the resource method directly
+          "when :#{key} then #{attribute}(obj)"
+        else
+          # For object methods, call the object method directly
+          "when :#{key} then obj.is_a?(Hash) ? obj.fetch(:#{attribute}) : obj.#{attribute}"
+        end
+      end
+
+      def safe_method_name?(name)
+        name.to_s.match?(SAFE_METHOD_NAME_PATTERN)
       end
     end
   end
