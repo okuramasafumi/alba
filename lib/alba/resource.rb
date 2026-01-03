@@ -291,7 +291,7 @@ module Alba
 
       def fetch_attribute(obj, key, attribute) # rubocop:disable Metrics
         value = case attribute
-                when Symbol then fetch_attribute_from_object_and_resource(obj, attribute)
+                when Symbol then fetch_symbol_attribute(obj, key, attribute)
                 when Proc then instance_exec(obj, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(obj, params: params, within: within) }
                 when TypedAttribute then attribute.value(object: obj) { |attr| fetch_attribute(obj, key, attr) }
@@ -302,6 +302,16 @@ module Alba
                   # :nocov:
                 end
         value.nil? && nil_handler ? instance_exec(obj, key, attribute, &nil_handler) : value
+      end
+
+      def fetch_symbol_attribute(obj, key, attribute)
+        # Use optimized method if compiled and method exists
+        optimized_method = :"_fetch_#{key}"
+        if @_compiled && respond_to?(optimized_method, true)
+          __send__(optimized_method, obj)
+        else
+          fetch_attribute_from_object_and_resource(obj, attribute)
+        end
       end
 
       def fetch_attribute_from_object_and_resource(obj, attribute)
@@ -659,9 +669,49 @@ module Alba
       def _compile
         return if @_compiled
 
+        _generate_optimized_fetch_methods
         @_compiled = true
         @_attributes.freeze
         @_traits.freeze
+      end
+
+      private
+
+      # Generate optimized fetch methods for Symbol attributes
+      # This eliminates __send__ overhead by creating direct method calls
+      #
+      # @api private
+      # @return [void]
+      def _generate_optimized_fetch_methods # rubocop:disable Metrics/MethodLength
+        @_attributes.each do |key, attribute|
+          next unless attribute.is_a?(Symbol)
+
+          method_name = :"_fetch_#{key}"
+          next if method_defined?(method_name)
+
+          if @_resource_methods.include?(attribute)
+            # For resource methods, generate direct call to the resource method
+            # def _fetch_computed(obj)
+            #   computed(obj)
+            # end
+            class_eval(<<~RUBY, __FILE__, __LINE__ + 1) # rubocop:disable Style/DocumentDynamicEvalDefinition
+              def #{method_name}(obj)
+                #{attribute}(obj)
+              end
+            RUBY
+          else
+            # For object methods, generate direct call to the object method
+            # Handle both Hash and regular objects
+            # def _fetch_id(obj)
+            #   obj.is_a?(Hash) ? obj.fetch(:id) : obj.id
+            # end
+            class_eval(<<~RUBY, __FILE__, __LINE__ + 1) # rubocop:disable Style/DocumentDynamicEvalDefinition
+              def #{method_name}(obj)
+                obj.is_a?(Hash) ? obj.fetch(:#{attribute}) : obj.#{attribute}
+              end
+            RUBY
+          end
+        end
       end
     end
   end

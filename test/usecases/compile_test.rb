@@ -183,6 +183,41 @@ class CompileTest < Minitest::Test
     assert_predicate resource_class, :_compiled
   end
 
+  # Test 9b: Compile generates optimized fetch methods
+  def test_compile_generates_optimized_fetch_methods # rubocop:disable Minitest/MultipleAssertions
+    resource_class = Class.new do
+      include Alba::Resource
+
+      attributes :id, :name
+    end
+
+    refute resource_class.method_defined?(:_fetch_id)
+    refute resource_class.method_defined?(:_fetch_name)
+
+    Alba.compile
+
+    assert resource_class.method_defined?(:_fetch_id)
+    assert resource_class.method_defined?(:_fetch_name)
+  end
+
+  # Test 9c: Optimized methods work correctly
+  def test_optimized_methods_work_correctly
+    resource_class = Class.new do
+      include Alba::Resource
+
+      attributes :id, :name
+    end
+
+    Alba.compile
+
+    user = User.new(1, 'Test')
+    resource = resource_class.new(user)
+
+    # Verify the optimized methods return correct values
+    assert_equal 1, resource.__send__(:_fetch_id, user)
+    assert_equal 'Test', resource.__send__(:_fetch_name, user)
+  end
+
   # Test 10: Resources produce correct output after compile
   def test_resources_produce_correct_output_after_compile
     resource_class = Class.new do
