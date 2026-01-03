@@ -682,9 +682,14 @@ module Alba
       #
       # @api private
       # @return [void]
+      # Validate that a symbol is safe to use in code generation
+      SAFE_METHOD_NAME_PATTERN = /\A[a-z_][a-zA-Z0-9_]*[?!=]?\z/
+      private_constant :SAFE_METHOD_NAME_PATTERN
+
       def _generate_optimized_fetch_methods # rubocop:disable Metrics/MethodLength
         @_attributes.each do |key, attribute|
           next unless attribute.is_a?(Symbol)
+          next unless safe_method_name?(key) && safe_method_name?(attribute)
 
           method_name = :"_fetch_#{key}"
           next if method_defined?(method_name)
@@ -712,6 +717,10 @@ module Alba
             RUBY
           end
         end
+      end
+
+      def safe_method_name?(name)
+        name.to_s.match?(SAFE_METHOD_NAME_PATTERN)
       end
     end
   end
