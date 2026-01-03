@@ -304,14 +304,8 @@ module Alba
         value.nil? && nil_handler ? instance_exec(obj, key, attribute, &nil_handler) : value
       end
 
-      def fetch_symbol_attribute(obj, key, attribute)
-        # Use optimized method if compiled and method exists
-        optimized_method = :"_fetch_#{key}"
-        if @_compiled && respond_to?(optimized_method, true)
-          __send__(optimized_method, obj)
-        else
-          fetch_attribute_from_object_and_resource(obj, attribute)
-        end
+      def fetch_symbol_attribute(obj, _key, attribute)
+        fetch_attribute_from_object_and_resource(obj, attribute)
       end
 
       def fetch_attribute_from_object_and_resource(obj, attribute)
@@ -669,7 +663,7 @@ module Alba
       def _compile
         return if @_compiled
 
-        _generate_optimized_fetch_methods
+        _prepend_optimized_module
         @_compiled = true
         @_attributes.freeze
         @_traits.freeze
@@ -677,45 +671,59 @@ module Alba
 
       private
 
-      # Generate optimized fetch methods for Symbol attributes
-      # This eliminates __send__ overhead by creating direct method calls
-      #
-      # @api private
-      # @return [void]
       # Validate that a symbol is safe to use in code generation
       SAFE_METHOD_NAME_PATTERN = /\A[a-z_][a-zA-Z0-9_]*[?!=]?\z/
       private_constant :SAFE_METHOD_NAME_PATTERN
 
-      def _generate_optimized_fetch_methods # rubocop:disable Metrics/MethodLength
-        @_attributes.each do |key, attribute|
-          next unless attribute.is_a?(Symbol)
-          next unless safe_method_name?(key) && safe_method_name?(attribute)
+      # Generate an optimized module and prepend it to the class
+      # The module contains fetch_symbol_attribute method with direct method calls
+      # This eliminates __send__ overhead entirely
+      #
+      # @api private
+      # @return [void]
+      def _prepend_optimized_module # rubocop:disable Metrics/MethodLength
+        # Collect symbol attributes that can be optimized
+        optimizable_attrs = @_attributes.select do |key, attribute|
+          attribute.is_a?(Symbol) && safe_method_name?(key) && safe_method_name?(attribute)
+        end
 
-          method_name = :"_fetch_#{key}"
-          next if method_defined?(method_name)
+        return if optimizable_attrs.empty?
 
-          if @_resource_methods.include?(attribute)
-            # For resource methods, generate direct call to the resource method
-            # def _fetch_computed(obj)
-            #   computed(obj)
-            # end
-            class_eval(<<~RUBY, __FILE__, __LINE__ + 1) # rubocop:disable Style/DocumentDynamicEvalDefinition
-              def #{method_name}(obj)
-                #{attribute}(obj)
-              end
-            RUBY
-          else
-            # For object methods, generate direct call to the object method
-            # Handle both Hash and regular objects
-            # def _fetch_id(obj)
-            #   obj.is_a?(Hash) ? obj.fetch(:id) : obj.id
-            # end
-            class_eval(<<~RUBY, __FILE__, __LINE__ + 1) # rubocop:disable Style/DocumentDynamicEvalDefinition
-              def #{method_name}(obj)
-                obj.is_a?(Hash) ? obj.fetch(:#{attribute}) : obj.#{attribute}
-              end
-            RUBY
+        resource_methods = @_resource_methods
+        # Build the case statement body
+        cases = build_optimized_cases(optimizable_attrs, resource_methods)
+
+        # Define optimized fetch_symbol_attribute directly on the class
+        # This is faster than prepending a module because it avoids module lookup overhead
+        # def fetch_symbol_attribute(obj, key, attribute)
+        #   case key
+        #   when :id then obj.is_a?(Hash) ? obj.fetch(:id) : obj.id
+        #   when :name then obj.is_a?(Hash) ? obj.fetch(:name) : obj.name
+        #   else fetch_attribute_from_object_and_resource(obj, attribute)
+        #   end
+        # end
+        class_eval(<<~RUBY, __FILE__, __LINE__ + 1) # rubocop:disable Style/DocumentDynamicEvalDefinition
+          def fetch_symbol_attribute(obj, key, attribute)
+            case key
+            #{cases}
+            else fetch_attribute_from_object_and_resource(obj, attribute)
+            end
           end
+        RUBY
+      end
+
+      def build_optimized_cases(optimizable_attrs, resource_methods)
+        cases = optimizable_attrs.map { |key, attribute| build_single_case(key, attribute, resource_methods) }
+        cases.join("\n          ")
+      end
+
+      def build_single_case(key, attribute, resource_methods)
+        if resource_methods.include?(attribute)
+          # For resource methods, call the resource method directly
+          "when :#{key} then #{attribute}(obj)"
+        else
+          # For object methods, call the object method directly
+          "when :#{key} then obj.is_a?(Hash) ? obj.fetch(:#{attribute}) : obj.#{attribute}"
         end
       end
 
