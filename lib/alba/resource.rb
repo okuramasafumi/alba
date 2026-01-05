@@ -681,7 +681,7 @@ module Alba
       #
       # @api private
       # @return [void]
-      def _prepend_optimized_module # rubocop:disable Metrics/MethodLength
+      def _prepend_optimized_module # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
         # Collect symbol attributes that can be optimized
         optimizable_attrs = @_attributes.select do |key, attribute|
           attribute.is_a?(Symbol) && safe_method_name?(key) && safe_method_name?(attribute)
@@ -690,41 +690,55 @@ module Alba
         return if optimizable_attrs.empty?
 
         resource_methods = @_resource_methods
-        # Build the case statement body
-        cases = build_optimized_cases(optimizable_attrs, resource_methods)
 
-        # Define optimized fetch_symbol_attribute directly on the class
-        # This is faster than prepending a module because it avoids module lookup overhead
-        # def fetch_symbol_attribute(obj, key, attribute)
-        #   case key
-        #   when :id then obj.is_a?(Hash) ? obj.fetch(:id) : obj.id
-        #   when :name then obj.is_a?(Hash) ? obj.fetch(:name) : obj.name
-        #   else fetch_attribute_from_object_and_resource(obj, attribute)
-        #   end
-        # end
+        # Generate individual fetch methods for each attribute
+        # These methods contain the actual attribute fetching logic with direct calls (no __send__)
+        optimizable_attrs.each do |key, attribute|
+          method_name = :"_fetch_#{key}"
+          if resource_methods.include?(attribute)
+            # For resource methods, call the resource method directly
+            # def _fetch_computed(obj)
+            #   computed(obj)
+            # end
+            class_eval(<<~RUBY, __FILE__, __LINE__ + 1) # rubocop:disable Style/DocumentDynamicEvalDefinition
+              def #{method_name}(obj)
+                #{attribute}(obj)
+              end
+            RUBY
+          else
+            # For object methods, call the object method directly
+            # def _fetch_id(obj)
+            #   obj.is_a?(Hash) ? obj.fetch(:id) : obj.id
+            # end
+            class_eval(<<~RUBY, __FILE__, __LINE__ + 1) # rubocop:disable Style/DocumentDynamicEvalDefinition
+              def #{method_name}(obj)
+                obj.is_a?(Hash) ? obj.fetch(:#{attribute}) : obj.#{attribute}
+              end
+            RUBY
+          end
+        end
+
+        # Build the hash literal string for embedding in the generated method
+        # This creates a frozen hash constant for O(1) lookup instead of O(n) case statement
+        hash_entries = optimizable_attrs.keys.map { |key| "#{key.inspect} => :_fetch_#{key}" }
+        hash_literal = hash_entries.join(', ')
+
+        # Define the optimized fetch_symbol_attribute method using class_eval
+        # Uses hash lookup (O(1)) to find the method name, then calls the generated method
+        # The generated methods (_fetch_id, _fetch_name, etc.) have direct calls without __send__
         class_eval(<<~RUBY, __FILE__, __LINE__ + 1) # rubocop:disable Style/DocumentDynamicEvalDefinition
+          OPTIMIZED_FETCH_METHODS = {#{hash_literal}}.freeze
+          private_constant :OPTIMIZED_FETCH_METHODS
+
           def fetch_symbol_attribute(obj, key, attribute)
-            case key
-            #{cases}
-            else fetch_attribute_from_object_and_resource(obj, attribute)
+            method_name = OPTIMIZED_FETCH_METHODS[key]
+            if method_name
+              __send__(method_name, obj)
+            else
+              fetch_attribute_from_object_and_resource(obj, attribute)
             end
           end
         RUBY
-      end
-
-      def build_optimized_cases(optimizable_attrs, resource_methods)
-        cases = optimizable_attrs.map { |key, attribute| build_single_case(key, attribute, resource_methods) }
-        cases.join("\n          ")
-      end
-
-      def build_single_case(key, attribute, resource_methods)
-        if resource_methods.include?(attribute)
-          # For resource methods, call the resource method directly
-          "when :#{key} then #{attribute}(obj)"
-        else
-          # For object methods, call the object method directly
-          "when :#{key} then obj.is_a?(Hash) ? obj.fetch(:#{attribute}) : obj.#{attribute}"
-        end
       end
 
       def safe_method_name?(name)

@@ -183,8 +183,8 @@ class CompileTest < Minitest::Test
     assert_predicate resource_class, :_compiled
   end
 
-  # Test 9b: Compile generates optimized fetch_symbol_attribute method
-  def test_compile_generates_optimized_method
+  # Test 9b: Compile generates optimized fetch methods for each attribute
+  def test_compile_generates_optimized_fetch_methods
     resource_class = Class.new do
       include Alba::Resource
 
@@ -193,13 +193,15 @@ class CompileTest < Minitest::Test
 
     Alba.compile
 
-    # After compile, the class should have its own fetch_symbol_attribute method defined
-    # (not inherited from InstanceMethods)
+    # After compile, individual _fetch_<key> methods should be defined
+    assert resource_class.method_defined?(:_fetch_id, false)
+    assert resource_class.method_defined?(:_fetch_name, false)
+    # And the optimized fetch_symbol_attribute method
     assert resource_class.method_defined?(:fetch_symbol_attribute, false)
   end
 
   # Test 9c: Optimized method works correctly via fetch_symbol_attribute
-  def test_optimized_method_works_correctly
+  def test_optimized_method_works_correctly # rubocop:disable Minitest/MultipleAssertions
     resource_class = Class.new do
       include Alba::Resource
 
@@ -214,6 +216,10 @@ class CompileTest < Minitest::Test
     # Verify the optimized fetch_symbol_attribute returns correct values
     assert_equal 1, resource.__send__(:fetch_symbol_attribute, user, :id, :id)
     assert_equal 'Test', resource.__send__(:fetch_symbol_attribute, user, :name, :name)
+
+    # Verify the individual fetch methods work directly
+    assert_equal 1, resource.__send__(:_fetch_id, user)
+    assert_equal 'Test', resource.__send__(:_fetch_name, user)
   end
 
   # Test 10: Resources produce correct output after compile
