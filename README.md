@@ -56,6 +56,10 @@ UserResource.new(user).serialize
 
 Seems useful? Continue reading!
 
+### Coming from ActiveModelSerializers(AMS)?
+
+If you are using ActiveModelSerializers and interested in Alba, we have an automatic converter! [alba_migration](https://github.com/ShoheiMitani/alba_migration) gem from [ShoheiMitani](https://github.com/ShoheiMitani) "provides a command-line tool to convert AMS serializer classes to Alba resource classes, making your migration process easier and less error-prone."
+
 ## Discussions
 
 Alba uses [GitHub Discussions](https://github.com/okuramasafumi/alba/discussions) to openly discuss the project.
