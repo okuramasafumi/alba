@@ -86,34 +86,6 @@ module Alba
       object.is_a?(Enumerable) && !object.is_a?(Struct) && !object.is_a?(Range) && !object.is_a?(Hash)
     end
 
-    # Enable inference for key and resource name
-    #
-    # @param with [Symbol, Class, Module] inflector
-    #   When it's a Symbol, it sets inflector with given name
-    #   When it's a Class or a Module, it sets given object to inflector
-    # @deprecated Use {.inflector=} instead
-    def enable_inference!(with:)
-      Alba::Deprecation.warn('Alba.enable_inference! is deprecated. Use `Alba.inflector=` instead.')
-      @inflector = inflector_from(with)
-      @inferring = true
-    end
-
-    # Disable inference for key and resource name
-    #
-    # @deprecated Use {.inflector=} instead
-    def disable_inference!
-      Alba::Deprecation.warn('Alba.disable_inference! is deprecated. Use `Alba.inflector = nil` instead.')
-      @inferring = false
-      @inflector = nil
-    end
-
-    # @deprecated Use {.inflector} instead
-    # @return [Boolean] whether inference is enabled or not
-    def inferring
-      Alba::Deprecation.warn('Alba.inferring is deprecated. Use `Alba.inflector` instead.')
-      @inferring
-    end
-
     # Set an inflector
     #
     # @param inflector [Symbol, Class, Module] inflector
@@ -221,12 +193,6 @@ module Alba
       @types = {}
       reset_transform_keys
       register_default_types
-    end
-
-    # @deprecated Use resource_for instead
-    def resource_with(object, with: :inference, &block)
-      Kernel.warn('Alba.resource_with is deprecated. Use `Alba.resource_for` instead.')
-      _resource_for(object, with: with, &block)
     end
 
     # Get a resource object from arguments
