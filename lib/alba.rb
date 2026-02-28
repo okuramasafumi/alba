@@ -219,8 +219,31 @@ module Alba
       @_on_error = :raise
       @_on_nil = nil
       @types = {}
+      @_resources = []
       reset_transform_keys
       register_default_types
+    end
+
+    # Register a resource class for compilation
+    #
+    # @param resource [Class<Alba::Resource>] the resource class to register
+    # @return [void]
+    # @api private
+    def register_resource(resource)
+      @_resources ||= []
+      @_resources << resource unless @_resources.include?(resource)
+    end
+
+    # Compile all registered resources
+    # This freezes them to prevent further modifications and optimizes them for performance
+    #
+    # @return [Array<Class<Alba::Resource>>] list of compiled resource classes
+    def compile
+      @_resources ||= []
+      @_resources.each do |resource|
+        resource._compile unless resource._compiled
+      end
+      @_resources.dup
     end
 
     # @deprecated Use resource_for instead
