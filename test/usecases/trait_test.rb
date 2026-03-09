@@ -168,7 +168,7 @@ class TraitTest < Minitest::Test
     end
   end
 
-  def test_multiple_traits_with_attribute_override_regardless_of_order
+  def test_multiple_traits_with_override_order_independent
     assert_equal(
       '{"id":1,"name":"MASAFUMI OKURA","greeting":"Hello, Masafumi OKURA!"}',
       UserResourceWithOverride.new(@user, with_traits: [:with_uppercased_name, :with_greeting]).serialize

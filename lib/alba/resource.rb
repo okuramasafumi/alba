@@ -131,9 +131,7 @@ module Alba
         base_attributes = resource_class._attributes.dup
         resource_class.class_eval(&body)
         # Only keep attributes that were added or changed by the trait
-        base_attributes.each_key do |key|
-          resource_class._attributes.delete(key) if resource_class._attributes[key].equal?(base_attributes[key])
-        end
+        resource_class._attributes.delete_if { |key, value| base_attributes.key?(key) && value.equal?(base_attributes[key]) }
         resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
         resource_class
       end
