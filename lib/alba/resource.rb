@@ -51,15 +51,13 @@ module Alba
       # @param within [Alba::WITHIN_DEFAULT, Hash, Array, nil, false, true]
       #   determines what associations to be serialized. If not set, it serializes all associations.
       # @param with_traits [Symbol, Array<Symbol>, nil] specified traits
-      # @param select [Method] select method object used with `nested_attribute` and `trait`
+      # @param select [Method] DEPRECATED noop
       def initialize(object, params: EMPTY_HASH, within: WITHIN_DEFAULT, with_traits: nil, select: nil)
         @object = object
         @params = params
         @within = within
         @with_traits = with_traits
-        # select override to share the same method with `trait` and `nested_attribute`
-        # Trait and NestedAttribute generates anonymous class so it checks if it's anonymous class to prevent accidental overriding
-        self.class.define_method(:select, &select) if select && self.class.name.nil?
+        warn '`select` keyword for Alba::Resource is deprecated', category: :deprecated, uplevel: 1 if select
         _setup
       end
 
@@ -125,7 +123,7 @@ module Alba
           resource_class.instance_variable_set(:@_attributes, {})
           resource_class.class_eval(&body)
           resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
-          hash.merge!(resource_class.new(obj, params: params, within: @within, select: method(:select)).serializable_hash)
+          hash.merge!(resource_class.new(obj, params: params, within: @within).serializable_hash)
         end
       end
 
@@ -295,7 +293,7 @@ module Alba
                 when Proc then instance_exec(obj, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(obj, params: params, within: within) }
                 when TypedAttribute then attribute.value(object: obj) { |attr| fetch_attribute(obj, key, attr) }
-                when NestedAttribute then attribute.value(object: obj, params: params, within: @within, select: method(:select))
+                when NestedAttribute then attribute.value(object: obj, params: params, within: @within)
                 when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: obj) { |attr| fetch_attribute(obj, key, attr) }
                   # :nocov:
                 else raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
@@ -489,7 +487,7 @@ module Alba
         raise ArgumentError, 'No block given in attribute method' unless block
 
         key_transformation = @_key_transformation_cascade ? @_transform_type : :none
-        attribute = NestedAttribute.new(key_transformation: key_transformation, &block)
+        attribute = NestedAttribute.new(klass: self, key_transformation: key_transformation, &block)
         @_attributes[name.to_sym] = options[:if] ? ConditionalAttribute.new(body: attribute, condition: options[:if]) : attribute
       end
       alias nested nested_attribute
@@ -634,7 +632,8 @@ module Alba
       # @return [void]
       def helper(mod = @_helper || Module.new, &block)
         mod.module_eval(&block) if block
-        extend mod
+        include(mod)
+        extend(mod)
 
         @_helper = mod
       end

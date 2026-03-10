@@ -7,6 +7,7 @@ module Alba
     @block: Proc
 
     def initialize: (
+      klass: Class,
       ?key_transformation: Alba::transform_type
     ) { () -> void } -> void
 
