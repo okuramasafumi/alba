@@ -121,19 +121,12 @@ module Alba
 
         Array(@with_traits).each_with_object({}) do |trait, hash|
           body = @_traits.fetch(trait) { raise Alba::Error, "Trait not found: #{trait}" }
-          resource_class = trait_resource_class(body)
+          resource_class = Class.new(self.class)
+          resource_class.instance_variable_set(:@_attributes, {})
+          resource_class.class_eval(&body)
+          resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
           hash.merge!(resource_class.new(obj, params: params, within: @within, select: method(:select)).serializable_hash)
         end
-      end
-
-      def trait_resource_class(body)
-        resource_class = Class.new(self.class)
-        base_attributes = resource_class._attributes.dup
-        resource_class.class_eval(&body)
-        # Only keep attributes that were added or changed by the trait
-        resource_class._attributes.delete_if { |key, value| base_attributes.key?(key) && value.equal?(base_attributes[key]) }
-        resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
-        resource_class
       end
 
       def deprecated_serializable_hash
