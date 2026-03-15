@@ -149,4 +149,47 @@ class TraitTest < Minitest::Test
       UserResourceWithExtension.new(@user, with_traits: :formatted_name).serialize
     )
   end
+
+  class UserResourceWithOverride
+    include Alba::Resource
+
+    attributes :id, :name
+
+    trait :with_uppercased_name do
+      attribute :name do |user|
+        user.name.upcase
+      end
+    end
+
+    trait :with_greeting do
+      attribute :greeting do |user|
+        "Hello, #{user.name}!"
+      end
+    end
+  end
+
+  def test_multiple_traits_with_override_order_independent
+    assert_equal(
+      '{"id":1,"name":"MASAFUMI OKURA","greeting":"Hello, Masafumi OKURA!"}',
+      UserResourceWithOverride.new(@user, with_traits: [:with_uppercased_name, :with_greeting]).serialize
+    )
+    assert_equal(
+      '{"id":1,"name":"MASAFUMI OKURA","greeting":"Hello, Masafumi OKURA!"}',
+      UserResourceWithOverride.new(@user, with_traits: [:with_greeting, :with_uppercased_name]).serialize
+    )
+  end
+
+  def test_single_trait_with_attribute_override
+    assert_equal(
+      '{"id":1,"name":"MASAFUMI OKURA"}',
+      UserResourceWithOverride.new(@user, with_traits: [:with_uppercased_name]).serialize
+    )
+  end
+
+  def test_trait_does_not_include_base_attributes
+    assert_equal(
+      '{"id":1,"name":"Masafumi OKURA","greeting":"Hello, Masafumi OKURA!"}',
+      UserResourceWithOverride.new(@user, with_traits: [:with_greeting]).serialize
+    )
+  end
 end
