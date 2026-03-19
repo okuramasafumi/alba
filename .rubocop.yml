@@ -132,6 +132,11 @@ Style/MethodCallWithArgsParentheses:
 Style/MissingElse:
   EnforcedStyle: case
 
+# In this test file, inheritance is the easiest way to have the same test suite for multiple inflectors
+Style/OneClassPerFile:
+  Exclude:
+    - test/usecases/with_inference_test.rb
+
 # It's example code, please forgive us
 Style/OptionalBooleanParameter:
   Exclude:
