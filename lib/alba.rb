@@ -345,7 +345,7 @@ module Alba
       end
       register_type(:Boolean, check: ->(obj) { [true, false].include?(obj) }, converter: ->(obj) { !!obj })
       [String, Integer].each do |t|
-        register_type(:"ArrayOf#{t}", check: ->(d) { d.is_a?(Array) && d.all? { _1.is_a?(t) } })
+        register_type(:"ArrayOf#{t}", check: ->(d) { d.is_a?(Array) && d.all?(t) })
       end
     end
   end
