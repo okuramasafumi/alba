@@ -234,6 +234,7 @@ module Alba
     # Otherwise, it behaves depending on `with` argument
     #
     # @param object [Object] the object whose class name is used for inferring resource class
+    # @param params [Hash] user-given Hash for arbitrary data
     # @param with [:inference, Proc, Class<Alba::Resource>] determines how to get resource class for `object`
     #   When it's `:inference`, it infers resource class from `object`'s class name
     #   When it's a Proc, it calls the Proc with `object` as an argument
@@ -241,13 +242,13 @@ module Alba
     #   Otherwise, it raises an ArgumentError
     # @return [Alba::Resource] resource class with `object` as its target object
     # @raise [ArgumentError] if `with` argument is not one of `:inference`, Proc or Class
-    def resource_for(object, with: :inference, &block)
-      _resource_for(object, with: with, &block)
+    def resource_for(object, params: {}, with: :inference, &block)
+      _resource_for(object, params: params, with: with, &block)
     end
 
     private
 
-    def _resource_for(object, with: :inference, &block) # rubocop:disable Metrics/MethodLength
+    def _resource_for(object, params: {}, with: :inference, &block) # rubocop:disable Metrics/MethodLength
       klass = if block
                 resource_class(&block)
               else
@@ -259,7 +260,7 @@ module Alba
                 end
               end
 
-      klass.new(object)
+      klass.new(object, params: params)
     end
 
     def inflector_from(name_or_module)
