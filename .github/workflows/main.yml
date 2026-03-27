@@ -40,7 +40,7 @@ jobs:
       run: |
         bundle exec rake
     - name: CodeCov
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6
       with:
         files: ./coverage/coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
