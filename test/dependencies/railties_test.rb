@@ -49,12 +49,12 @@ class RailtiesTest < Minitest::Test
   class MyFoosController < ActionController::Base
     def show
       foo = Foo.new(1, 'foo')
-      render json: serialize(foo, root_key: 'foo')
+      render json: serialize(foo, params: nil, root_key: 'foo')
     end
 
     def index
       foo = Foo.new(1, 'foo')
-      render_serialized_json([foo], with: FooResource, root_key: 'foos', meta: {total: 1})
+      render_serialized_json([foo], params: {include_special: true}, with: FooResource, root_key: 'foos', meta: {total: 1})
     end
   end
 
@@ -64,6 +64,10 @@ class RailtiesTest < Minitest::Test
     include Alba::Resource
 
     attributes :id, :name
+
+    attribute :special, if: proc { params && params[:include_special] } do |foo|
+      "special-#{foo.name}"
+    end
   end
 
   class FakeResponse
@@ -115,7 +119,7 @@ class RailtiesTest < Minitest::Test
   def test_foos_controller_index_with_options
     controller = controller_instance(MyFoosController)
     controller.index
-    assert_equal '{"foos":[{"id":1,"name":"foo"}],"meta":{"total":1}}', controller.response_body.first
+    assert_equal '{"foos":[{"id":1,"name":"foo","special":"special-foo"}],"meta":{"total":1}}', controller.response_body.first
   end
 
   private
