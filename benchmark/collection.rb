@@ -146,6 +146,41 @@ class PankoPostSerializer < Panko::Serializer
   end
 end
 
+# --- PropsTemplate serializers ---
+
+require "props_template"
+
+Props::Template.class_eval do
+  def self.encode!(context, options = {})
+    json = new(context, options)
+    yield json
+    json.result!
+  end
+end
+
+class PropsTemplateSerializer
+  def initialize(posts)
+    @posts = posts
+  end
+
+  def to_json
+    Props::Template.encode!(nil) do |json|
+      json.array! @posts do |post|
+        json.id post.id
+        json.body post.body
+        json.commenter_names post.commenters.pluck(:name)
+        json.comments do
+          json.array! post.comments do |comment|
+            json.id comment.id
+            json.body comment.body
+          end
+        end
+      end
+    end
+  end
+end
+
+
 # --- Representable serializers ---
 
 require "representable"
@@ -298,6 +333,7 @@ simple_ams = Proc.new { SimpleAMS::Renderer::Collection.new(posts, serializer: S
 turbostreamer = Proc.new { TurbostreamerSerializer.new(posts).to_json }
 rabl = Proc.new { Rabl::Renderer.json(posts, "index") }
 jbuilder = Proc.new { JBuilderSerializer.new.render(posts) }
+props_template = Proc.new { PropsTemplateSerializer.new(posts).to_json }
 
 # --- Execute the serializers to check their output ---
 puts "Checking outputs..."
@@ -317,7 +353,8 @@ parsed_correct = JSON.parse(correct)
   simple_ams: simple_ams,
   turbostreamer: turbostreamer,
   rabl: rabl,
-  jbuilder: jbuilder
+  jbuilder: jbuilder,
+  props_template: props_template
 }.each do |name, serializer|
   result = serializer.call
   parsed_result = JSON.parse(result)
@@ -343,6 +380,7 @@ benchmark_body = lambda do |x|
   x.report(:turbostreamer, &turbostreamer)
   x.report(:rabl, &rabl)
   x.report(:jbuilder, &jbuilder)
+  x.report(:props_template, &props_template)
 
   x.compare!
 end
@@ -356,7 +394,7 @@ Benchmark.memory(&benchmark_body)
 # --- Show gem versions ---
 
 puts "Gem versions:"
-gems = %w[alba active_model_serializers barley blueprinter fast_serializer jserializer panko_serializer representable simple_ams turbostreamer rabl jbuilder]
+gems = %w[alba active_model_serializers barley blueprinter fast_serializer jserializer panko_serializer props_template representable simple_ams turbostreamer rabl jbuilder]
 Bundler.load.specs.each do |spec|
   puts "#{spec.name}: #{spec.version}" if gems.include?(spec.name)
 end
