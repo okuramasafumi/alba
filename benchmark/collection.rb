@@ -357,6 +357,9 @@ parsed_correct = JSON.parse(correct)
   props_template: props_template
 }.each do |name, serializer|
   result = serializer.call
+
+  # This temp fixes barley for the benchmark to run as it returns an array of strings
+  result = "[#{result.join(",")}]" if result.is_a?(Array)
   parsed_result = JSON.parse(result)
   puts "#{name} yields wrong output: #{parsed_result}" unless parsed_result == parsed_correct
 end

@@ -165,4 +165,4 @@ alba_with_transformation:     833869 allocated - 3.22x more
           simple_ams:   11133273 allocated - 42.96x more
 ```
 
-Conclusion: panko is extremely fast but it's a C extension gem. As pure Ruby gems, Alba, `props_template`, `turbostreamer` and `jserializer` are notably faster than others. With `Oj.optimize_rails`, `jbuilder` and Rails standard serialization are also fast. 
+Conclusion: panko is extremely fast but it's a C extension gem. As pure Ruby gems, Alba, `props_template`, `turbostreamer` and `jserializer` are notably faster than others. With `Oj.optimize_rails`, `jbuilder` and Rails standard serialization are also fast.
