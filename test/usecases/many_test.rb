@@ -341,8 +341,9 @@ class ManyTest < Minitest::Test
   end
 
   def test_wrong_resource_error
-    assert_raises(Alba::Error, 'Unexpected resource type: Array') do
+    err = assert_raises(Alba::Error) do
       WrongResource.new('fake').serialize
     end
+    assert_match(/Unexpected resource type: Array/, err.message)
   end
 end

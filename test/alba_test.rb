@@ -183,9 +183,10 @@ class AlbaTest < Minitest::Test
   end
 
   def test_it_raises_error_with_unsupported_backend
-    assert_raises(Alba::UnsupportedBackend, 'Unsupported backend, not_supported') do
+    err = assert_raises(Alba::UnsupportedBackend) do
       Alba.backend = :not_supported
     end
+    assert_match(/Unsupported backend, not_supported/, err.message)
   end
 
   def test_it_sets_encoder_directly
@@ -203,12 +204,14 @@ class AlbaTest < Minitest::Test
   end
 
   def test_it_raises_argument_error_when_encoder_is_not_following_spec
-    assert_raises(ArgumentError, 'Encoder must be a Proc accepting one argument') do
+    err = assert_raises(ArgumentError) do
       Alba.encoder = :does_not_work
     end
-    assert_raises(ArgumentError, 'Encoder must be a Proc accepting one argument') do
+    assert_match(/Encoder must be a Proc accepting one argument/, err.message)
+    err = assert_raises(ArgumentError) do
       Alba.encoder = -> {}
     end
+    assert_match(/Encoder must be a Proc accepting one argument/, err.message)
   end
 
   class ArticleResource
@@ -426,13 +429,16 @@ class AlbaTest < Minitest::Test
   end
 
   def test_serialize_collection_with_unknown_with
-    assert_raises(ArgumentError, '`with` argument must be either :inference, Proc or Class') { Alba.serialize([1, 2, 3], with: :unknown) }
+    err = assert_raises(ArgumentError) { Alba.serialize([1, 2, 3], with: :unknown) }
+    assert_match(/`with` argument must be either :inference, Proc or Class/, err.message)
   end
 
   def test_serialize_nil_without_block_raises_argument_error
     with_inflector(:active_support) do
-      assert_raises(ArgumentError, 'Either object or block must be given') { Alba.serialize }
-      assert_raises(ArgumentError, 'Either object or block must be given') { Alba.hashify }
+      err = assert_raises(ArgumentError) { Alba.serialize }
+      assert_match(/Either object or block must be given/, err.message)
+      err = assert_raises(ArgumentError) { Alba.hashify }
+      assert_match(/Either object or block must be given/, err.message)
     end
   end
 

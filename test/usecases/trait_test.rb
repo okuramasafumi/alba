@@ -88,9 +88,10 @@ class TraitTest < Minitest::Test
   end
 
   def test_it_raises_error_if_trait_not_found
-    assert_raises(Alba::Error, 'Trait not found: not_found') do
+    err = assert_raises(Alba::Error) do
       UserResource.new(@user, with_traits: :not_found).serialize
     end
+    assert_match(/Trait not found: not_found/, err.message)
   end
 
   class UserResourceWithProfile < UserResource
