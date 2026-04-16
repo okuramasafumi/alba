@@ -8,7 +8,7 @@ module Alba
 
       ActiveSupport.on_load(:action_controller) do
         define_method(:serialize) do |obj, params: {}, with: nil, root_key: nil, meta: {}, &block|
-          resource = with.nil? ? Alba.resource_for(obj, params: params, &block) : with.new(obj)
+          resource = with.nil? ? Alba.resource_for(obj, params: params, &block) : with.new(obj, params: params)
           resource.to_json(root_key: root_key, meta: meta)
         end
 

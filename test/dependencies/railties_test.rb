@@ -49,12 +49,19 @@ class RailtiesTest < Minitest::Test
   class MyFoosController < ActionController::Base
     def show
       foo = Foo.new(1, 'foo')
-      render json: serialize(foo, params: nil, root_key: 'foo')
+      render json: serialize(foo, params: {include_special: true}, root_key: 'foo')
     end
 
     def index
       foo = Foo.new(1, 'foo')
       render_serialized_json([foo], params: {include_special: true}, with: FooResource, root_key: 'foos', meta: {total: 1})
+    end
+  end
+
+  class FoosWithResourceController < ActionController::Base
+    def show
+      foo = Foo.new(1, 'foo')
+      render json: serialize(foo, params: {include_special: true}, with: FooResource, root_key: 'foo')
     end
   end
 
@@ -113,13 +120,19 @@ class RailtiesTest < Minitest::Test
   def test_foos_controller_show_with_options
     controller = controller_instance(MyFoosController)
     controller.show
-    assert_equal '{"foo":{"id":1,"name":"foo"}}', controller.response_body.first
+    assert_equal '{"foo":{"id":1,"name":"foo","special":"special-foo"}}', controller.response_body.first
   end
 
   def test_foos_controller_index_with_options
     controller = controller_instance(MyFoosController)
     controller.index
     assert_equal '{"foos":[{"id":1,"name":"foo","special":"special-foo"}],"meta":{"total":1}}', controller.response_body.first
+  end
+
+  def test_serialize_with_resource_and_params
+    controller = controller_instance(FoosWithResourceController)
+    controller.show
+    assert_equal '{"foo":{"id":1,"name":"foo","special":"special-foo"}}', controller.response_body.first
   end
 
   private
