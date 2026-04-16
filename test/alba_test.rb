@@ -203,7 +203,7 @@ class AlbaTest < Minitest::Test
     assert_equal(:custom, Alba.backend)
   end
 
-  def test_it_raises_argument_error_when_encoder_is_not_following_spec
+  def test_it_raises_argument_error_when_encoder_is_not_following_spec # rubocop:disable Minitest/MultipleAssertions
     err = assert_raises(ArgumentError) do
       Alba.encoder = :does_not_work
     end
@@ -433,7 +433,7 @@ class AlbaTest < Minitest::Test
     assert_match(/`with` argument must be either :inference, Proc or Class/, err.message)
   end
 
-  def test_serialize_nil_without_block_raises_argument_error
+  def test_serialize_nil_without_block_raises_argument_error # rubocop:disable Minitest/MultipleAssertions
     with_inflector(:active_support) do
       err = assert_raises(ArgumentError) { Alba.serialize }
       assert_match(/Either object or block must be given/, err.message)
