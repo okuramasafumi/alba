@@ -101,20 +101,12 @@ module Alba
 
     def assign_resource(nesting, key_transformation, block, helper)
       @resource = if block
-                    charged_resource_class(helper, key_transformation, block)
+                    Alba.resource_class(helper: helper, key_transformation: key_transformation, &block)
                   elsif Alba.inflector
                     Alba.infer_resource_class(@name, nesting: nesting)
                   else
                     raise ArgumentError, 'When Alba.inflector is nil, either resource or block is required'
                   end
-    end
-
-    def charged_resource_class(helper, key_transformation, block)
-      klass = Alba.resource_class
-      klass.helper(helper) if helper
-      klass.transform_keys(key_transformation)
-      klass.class_eval(&block)
-      klass
     end
 
     def to_h_with_each_resource(object, within, params)
