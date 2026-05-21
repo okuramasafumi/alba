@@ -38,4 +38,13 @@ end
 desc 'Run all type checks'
 task typecheck: [:rbs, :steep]
 
+namespace :typecheck do
+  desc 'Run Steep type checking against examples'
+  task :examples do
+    puts 'Running Steep type check for examples...'
+    result = system('bundle', 'exec', 'steep', 'check', '--steepfile=examples/Steepfile')
+    exit(1) unless result
+  end
+end
+
 task default: :test

@@ -1,0 +1,17 @@
+# frozen_string_literal: true
+
+D = Steep::Diagnostic
+
+Dir.glob('examples/*.rb').each do |path|
+  target :"example_#{File.basename(path, '.rb')}" do
+    signature 'sig'
+
+    check path
+
+    library 'json'
+    library 'logger'
+    library 'pathname'
+
+    configure_code_diagnostics(D::Ruby.lenient)
+  end
+end
