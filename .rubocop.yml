@@ -18,6 +18,7 @@ AllCops:
     - 'alba.gemspec'
     - 'benchmark/**/*.rb'
     - 'docs/**/*'
+    - 'examples/**/*.rb'
     - 'script/**/*.rb'
   NewCops: enable
   EnabledByDefault: true
