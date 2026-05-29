@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'set'
 require_relative 'alba/version'
 require_relative 'alba/errors'
 require_relative 'alba/resource'
@@ -15,6 +16,9 @@ module Alba
 
     # Getter for inflector, a module responsible for inflecting strings
     attr_reader :inflector
+
+    # @return [Set] set of classes that include Enumerable but should not be treated as collections
+    attr_reader :non_collection_types
 
     # Set the backend, which actually serializes object into JSON
     #
@@ -79,11 +83,12 @@ module Alba
     end
 
     # Detect if object is a collection or not.
-    # When object is a Struct or a Range, it's Enumerable but not a collection
+    # Types in {.non_collection_types} (default: Struct, Range, Hash) are
+    # considered non-collection even if they include Enumerable.
     #
     # @api private
     def collection?(object)
-      object.is_a?(Enumerable) && !object.is_a?(Struct) && !object.is_a?(Range) && !object.is_a?(Hash)
+      object.is_a?(Enumerable) && @non_collection_types.none? { |type| object.is_a?(type) }
     end
 
     # Enable inference for key and resource name
@@ -219,6 +224,7 @@ module Alba
       @_on_error = :raise
       @_on_nil = nil
       @types = {}
+      @non_collection_types = Set[Struct, Range, Hash]
       reset_transform_keys
       register_default_types
     end

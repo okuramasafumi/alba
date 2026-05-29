@@ -485,4 +485,56 @@ class AlbaTest < Minitest::Test
       end
     end
   end
+
+  class EnumerableSingleObject
+    include Enumerable
+
+    attr_reader :id, :name
+
+    def initialize(id, name)
+      @id = id
+      @name = name
+    end
+
+    def each
+      yield [:id, @id]
+      yield [:name, @name]
+    end
+  end
+
+  def test_non_collection_types_excludes_custom_enumerable
+    obj = EnumerableSingleObject.new(1, 'test')
+    assert Alba.collection?(obj)
+
+    Alba.non_collection_types << EnumerableSingleObject
+    refute Alba.collection?(obj)
+  ensure
+    Alba.reset!
+  end
+
+  def test_non_collection_types_does_not_affect_real_collections
+    Alba.non_collection_types << EnumerableSingleObject
+    assert Alba.collection?([1, 2, 3])
+  ensure
+    Alba.reset!
+  end
+
+  def test_non_collection_types_resets_to_defaults
+    Alba.non_collection_types << EnumerableSingleObject
+    Alba.reset!
+    assert_equal Set[Struct, Range, Hash], Alba.non_collection_types
+  end
+
+  def test_serialize_custom_enumerable_as_single_object
+    obj = EnumerableSingleObject.new(42, 'stripe_pm')
+    Alba.non_collection_types << EnumerableSingleObject
+
+    result = Alba.serialize(obj) do
+      attributes :id, :name
+    end
+
+    assert_equal '{"id":42,"name":"stripe_pm"}', result
+  ensure
+    Alba.reset!
+  end
 end
