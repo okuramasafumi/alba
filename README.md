@@ -1927,16 +1927,18 @@ Don't forget calling `super` in this way.
 
 ### Treating specific classes as non-collection
 
-Sometimes we need to serialize an object that's `Enumerable` but not a collection. By default, Alba treats `Hash`, `Range` and `Struct` as non-collection object, but if we want to add some classes to this list, we can override `Alba.collection?` method like following:
+Sometimes we need to serialize an object that's `Enumerable` but not a collection. By default, Alba treats `Hash`, `Range` and `Struct` as non-collection objects. You can add additional classes to this list via `Alba.non_collection_types`:
 
 ```ruby
-Alba.singleton_class.prepend(
-  Module.new do
-    def collection?(object)
-      super && !object.is_a?(SomeClass)
-    end
-  end
-)
+Alba.non_collection_types << Stripe::StripeObject
+Alba.non_collection_types << MyEnumerableEntity
+```
+
+You can inspect the current set of excluded types (including the defaults) at any time:
+
+```ruby
+Alba.non_collection_types
+# => #<Set: {Struct, Range, Hash, Stripe::StripeObject, MyEnumerableEntity}>
 ```
 
 ### Adding indexes to `many` association
