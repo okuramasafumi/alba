@@ -1,6 +1,6 @@
 # --- Test data model setup ---
 
-RubyVM::YJIT.enable unless ENV["NO_YJIT"]
+RubyVM::YJIT.enable if defined?(RubyVM::YJIT) && !ENV["NO_YJIT"]
 require "csv"
 require "active_record"
 require "logger"
@@ -9,7 +9,7 @@ require "sqlite3"
 Oj.optimize_rails unless ENV['NO_OJ_OPTIMIZE_RAILS']
 
 puts 'Running benchmark with the following configuration:'
-puts "YJIT: #{RubyVM::YJIT.enabled? ? 'enabled' : 'disabled'}"
+puts "YJIT: #{RubyVM::YJIT.enabled? ? 'enabled' : 'disabled'}" if defined?(RubyVM::YJIT)
 puts "Oj.optimize_rails: #{ENV['NO_OJ_OPTIMIZE_RAILS'] ? 'disabled' : 'enabled'}"
 
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
