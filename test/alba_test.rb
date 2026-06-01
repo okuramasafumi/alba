@@ -522,7 +522,7 @@ class AlbaTest < Minitest::Test
   def test_non_collection_types_resets_to_defaults
     Alba.non_collection_types << EnumerableSingleObject
     Alba.reset!
-    assert_equal Set[Struct, Range, Hash], Alba.non_collection_types
+    assert_equal [Struct, Range, Hash], Alba.non_collection_types
   end
 
   def test_serialize_custom_enumerable_as_single_object

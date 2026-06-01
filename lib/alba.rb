@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'set'
 require_relative 'alba/version'
 require_relative 'alba/errors'
 require_relative 'alba/resource'
@@ -17,7 +16,7 @@ module Alba
     # Getter for inflector, a module responsible for inflecting strings
     attr_reader :inflector
 
-    # @return [Set] set of classes that include Enumerable but should not be treated as collections
+    # @return [Array<Class>] classes that include Enumerable but should not be treated as collections
     attr_reader :non_collection_types
 
     # Set the backend, which actually serializes object into JSON
@@ -224,7 +223,7 @@ module Alba
       @_on_error = :raise
       @_on_nil = nil
       @types = {}
-      @non_collection_types = Set[Struct, Range, Hash]
+      @non_collection_types = [Struct, Range, Hash]
       reset_transform_keys
       register_default_types
     end

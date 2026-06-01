@@ -1934,11 +1934,11 @@ Alba.non_collection_types << Stripe::StripeObject
 Alba.non_collection_types << MyEnumerableEntity
 ```
 
-You can inspect the current set of excluded types (including the defaults) at any time:
+You can inspect the current list of excluded types (including the defaults) at any time:
 
 ```ruby
 Alba.non_collection_types
-# => #<Set: {Struct, Range, Hash, Stripe::StripeObject, MyEnumerableEntity}>
+# => [Struct, Range, Hash, Stripe::StripeObject, MyEnumerableEntity]
 ```
 
 ### Adding indexes to `many` association
