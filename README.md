@@ -106,6 +106,7 @@ While Alba's core is simple, it provides additional features when you need them.
 - Well tested, the test coverage is 99%
 - Well maintained, getting frequent update and new releases (see [version history](https://rubygems.org/gems/alba/versions))
 
+
 ## Comparison with other serializers
 
 Alba aims to provide a well-balanced combination of simplicity, performance, and features. Here's how it compares to other popular Ruby JSON serializers:
@@ -144,7 +145,7 @@ Or install it yourself as:
 
 ## Supported Ruby versions
 
-Alba supports CRuby 3.0 and higher and latest JRuby and TruffleRuby.
+Alba works with CRuby 3.0 and higher and latest JRuby and TruffleRuby. However, Ruby 3.0 is not actively tested, so use it at your own risk.
 
 ## Documentation
 
