@@ -9,6 +9,7 @@ gem 'activesupport', require: false # For backend
 gem 'dry-inflector', require: false # For inflection
 gem 'ffaker', require: false # For testing
 gem 'minitest', '~> 5.14' # For test
+gem 'pbt', require: false # For property-based testing
 gem 'railties', require: false # For Rails integration testing
 gem 'rake', '~> 13.0' # For test and automation
 gem 'rubocop', '~> 1.87.0', require: false # For lint
