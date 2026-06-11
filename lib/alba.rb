@@ -57,7 +57,7 @@ module Alba
         h = hashify_collection(object, with, root_key, &block)
         Alba.encoder.call(h)
       else
-        resource = resource_for(object, &block)
+        resource = resource_for(object, with: with, &block)
         resource.serialize(root_key: root_key)
       end
     end
@@ -76,7 +76,7 @@ module Alba
       if collection?(object)
         hashify_collection(object, with, root_key, &block)
       else
-        resource = resource_for(object, &block)
+        resource = resource_for(object, with: with, &block)
         resource.as_json(root_key: root_key)
       end
     end
