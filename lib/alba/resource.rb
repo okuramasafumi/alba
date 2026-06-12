@@ -114,6 +114,11 @@ module Alba
       end
       alias to_h serializable_hash
 
+      # A hook method to override so that attributes can be filtered
+      def attributes
+        @_attributes
+      end
+
       private
 
       def hash_from_traits(obj)
@@ -126,10 +131,6 @@ module Alba
           resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
           hash.merge!(resource_class.new(obj, params: params, within: @within, select: method(:select)).serializable_hash)
         end
-      end
-
-      def deprecated_serializable_hash
-        Alba.collection?(@object) ? serializable_hash_for_collection : converter.call(@object)
       end
 
       def serialize_with(hash)
@@ -168,18 +169,6 @@ module Alba
         end
       end
 
-      def deprecated_serializable_hash_for_collection
-        if @_collection_key
-          @object.to_h do |item|
-            k = item.public_send(@_collection_key)
-            key = Alba.regularize_key(k)
-            [key, converter.call(item)]
-          end
-        else
-          @object.each_with_object([], &collection_converter)
-        end
-      end
-
       # @return [String]
       def fetch_key
         k = Alba.collection?(@object) ? _key_for_collection : _key
@@ -211,21 +200,6 @@ module Alba
         @_transforming_root_key
       end
 
-      def converter
-        lambda do |obj|
-          attributes_to_hash(obj, {})
-        end
-      end
-
-      def collection_converter
-        lambda do |obj, a|
-          a << {}
-          h = a.last
-          attributes_to_hash(obj, h)
-          a
-        end
-      end
-
       def attributes_to_hash(obj, hash)
         attributes.each do |key, attribute|
           set_key_and_attribute_body_from(obj, key, attribute, hash)
@@ -235,14 +209,6 @@ module Alba
           handle_error(e, obj, key, attribute, hash)
         end
         @with_traits.nil? ? hash : hash.merge!(hash_from_traits(obj))
-      end
-
-      # This is default behavior for getting attributes for serialization
-      # Override this method to filter certain attributes
-      #
-      # @deprecated in favor of `select`
-      def attributes
-        @_attributes
       end
 
       # Default implementation for selecting attributes
@@ -354,16 +320,8 @@ module Alba
       attr_reader(*INTERNAL_VARIABLES.keys)
 
       # This `method_added` is used for defining "resource methods"
-      def method_added(method_name) # rubocop:disable Metrics/MethodLength
+      def method_added(method_name)
         case method_name
-        when :collection_converter, :converter
-          warn "Defining ##{method_name} methods is deprecated", category: :deprecated, uplevel: 1
-          alias_method :serializable_hash_for_collection, :deprecated_serializable_hash_for_collection
-          private(:serializable_hash_for_collection)
-          alias_method :serializable_hash, :deprecated_serializable_hash
-          alias_method :to_h, :deprecated_serializable_hash
-        when :attributes
-          warn 'Overriding `attributes` is deprecated, use `select` instead.', category: :deprecated, uplevel: 1
         when :select
           @_select_arity = instance_method(:select).arity
         when :_setup # noop

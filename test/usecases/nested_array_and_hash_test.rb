@@ -37,8 +37,8 @@ class HashAttributeTest < Minitest::Test
   class ExtendedFooResource < FooResource
     many :bars, resource: BarResource
 
-    def attributes
-      @_attributes.except(:config)
+    def select(key, *)
+      key.to_sym != :config
     end
   end
 
