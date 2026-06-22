@@ -3,6 +3,9 @@
 require 'bundler/gem_tasks'
 require 'rake/testtask'
 
+# Load Alba tasks
+Dir['lib/tasks/*.rake'].each { |f| load f }
+
 if ENV['BUNDLE_GEMFILE'] == File.expand_path('Gemfile') || ENV['BUNDLE_GEMFILE'].empty? || ENV['BUNDLE_GEMFILE'].nil?
   ENV['BUNDLE_GEMFILE'] = File.expand_path('Gemfile')
 end
