@@ -121,9 +121,10 @@ module Alba
 
         Array(@with_traits).each_with_object({}) do |trait, hash|
           body = @_traits.fetch(trait) { raise Alba::Error, "Trait not found: #{trait}" }
-          resource_class = Class.new(self.class)
-          resource_class.class_eval(&body)
-          resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
+          resource_class = Alba.resource_class(helper: @_helper, key_transformation: @_transform_type, &body)
+          # resource_class = Class.new(self.class)
+          # resource_class.class_eval(&body)
+          # resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
           hash.merge!(resource_class.new(obj, params: params, within: @within, select: method(:select)).serializable_hash)
         end
       end
@@ -488,7 +489,7 @@ module Alba
         raise ArgumentError, 'No block given in attribute method' unless block
 
         key_transformation = @_key_transformation_cascade ? @_transform_type : :none
-        attribute = NestedAttribute.new(key_transformation: key_transformation, &block)
+        attribute = NestedAttribute.new(helper: @_helper, key_transformation: key_transformation, &block)
         @_attributes[name.to_sym] = options[:if] ? ConditionalAttribute.new(body: attribute, condition: options[:if]) : attribute
       end
       alias nested nested_attribute
@@ -630,10 +631,11 @@ module Alba
       # Define helper methods
       #
       # @param mod [Module] a module to extend
+      # @param include [Boolean] whether to include the module instead of extending. It's useful for methods inside `attribute` block
       # @return [void]
-      def helper(mod = @_helper || Module.new, &block)
+      def helper(mod = @_helper || Module.new, include: false, &block)
         mod.module_eval(&block) if block
-        extend mod
+        include ? include(mod) : extend(mod)
 
         @_helper = mod
       end
