@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `Alba.non_collection_types` for declaring Enumerable classes that should not be treated as collections [#532](https://github.com/okuramasafumi/alba/pull/532)
 
+### Changed
+
+- Skip calling `#nil?` on attribute values when no nil handler (`on_nil`) is set, so lazy-loading proxies such as batch-loader keep their batching
+
 ### Fixed
 
 - Trait redefining base-level attribute causes wrong result with multiple traits [#498](https://github.com/okuramasafumi/alba/issues/498) and [#502](https://github.com/okuramasafumi/alba/pull/502)
