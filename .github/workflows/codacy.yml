@@ -54,6 +54,20 @@ jobs:
           # This will handover control about PR rejection to the GitHub side
           max-allowed-issues: 2147483647
 
+      # Ensure each SARIF run has a unique automationDetails.id (required by upload-sarif@v4)
+      - name: Fix SARIF multi-run categories
+        run: |
+          python3 - <<'EOF'
+          import json
+          with open('results.sarif') as f:
+              sarif = json.load(f)
+          for i, run in enumerate(sarif.get('runs', [])):
+              tool_name = run.get('tool', {}).get('driver', {}).get('name', f'tool-{i}')
+              run.setdefault('automationDetails', {})['id'] = tool_name
+          with open('results.sarif', 'w') as f:
+              json.dump(sarif, f)
+          EOF
+
       # Upload the SARIF file generated in the previous step
       - name: Upload SARIF results file
         uses: github/codeql-action/upload-sarif@v4
