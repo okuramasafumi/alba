@@ -319,8 +319,8 @@ alba_inline = Proc.new do
   end
 end
 ams = Proc.new { ActiveModelSerializers::SerializableResource.new(posts, {each_serializer: AMSPostSerializer}).to_json }
-barley = Proc.new { posts.map { |post| BarleyPostSerializer.new(post).serializable_hash.to_json } }
-barley_cache = Proc.new { posts.map { |post| BarleyPostSerializer.new(post, cache: true).serializable_hash.to_json } }
+barley = Proc.new { posts.map { |post| BarleyPostSerializer.new(post).serializable_hash }.to_json }
+barley_cache = Proc.new { posts.map { |post| BarleyPostSerializer.new(post, cache: true).serializable_hash }.to_json }
 blueprinter = Proc.new { PostBlueprint.render(posts) }
 fast_serializer = Proc.new { FastSerializerPostResource.new(posts).to_json }
 jserializer = Proc.new { JserializerPostSerializer.new(posts, is_collection: true).to_json }
@@ -358,8 +358,6 @@ parsed_correct = JSON.parse(correct)
 }.each do |name, serializer|
   result = serializer.call
 
-  # This temp fixes barley for the benchmark to run as it returns an array of strings
-  result = "[#{result.join(",")}]" if result.is_a?(Array)
   parsed_result = JSON.parse(result)
   puts "#{name} yields wrong output: #{parsed_result}" unless parsed_result == parsed_correct
 end
