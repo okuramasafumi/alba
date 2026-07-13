@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Traits are now applied once per resource class instead of once per serialized object, making an attribute in a trait cost the same as one declared inline
+  - A trait body is evaluated once per trait combination and the result is memoized, so side effects or runtime conditionals in a trait body no longer run on every serialization
+  - `transform_keys` inside a trait now applies to the whole output of the resource serialized with that trait, not only to the keys the trait defines
+
 ### Added
 
 - Add `Alba.non_collection_types` for declaring Enumerable classes that should not be treated as collections [#532](https://github.com/okuramasafumi/alba/pull/532)

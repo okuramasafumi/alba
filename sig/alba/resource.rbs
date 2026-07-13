@@ -22,7 +22,6 @@ module Alba
         untyped object,
         ?params: generic_hash,
         ?within: within,
-        ?with_traits: Symbol | Array[Symbol] | nil,
         ?select: Method?
       ) -> void
 
@@ -127,6 +126,14 @@ module Alba
 
       # Traits
       def trait: (Symbol name) { () -> void } -> void
+      def new: (
+        untyped object,
+        ?params: generic_hash,
+        ?within: within,
+        ?with_traits: Symbol | Array[Symbol] | nil,
+        ?select: Method?
+      ) -> untyped
+      def class_with_traits: (Array[Symbol] traits) -> untyped
 
       # Type checking
       def typed_attribute: (Symbol | String name, Symbol | Class type, **untyped opts) -> void
