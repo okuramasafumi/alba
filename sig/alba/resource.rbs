@@ -12,19 +12,17 @@ module Alba
       @object: untyped
       @params: generic_hash
       @within: untyped
-      @with_traits: Symbol | Array[Symbol] | nil
 
       attr_reader object: untyped
       attr_reader params: generic_hash
 
-      def initialize: (untyped, ?params: generic_hash, ?within: untyped, ?with_traits: Symbol | Array[Symbol] | nil, ?select: Method?) -> void
+      def initialize: (untyped, ?params: generic_hash, ?within: untyped, ?select: Method?) -> void
       def serialize: (?root_key: root_key_type, ?meta: generic_hash) -> String
       def to_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> String
       def as_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> untyped
       def serializable_hash: () -> untyped
       alias to_h serializable_hash
 
-      def hash_from_traits: (untyped) -> untyped
       def deprecated_serializable_hash: () -> untyped
       def serialize_with: (untyped) -> String
       def hash_with_metadata: (untyped, generic_hash) -> untyped
@@ -94,6 +92,7 @@ module Alba
       @_resource_methods: Array[Symbol]
       @_select_arity: Integer?
       @_traits: Hash[Symbol, Proc]
+      @_classes_with_traits: Hash[Array[Symbol], untyped]?
 
       def alias_method: (Symbol, Symbol) -> Symbol
       def private: (*Symbol) -> untyped
@@ -104,7 +103,10 @@ module Alba
       def module_eval: [A] () { () [self: untyped] -> A } -> A
       def name: () -> untyped
       def dup: () -> untyped
-      def new: (*untyped, **untyped) -> untyped
+      def new: (untyped, ?with_traits: Symbol | Array[Symbol] | nil, **untyped) -> untyped
+      private def class_with_traits: (untyped) -> untyped
+      private def build_class_with_traits: (untyped) -> untyped
+      def itself: () -> Class
       def _resource_methods: () -> Array[Symbol]
 
       def method_added: (Symbol) -> untyped

@@ -50,13 +50,11 @@ module Alba
       # @param params [Hash] user-given Hash for arbitrary data
       # @param within [Alba::WITHIN_DEFAULT, Hash, Array, nil, false, true]
       #   determines what associations to be serialized. If not set, it serializes all associations.
-      # @param with_traits [Symbol, Array<Symbol>, nil] specified traits
       # @param select [Method] DEPRECATED noop
-      def initialize(object, params: EMPTY_HASH, within: WITHIN_DEFAULT, with_traits: nil, select: nil)
+      def initialize(object, params: EMPTY_HASH, within: WITHIN_DEFAULT, select: nil)
         @object = object
         @params = params
         @within = within
-        @with_traits = with_traits
         warn '`select` keyword for Alba::Resource is deprecated', category: :deprecated, uplevel: 1 if select
         _setup
       end
@@ -113,19 +111,6 @@ module Alba
       alias to_h serializable_hash
 
       private
-
-      def hash_from_traits(obj)
-        return {} if @with_traits.nil?
-
-        Array(@with_traits).each_with_object({}) do |trait, hash|
-          body = @_traits.fetch(trait) { raise Alba::Error, "Trait not found: #{trait}" }
-          resource_class = Class.new(self.class)
-          resource_class.instance_variable_set(:@_attributes, {})
-          resource_class.class_eval(&body)
-          resource_class.transform_keys(@_transform_type) unless @_transform_type == :none
-          hash.merge!(resource_class.new(obj, params: params, within: @within).serializable_hash)
-        end
-      end
 
       def serialize_with(hash)
         serialized_json = encode(hash)
@@ -202,7 +187,7 @@ module Alba
         rescue StandardError => e
           handle_error(e, obj, key, attribute, hash)
         end
-        @with_traits.nil? ? hash : hash.merge!(hash_from_traits(obj))
+        hash
       end
 
       # Default implementation for selecting attributes
@@ -312,6 +297,34 @@ module Alba
     # Class methods
     module ClassMethods
       attr_reader(*INTERNAL_VARIABLES.keys)
+
+      # @param with_traits [Symbol, Array<Symbol>, nil] traits to apply, in the given order
+      # @raise [Alba::Error] when a trait is not defined on this resource
+      # @see InstanceMethods#initialize
+      def new(object, with_traits: nil, **kwargs)
+        return super(object, **kwargs) if with_traits.nil?
+
+        class_with_traits(Array(with_traits)).new(object, **kwargs)
+      end
+
+      # A subclass with the given traits applied, built once per trait combination.
+      def class_with_traits(traits)
+        classes = @_classes_with_traits || {}
+        @_classes_with_traits = classes
+        classes[traits] || (classes[traits.dup.freeze] = build_class_with_traits(traits))
+      end
+      private :class_with_traits
+
+      def build_class_with_traits(traits)
+        resource_class = Class.new(itself)
+        resource_name = name
+        resource_class.define_singleton_method(:name) { resource_name }
+        traits.each do |trait|
+          resource_class.class_eval(&@_traits.fetch(trait) { raise Alba::Error, "Trait not found: #{trait}" })
+        end
+        resource_class
+      end
+      private :build_class_with_traits
 
       # This `method_added` is used for defining "resource methods"
       def method_added(method_name)
@@ -527,6 +540,8 @@ module Alba
       # @see #transform_keys
       def transform_keys!(type)
         dup.class_eval do
+          # Class#dup copies the memo, whose classes were built with the old transform type
+          @_classes_with_traits = nil
           transform_keys(type, root: @_transforming_root_key, cascade: @_key_transformation_cascade)
 
           if @_key_transformation_cascade
