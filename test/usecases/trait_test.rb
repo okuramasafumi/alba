@@ -266,6 +266,27 @@ class TraitTest < Minitest::Test
     assert_equal 1, evaluations
   end
 
+  class UserResourceWithSelect
+    include Alba::Resource
+
+    attributes :id
+
+    trait :name_and_email do
+      attributes :name, :email
+    end
+
+    def select(_key, value)
+      !value.to_s.include?('@')
+    end
+  end
+
+  def test_select_defined_on_the_resource_filters_trait_attributes
+    assert_equal(
+      '{"id":1,"name":"Masafumi OKURA"}',
+      UserResourceWithSelect.new(@user, with_traits: :name_and_email).serialize
+    )
+  end
+
   def test_traits_applied_in_a_different_order_do_not_share_their_attributes
     assert_equal(
       '{"id":1,"name":"MASAFUMI OKURA","greeting":"Hello, Masafumi OKURA!"}',
