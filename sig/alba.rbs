@@ -36,6 +36,8 @@ module Alba
   def self.inflector: () -> inflector_type
   def self.inflector=: (Symbol | inflector_type) -> void
 
+  def self.default_superclass=: (Class | String | Symbol) -> void
+
   # Serialization methods
   def self.serialize: (untyped object, ?with: :inference | Proc | resource_class, ?root_key: key_type) ?{ () -> void } -> String
   def self.hashify: (untyped object, ?with: :inference | Proc | resource_class, ?root_key: key_type) ?{ () -> void } -> generic_hash
