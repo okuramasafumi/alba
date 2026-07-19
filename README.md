@@ -235,6 +235,20 @@ else
 end
 ```
 
+#### Default superclass configuration
+
+You can set the default superclass for resource classes created for Nested Attributes and Traits.
+
+```ruby
+Alba.default_superclass = MyBaseSerializer
+```
+
+Note that in some environments like Rails applications, the class object is not loaded in the initializer phase. You can also set `String`.
+
+```ruby
+Alba.default_superclass = 'MyBaseSerializer'
+```
+
 ### Naming
 
 Alba tries to infer resource name from class name like the following.

@@ -19,6 +19,13 @@ module Alba
     # @return [Array<Class>] classes that include Enumerable but should not be treated as collections
     attr_reader :non_collection_types
 
+    # Set the default superclass for resource classes created with {.resource_class}
+    #
+    # @param value [Class, String, Symbol] the default superclass
+    # @example
+    #   Alba.default_superclass = '::MyApp::BaseResource'
+    attr_writer :default_superclass
+
     # Set the backend, which actually serializes object into JSON
     #
     # @param backend [#to_sym, nil] the name of the backend
@@ -131,7 +138,7 @@ module Alba
     # @param block [Block] resource body
     # @return [Class<Alba::Resource>] resource class
     def resource_class(&block)
-      klass = Class.new
+      klass = Class.new(resolved_default_superclass)
       klass.include(Alba::Resource)
       klass.class_eval(&block) if block
       klass
@@ -224,6 +231,7 @@ module Alba
       @_on_nil = nil
       @types = {}
       @non_collection_types = [Struct, Range, Hash]
+      @default_superclass = ::Object
       reset_transform_keys
       register_default_types
     end
@@ -340,6 +348,10 @@ module Alba
 
     def reset_transform_keys
       @_transformed_keys = Hash.new { |h, k| h[k] = {} }
+    end
+
+    def resolved_default_superclass
+      @default_superclass.is_a?(Class) ? @default_superclass : Object.const_get(@default_superclass.to_s)
     end
 
     def register_default_types # rubocop:disable Metrics/AbcSize

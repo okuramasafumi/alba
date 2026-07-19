@@ -34,6 +34,8 @@ class AlbaTest < Minitest::Test
     end
   end
 
+  CustomResourceSuperclass = Class.new
+
   def setup
     Alba.backend = nil
 
@@ -46,6 +48,16 @@ class AlbaTest < Minitest::Test
 
   def teardown
     Alba.backend = nil
+  end
+
+  def test_resource_class_uses_configured_default_superclass
+    [CustomResourceSuperclass, 'AlbaTest::CustomResourceSuperclass', :'AlbaTest::CustomResourceSuperclass'].each do |superclass|
+      Alba.default_superclass = superclass
+
+      assert_equal CustomResourceSuperclass, Alba.resource_class.superclass
+    end
+  ensure
+    Alba.reset!
   end
 
   def test_it_serializes_object_with_block
