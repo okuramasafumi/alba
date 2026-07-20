@@ -129,23 +129,76 @@ class NestedAttributeTest < Minitest::Test
     )
   end
 
-  # TODO: Fix this test
-  # class Bar3Resource
-  #   include Alba::Resource
-  #
-  #   nested_attribute :na do
-  #     attributes :some_value
-  #   end
-  #
-  #   def some_value(_object)
-  #     'From resource method'
-  #   end
-  # end
-  #
-  # def test_nested_attribute_with_resource_method
-  #   assert_equal(
-  #     '{"na":{"some_value":"From resource method"}}',
-  #     Bar3Resource.new(Bar.new('foo')).serialize
-  #   )
-  # end
+  module MyDSL
+    def self.included(base)
+      base.extend(ClassMethods)
+    end
+
+    module ClassMethods
+      def my_dsl_method(name)
+        # class-level DSL
+      end
+    end
+  end
+
+  class Bar4Resource
+    include Alba::Resource
+
+    helper MyDSL
+
+    nested :details do
+      my_dsl_method :baz # This should work
+      attributes :some_value
+    end
+  end
+
+  def test_class_method_style_helper_works_with_nested_attribute
+    assert_equal(
+      '{"details":{"some_value":"hello"}}',
+      Bar4Resource.new(Bar.new(:hello)).serialize
+    )
+  end
+
+  module SimpleHelper
+    def simple_dsl_method(name)
+      # class-level DSL
+    end
+  end
+
+  class Bar5Resource
+    include Alba::Resource
+
+    helper SimpleHelper
+
+    nested :details do
+      simple_dsl_method :baz # This should work
+      attributes :some_value
+    end
+  end
+
+  def test_helper_works_with_nested_attribute
+    assert_equal(
+      '{"details":{"some_value":"hello"}}',
+      Bar5Resource.new(Bar.new(:hello)).serialize
+    )
+  end
+
+  class Bar6Resource
+    include Alba::Resource
+
+    nested_attribute :na do
+      attributes :some_value
+    end
+
+    def some_value(_object)
+      'From resource method'
+    end
+  end
+
+  def test_nested_attribute_with_resource_method
+    assert_equal(
+      '{"na":{"some_value":"From resource method"}}',
+      Bar6Resource.new(Bar.new('foo')).serialize
+    )
+  end
 end

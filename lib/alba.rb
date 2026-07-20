@@ -135,11 +135,15 @@ module Alba
       reset_transform_keys
     end
 
+    # @param helper [Module] helper module to include
+    # @param key_transformation [Symbol] key transformation type
     # @param block [Block] resource body
     # @return [Class<Alba::Resource>] resource class
-    def resource_class(&block)
+    def resource_class(helper: nil, key_transformation: :none, &block)
       klass = Class.new(resolved_default_superclass)
       klass.include(Alba::Resource)
+      klass.helper(helper) if helper
+      klass.transform_keys(key_transformation)
       klass.class_eval(&block) if block
       klass
     end
