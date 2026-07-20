@@ -18,7 +18,7 @@ gem 'rubocop-md', '~> 2.0', require: false # For lint
 gem 'rubocop-minitest', '~> 0.39.1', require: false # For lint
 gem 'rubocop-performance', '~> 1.26.0', require: false # For lint
 gem 'rubocop-rake', '~> 0.7.1', require: false # For lint
-gem 'simplecov', '~> 0.22.0', require: false # For test coverage
+gem 'simplecov', '~> 1.0.2', require: false # For test coverage
 gem 'simplecov-cobertura', require: false # For test coverage
 gem 'yard', require: false # For documentation
 
