@@ -1,162 +1,146 @@
 module Alba
-  # Main Resource module that gets included into resource classes
   module Resource
-    # Type for serialization options
-    type serialization_opts = {
-      root_key: Alba::key_type,
-      meta: generic_hash
-    }
+    type attribute = untyped
 
-    type attribute = Symbol | Proc | ::Alba::Association | ::Alba::TypedAttribute | ::Alba::NestedAttribute | ::Alba::ConditionalAttribute
+    INTERNAL_VARIABLES: Hash[Symbol, untyped]
+    WITHIN_DEFAULT: Object
+    EMPTY_HASH: generic_hash
 
-    # Module inclusion hook
-    def self.included: (Class base) -> void
+    def self.included: (Class) -> untyped
 
-    # Instance methods available when Resource is included
     module InstanceMethods
+      @object: untyped
+      @params: generic_hash
+      @within: untyped
+      @with_traits: Symbol | Array[Symbol] | nil
+
       attr_reader object: untyped
       attr_reader params: generic_hash
 
-      # Initialization
-      def initialize: (
-        untyped object,
-        ?params: generic_hash,
-        ?within: within,
-        ?with_traits: Symbol | Array[Symbol] | nil,
-        ?select: Method?
-      ) -> void
+      def initialize: (untyped, ?params: generic_hash, ?within: untyped, ?with_traits: Symbol | Array[Symbol] | nil, ?select: Method?) -> void
+      def serialize: (?root_key: root_key_type, ?meta: generic_hash) -> String
+      def to_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> String
+      def as_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> untyped
+      def serializable_hash: () -> untyped
+      alias to_h serializable_hash
 
-      # Serialization methods
-      def serialize: (?root_key: Alba::key_type, ?meta: generic_hash) -> String
-      def to_json: (?generic_hash options, ?root_key: Alba::key_type, ?meta: generic_hash) -> String
-      def as_json: (?generic_hash options, ?root_key: Alba::key_type, ?meta: generic_hash) -> generic_hash
-      def to_h: () -> generic_hash
-      def serializable_hash: () -> generic_hash
-
-      private
-
-      def encode: (generic_hash) -> String
-      def serialize_with: (generic_hash) -> String
-      def hash_with_metadata: (generic_hash, generic_hash) -> generic_hash
-      def fetch_key: () -> Alba::key_type
-      def transformable_root?: () -> bool
-      def transform_key: (Alba::key_type) -> Alba::key_type
-      def transform_keys: (generic_hash) -> generic_hash
-      def fetch_attribute: (untyped object, Symbol | String key, attribute attribute) -> untyped
-      def attributes_from_association: (Association association, untyped obj) -> [Alba::key_type, untyped]
-      def association_editor: () -> Module?
-      def assoc_name_from_params: (Symbol | String name) -> (Symbol | String)
-      def handle_error: (StandardError error, Symbol? on_error, Symbol | String key, attribute attribute, ::Alba::Resource resource_class) -> untyped
-      def on_nil: (untyped object, Symbol | String key) -> untyped
-      def conditional_attribute?: (untyped object, ConditionalAttribute attribute) -> bool
+      def hash_from_traits: (untyped) -> untyped
+      def deprecated_serializable_hash: () -> untyped
+      def serialize_with: (untyped) -> String
+      def hash_with_metadata: (untyped, generic_hash) -> untyped
+      def _metadata: (untyped, generic_hash) -> generic_hash
+      def serializable_hash_for_collection: () -> untyped
+      def deprecated_serializable_hash_for_collection: () -> untyped
+      def fetch_key: () -> root_key_type
+      def _key_for_collection: () -> root_key_type
+      def _key: () -> root_key_type
+      def resource_name: (?pluralized: bool) -> String
+      def transforming_root_key?: () -> bool
+      def converter: () -> Proc
+      def collection_converter: () -> Proc
+      def attributes_to_hash: (untyped, generic_hash) -> generic_hash
+      def attributes: () -> Hash[Symbol | String, attribute]
+      def select: (untyped, untyped, untyped) -> bool
+      def set_key_and_attribute_body_from: (untyped, untyped, attribute, generic_hash) -> untyped
+      def do_select: (untyped, untyped, untyped) -> bool
+      def handle_error: (StandardError, untyped, Symbol | String, attribute, generic_hash) -> untyped
+      def transform_key: (untyped) -> untyped
+      def fetch_attribute: (untyped, untyped, attribute) -> untyped
+      def fetch_attribute_from_object_and_resource: (untyped, Symbol) -> untyped
+      def _fetch_attribute_from_object_first: (untyped, Symbol) -> untyped
+      def _fetch_attribute_from_resource_first: (untyped, Symbol) -> untyped
+      def nil_handler: () -> untyped
+      def yield_if_within: (Symbol) { (untyped) -> untyped } -> untyped
+      def check_within: (Symbol) -> untyped
       def _setup: () -> void
-      def select: (Symbol | String key, untyped value, attribute attribute) -> bool
+
+      # These methods are available on the eventual resource instance. Declaring
+      # them here models the module's inclusion context for Steep.
+      def class: () -> Class
+      def instance_eval: [A] () { () [self: self] -> A } -> A
+      def instance_exec: [A] (*untyped) { (*untyped) [self: self] -> A } -> A
+      def __send__: (Symbol, *untyped) -> untyped
+      def binding: () -> Binding
+      def encode: (untyped) -> String
     end
 
-    # Class methods added when Resource is included
+    interface _ClassContext
+      def alias_method: (Symbol, Symbol) -> Symbol
+      def private: (*Symbol) -> untyped
+      def instance_method: (Symbol) -> UnboundMethod
+      def include: (*Module) -> untyped
+      def extend: (*Module) -> untyped
+      def class_eval: [A] () { () [self: untyped] -> A } -> A
+      def module_eval: [A] () { () [self: untyped] -> A } -> A
+      def name: () -> untyped
+      def dup: () -> untyped
+      def new: (*untyped, **untyped) -> untyped
+      def _resource_methods: () -> Array[Symbol]
+    end
+
     module ClassMethods
-      # DSL Methods for defining attributes
-      def attributes: (*(Symbol | String) attrs, ?if: Proc | Symbol | nil, **untyped opts) -> void
-      def attribute: (Symbol | String name, **untyped opts) ?{ (untyped, untyped) -> untyped } -> void
-      def root_key: (Symbol | String | true | nil key) -> void
-      def root_key_for_collection: (Symbol | String | nil key) -> void
-      def root_key!: (Symbol | String | true | nil key, ?Symbol | String | true | nil key_for_collection) -> void
+      @_attributes: Hash[Symbol | String, attribute]
+      @_key: class_key_type
+      @_key_for_collection: class_key_type
+      @_meta: untyped
+      @_transform_type: transform_type
+      @_transforming_root_key: bool
+      @_key_transformation_cascade: bool
+      @_on_error: untyped
+      @_on_nil: untyped
+      @_layout: Layout?
+      @_collection_key: key_type
+      @_helper: Module?
+      @_resource_methods: Array[Symbol]
+      @_select_arity: Integer?
+      @_traits: Hash[Symbol, Proc]
 
-      # Association DSL methods
-      def association: (
-        Symbol | String name,
-        ?resource: Alba::resource_class | nil,
-        ?key: Alba::key_type,
-        ?condition: Proc | Symbol | nil,
-        **untyped opts
-      ) ?{ () -> void } -> void
+      def alias_method: (Symbol, Symbol) -> Symbol
+      def private: (*Symbol) -> untyped
+      def instance_method: (Symbol) -> UnboundMethod
+      def include: (*Module) -> untyped
+      def extend: (*Module) -> untyped
+      def class_eval: [A] () { () [self: untyped] -> A } -> A
+      def module_eval: [A] () { () [self: untyped] -> A } -> A
+      def name: () -> untyped
+      def dup: () -> untyped
+      def new: (*untyped, **untyped) -> untyped
+      def _resource_methods: () -> Array[Symbol]
 
-      def one: (
-        Symbol | String name,
-        ?resource: Alba::resource_class | nil,
-        ?key: Alba::key_type,
-        **untyped opts
-      ) ?{ () -> void } -> void
-
-      def many: (
-        Symbol | String name,
-        ?resource: Alba::resource_class | nil,
-        ?key: Alba::key_type,
-        **untyped opts
-      ) ?{ () -> void } -> void
-
-      def belongs_to: (
-        Symbol | String name,
-        ?resource: Alba::resource_class | nil,
-        ?key: Alba::key_type,
-        **untyped opts
-      ) ?{ () -> void } -> void
-
-      def has_one: (
-        Symbol | String name,
-        ?resource: Alba::resource_class | nil,
-        ?key: Alba::key_type,
-        **untyped opts
-      ) ?{ () -> void } -> void
-
-      def has_many: (
-        Symbol | String name,
-        ?resource: Alba::resource_class | nil,
-        ?key: Alba::key_type,
-        **untyped opts
-      ) ?{ () -> void } -> void
-
-      # Nested attributes
-      def nested_attribute: (Symbol | String name, **untyped opts) { () -> void } -> void
-      def nested: (Symbol | String name, **untyped opts) { () -> void } -> void
-
-      # Meta and params
-      def meta: (?Symbol | Proc | nil meta) ?{ () -> generic_hash } -> void
-      def collection_key: (Symbol | String key) -> void
-
-      # Transform and configuration
-      def transform_keys: (Alba::transform_type type, ?root: bool, ?cascade: bool) -> void
-      def on_error: (:raise | :ignore | :nullify | nil handler) -> void
-      def on_nil: (:ignore | nil handler) -> void
-      def layout: (?file: String | nil, ?inline: Proc | nil) -> void
-
-      # Helper methods
-      def helper: (Module helper_module) -> void
-      def prefer_resource_method!: () -> void
-      def prefer_object_method!: () -> void
-
-      # Traits
-      def trait: (Symbol name) { () -> void } -> void
-
-      # Type checking
-      def typed_attribute: (Symbol | String name, Symbol | Class type, **untyped opts) -> void
-
-      # Ignoring attributes
-      def ignoring: (Symbol | String attr) { () -> void } -> void
-
-      # Selecting attributes
-      def select: (*Symbol attrs) -> bool
-
-      # Internal attribute accessors
-      attr_accessor _attributes: generic_hash
-      attr_accessor _key: Alba::key_type
-      attr_accessor _key_for_collection: Alba::key_type
-      attr_accessor _meta: untyped
-      attr_accessor _transform_type: Alba::transform_type
-      attr_accessor _transforming_root_key: bool
-      attr_accessor _key_transformation_cascade: bool
-      attr_accessor _on_error: Symbol | nil
-      attr_accessor _on_nil: Symbol | nil
-      attr_accessor _layout: untyped
-      attr_accessor _collection_key: Alba::key_type
-      attr_accessor _helper: Module | nil
-      attr_accessor _resource_methods: Array[Symbol]
-      attr_accessor _select_arity: Integer | nil
-      attr_accessor _traits: Hash[Symbol, untyped]
+      def method_added: (Symbol) -> untyped
+      def inherited: (Class) -> untyped
+      def attributes: (*(Symbol | String), ?if: Proc | Symbol | nil, **untyped) -> untyped
+      def assign_attributes: (Array[Symbol | String], Proc | Symbol | nil) -> untyped
+      def assign_attributes_with_types: (Hash[Symbol | String, untyped], Proc | Symbol | nil) ?{ (untyped) -> untyped } -> untyped
+      def attribute: (?Symbol | String | nil, ?if: Proc | Symbol | nil, **untyped) ?{ (untyped) -> untyped } -> untyped
+      def association: (Symbol | String, ?Proc?, ?resource: untyped, ?serializer: untyped, ?source: Proc?, ?key: key_type, ?with_traits: Symbol | Array[Symbol] | nil, ?params: generic_hash, **untyped) ?{ () -> void } -> untyped
+      alias one association
+      alias many association
+      alias has_one association
+      alias has_many association
+      def nesting: () -> String?
+      def nested_attribute: (Symbol | String, **untyped) ?{ () -> void } -> untyped
+      alias nested nested_attribute
+      def trait: (Symbol | String) ?{ () -> void } -> untyped
+      def root_key: (Symbol | String, ?Symbol | String | nil) -> untyped
+      def root_key_for_collection: (Symbol | String) -> untyped
+      def root_key!: () -> untyped
+      def meta: (?Symbol) ?{ () -> generic_hash } -> untyped
+      def layout: (?file: String?, ?inline: Proc?) -> untyped
+      def transform_keys: (Symbol | String, ?root: bool, ?cascade: bool) -> untyped
+      def transform_keys!: (Symbol | String) -> untyped
+      def collection_key: (Symbol | String) -> untyped
+      def on_error: (?Symbol?) ?{ (*untyped) -> untyped } -> untyped
+      def validated_error_handler: (untyped) -> Symbol
+      def on_nil: () ?{ (*untyped) -> untyped } -> untyped
+      def helper: (?Module) ?{ (*untyped) -> untyped } -> untyped
+      def prefer_resource_method!: () -> untyped
+      def prefer_object_method!: () -> untyped
     end
 
-    # Include both instance and class methods
     include InstanceMethods
     extend ClassMethods
   end
+
+  Serializer: singleton(Resource)
 end

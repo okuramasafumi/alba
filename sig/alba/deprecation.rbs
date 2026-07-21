@@ -1,6 +1,7 @@
 module Alba
   # Module for printing deprecation warning
   module Deprecation
-    def warn: (_ToS message) -> nil
+    def self?.warn: (_ToS message) -> nil
+    def caller_locations: (Range[Integer]) -> Array[Thread::Backtrace::Location]
   end
 end

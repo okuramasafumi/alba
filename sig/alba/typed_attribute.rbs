@@ -5,14 +5,15 @@ module Alba
     
     @name: Symbol | String
     @type: Alba::Type
+    @block: untyped
     
     def initialize: (
       name: Symbol | String,
       type: Symbol | Class,
-      converter: Proc | bool | nil
-    ) -> void
+      converter: untyped
+    ) ?{ (untyped) -> untyped } -> void
     
-    def value: () { (Symbol | String) -> untyped } -> untyped
+    def value: (?object: untyped) { (Symbol | String) -> untyped } -> untyped
     
     private
     
