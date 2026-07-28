@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The class backing a nested attribute is now built once instead of once per serialized object, so a nested attribute body is evaluated once however many objects are serialized
+
 ## 3.11.0 2026-07-25
 
 ### Added
