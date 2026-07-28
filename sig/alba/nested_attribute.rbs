@@ -19,8 +19,8 @@ module Alba
       within: within
     ) -> generic_hash
 
-    def resource_class: () -> untyped
+    private def resource_class: () -> untyped
 
-    def build_resource_class: () -> untyped
+    private def build_resource_class: () -> untyped
   end
 end
