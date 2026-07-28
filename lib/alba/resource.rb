@@ -50,14 +50,12 @@ module Alba
       # @param params [Hash] user-given Hash for arbitrary data
       # @param within [Alba::WITHIN_DEFAULT, Hash, Array, nil, false, true]
       #   determines what associations to be serialized. If not set, it serializes all associations.
-      # @param select [Method] select method object used with `nested_attribute` and `trait`
+      # @param select [Method] DEPRECATED noop
       def initialize(object, params: EMPTY_HASH, within: WITHIN_DEFAULT, select: nil)
         @object = object
         @params = params
         @within = within
-        # select override to share the same method with `trait` and `nested_attribute`
-        # Trait and NestedAttribute generates anonymous class so it checks if it's anonymous class to prevent accidental overriding
-        self.class.define_method(:select, &select) if select && self.class.name.nil?
+        warn '`select` keyword for Alba::Resource is deprecated', category: :deprecated, uplevel: 1 if select
         _setup
       end
 
@@ -280,7 +278,7 @@ module Alba
                 when Proc then instance_exec(obj, &attribute)
                 when Alba::Association then yield_if_within(attribute.name.to_sym) { |within| attribute.to_h(obj, params: params, within: within) }
                 when TypedAttribute then attribute.value(object: obj) { |attr| fetch_attribute(obj, key, attr) }
-                when NestedAttribute then attribute.value(object: obj, params: params, within: @within, select: method(:select))
+                when NestedAttribute then attribute.value(object: obj, params: params, within: @within)
                 when ConditionalAttribute then attribute.with_passing_condition(resource: self, object: obj) { |attr| fetch_attribute(obj, key, attr) }
                   # :nocov:
                 else raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
@@ -342,27 +340,30 @@ module Alba
       # @param with_traits [Symbol, Array<Symbol>, nil] traits to apply, in the given order
       # @raise [Alba::Error] when a trait is not defined on this resource
       # @see InstanceMethods#initialize
-      def new(object, params: EMPTY_HASH, within: WITHIN_DEFAULT, with_traits: nil, select: nil)
-        if with_traits.nil?
-          super(object, params: params, within: within, select: select)
-        else
-          class_with_traits(Array(with_traits)).new(object, params: params, within: within, select: select)
-        end
+      def new(object, with_traits: nil, **kwargs)
+        return super(object, **kwargs) if with_traits.nil?
+
+        class_with_traits(Array(with_traits)).new(object, **kwargs)
       end
 
       # A subclass with the given traits applied, built once per trait combination.
       def class_with_traits(traits)
-        @_classes_with_traits ||= {}
-        @_classes_with_traits[traits] || begin
-          resource_class = Class.new(self)
-          resource_class.define_singleton_method(:name) { superclass.name }
-          traits.each do |trait|
-            resource_class.class_eval(&_traits.fetch(trait) { raise Alba::Error, "Trait not found: #{trait}" })
-          end
-          @_classes_with_traits[traits.dup.freeze] = resource_class
-        end
+        classes = @_classes_with_traits || {}
+        @_classes_with_traits = classes
+        classes[traits] || (classes[traits.dup.freeze] = build_class_with_traits(traits))
       end
       private :class_with_traits
+
+      def build_class_with_traits(traits)
+        resource_class = Class.new(itself)
+        resource_name = name
+        resource_class.define_singleton_method(:name) { resource_name }
+        traits.each do |trait|
+          resource_class.class_eval(&@_traits.fetch(trait) { raise Alba::Error, "Trait not found: #{trait}" })
+        end
+        resource_class
+      end
+      private :build_class_with_traits
 
       # This `method_added` is used for defining "resource methods"
       def method_added(method_name) # rubocop:disable Metrics/MethodLength
@@ -499,7 +500,7 @@ module Alba
         raise ArgumentError, 'No block given in attribute method' unless block
 
         key_transformation = @_key_transformation_cascade ? @_transform_type : :none
-        attribute = NestedAttribute.new(key_transformation: key_transformation, &block)
+        attribute = NestedAttribute.new(klass: self, key_transformation: key_transformation, &block)
         @_attributes[name.to_sym] = options[:if] ? ConditionalAttribute.new(body: attribute, condition: options[:if]) : attribute
       end
       alias nested nested_attribute
@@ -646,7 +647,8 @@ module Alba
       # @return [void]
       def helper(mod = @_helper || Module.new, &block)
         mod.module_eval(&block) if block
-        extend mod
+        include(mod)
+        extend(mod)
 
         @_helper = mod
       end

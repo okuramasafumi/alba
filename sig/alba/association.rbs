@@ -2,9 +2,15 @@ module Alba
   # Representing association
   class Association
     # Class methods
-    @const_cache: Hash[String, Class]
+    self.@const_cache: Hash[Symbol | String, Class]
 
-    def self.const_cache: () -> Hash[String, Class]
+    @condition: untyped
+    @resource: untyped
+    @source: Proc?
+    @with_traits: Symbol | Array[Symbol] | nil
+    @params: generic_hash
+
+    def self.const_cache: () -> Hash[Symbol | String, Class]
 
     # Instance variables and methods
     attr_reader name: Symbol | String
@@ -21,7 +27,7 @@ module Alba
       ?helper: Module?
     ) ?{ () -> void } -> void
 
-    def key_transformation=: (Alba::transform_type type) -> void
+    def key_transformation=: (Symbol | String type) -> void
 
     def to_h: (
       untyped target,
@@ -33,8 +39,7 @@ module Alba
 
     def object_from: (untyped target, generic_hash params) -> untyped
     def constantize: (Class | Symbol | String resource) -> Class
-    def assign_resource: (String? nesting, Alba::transform_type key_transformation, Proc? block, Module? helper) -> void
-    def charged_resource_class: (Module? helper, Alba::transform_type key_transformation, Proc block) -> Class
+    def assign_resource: (String? nesting, Alba::transform_type key_transformation, untyped block, Module? helper) -> void
     def to_h_with_each_resource: (Enumerable[untyped] object, within within, generic_hash params) -> Array[generic_hash]
     def to_h_with_constantize_resource: (untyped object, within within, generic_hash params) -> generic_hash
   end

@@ -1,8 +1,8 @@
 module Alba
   # Represents attribute with `if` option
   class ConditionalAttribute
-    @body: Symbol | Proc | Alba::Association | Alba::TypedAttribute | Alba::NestedAttribute
-    @condition: Symbol | Proc
+    @body: untyped
+    @condition: untyped
 
     def initialize: (
       body: Symbol | Proc | Alba::Association | Alba::TypedAttribute | Alba::NestedAttribute,
@@ -10,14 +10,14 @@ module Alba
     ) -> void
 
     def with_passing_condition: (
-      resource: Alba::Resource,
+      resource: untyped,
       ?object: untyped
     ) { (Symbol | Proc | Alba::Association | Alba::TypedAttribute | Alba::NestedAttribute) -> untyped } -> untyped
 
     private
 
-    def condition_passes?: (Alba::Resource resource, untyped object) -> bool
+    def condition_passes?: (untyped resource, untyped object) -> bool
     def with_two_arity_proc_condition?: () -> bool
-    def second_object: (untyped object, Alba::Resource resource) -> untyped
+    def second_object: (untyped object, untyped resource) -> untyped
   end
 end

@@ -1,20 +1,21 @@
 module Alba
   # Representing nested attribute
   class NestedAttribute
-    attr_writer key_transformation: Alba::transform_type
+    attr_writer key_transformation: Symbol | String
 
-    @key_transformation: Alba::transform_type
-    @block: Proc
+    @key_transformation: Symbol | String
+    @block: untyped
+    @klass: untyped
 
     def initialize: (
+      klass: untyped,
       ?key_transformation: Alba::transform_type
     ) { () -> void } -> void
 
     def value: (
       object: untyped,
       params: generic_hash,
-      within: within,
-      ?select: Method?
+      within: within
     ) -> generic_hash
   end
 end

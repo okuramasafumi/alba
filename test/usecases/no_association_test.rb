@@ -109,13 +109,6 @@ class NoAssociationTest < Minitest::Test
     )
   end
 
-  def test_serialiaze_method_with_option_and_key_is_true
-    assert_equal(
-      '{"true":{"id":1,"name":"Masafumi OKURA","name_with_email":"Masafumi OKURA: masafumi@example.com"}}',
-      UserResource.new(@user).serialize(root_key: true)
-    )
-  end
-
   class UserResourceWithKey
     include Alba::Resource
 

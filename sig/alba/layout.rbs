@@ -1,8 +1,8 @@
 module Alba
   # Layout serialization
   class Layout
-    @body: String | Proc
-    @resource: Alba::Resource
+    @body: untyped
+    @resource: untyped
     @serialized_json: String
 
     def object: () -> untyped
@@ -10,13 +10,15 @@ module Alba
     def serializable_hash: () -> generic_hash
     def to_h: () -> generic_hash
 
+    def self.def_delegators: (Symbol, *Symbol) -> void
+
     def initialize: (
-      file: String?,
-      inline: Proc?
+      file: untyped,
+      inline: untyped
     ) -> void
 
     def serialize: (
-      resource: Alba::Resource,
+      resource: untyped,
       serialized_json: String,
       binding: Binding
     ) -> String

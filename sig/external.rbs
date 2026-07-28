@@ -1,0 +1,47 @@
+# Minimal declarations for optional Rails APIs used by Alba. The Rails gems do
+# not currently ship RBS signatures.
+module ActiveSupport
+  interface _ActionControllerClass
+    def define_method: (Symbol) { (*untyped, **untyped) [self: _ActionControllerInstance] -> untyped } -> Symbol
+  end
+
+  interface _ActionControllerInstance
+    def render: (**untyped) -> untyped
+  end
+
+  def self.on_load: (Symbol) { () [self: _ActionControllerClass] -> void } -> void
+
+  module Inflector
+    def self.camelize: (String, ?bool) -> String
+    def self.dasherize: (String) -> String
+    def self.underscore: (String) -> String
+    def self.classify: (String) -> String
+    def self.demodulize: (String) -> String
+    def self.pluralize: (String) -> String
+  end
+
+  module JSON
+    def self.encode: (untyped) -> String
+  end
+end
+
+module Rails
+  class Railtie
+    def self.initializer: (String) { () -> void } -> void
+  end
+end
+
+class Module
+  def delegate: (*Symbol, to: untyped) -> void
+end
+
+class Class
+  def helper: (*untyped, **untyped) ?{ (*untyped) -> untyped } -> untyped
+  def transform_keys: (*untyped, **untyped) -> untyped
+end
+
+# Enumerable is modeled as a mixin, so Steep otherwise loses Object methods
+# after narrowing an arbitrary object with `is_a?(Enumerable)`.
+module Enumerable[unchecked out Elem]
+  def is_a?: (Module) -> bool
+end

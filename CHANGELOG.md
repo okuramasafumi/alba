@@ -12,14 +12,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - A trait body is evaluated once per trait combination and the result is memoized, so side effects or runtime conditionals in a trait body no longer run on every serialization
   - `transform_keys` inside a trait now applies to the whole output of the resource serialized with that trait, not only to the keys the trait defines
 
+## 3.11.0 2026-07-25
+
 ### Added
 
+- Rails: `serialize` and `render_serialized_json` now takes `params` [#509](https://github.com/okuramasafumi/alba/pull/509)
 - Add `Alba.non_collection_types` for declaring Enumerable classes that should not be treated as collections [#532](https://github.com/okuramasafumi/alba/pull/532)
+- Add default superclass configuration [#547](https://github.com/okuramasafumi/alba/pull/547)
 
 ### Fixed
 
 - Trait redefining base-level attribute causes wrong result with multiple traits [#498](https://github.com/okuramasafumi/alba/issues/498) and [#502](https://github.com/okuramasafumi/alba/pull/502)
   - Thank you for reporting this issue, @yukihiro-numata
+- Pass params to resource in serialize when with is given [#524](https://github.com/okuramasafumi/alba/pull/524)
+  - Thank you, @JohnnyKei
+- `Alba.serialize(single, with: SomeResource)` crash
+- helpers are now available in NestedAttribute [#503](https://github.com/okuramasafumi/alba/pull/503)
+
+### Changed
+
+- More strict types
 
 ## 3.10.0 2025-11-11
 

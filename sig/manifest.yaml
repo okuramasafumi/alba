@@ -2,3 +2,5 @@ dependencies:
   - name: rbs
   - name: logger
   - name: json
+  - name: erb
+  - name: forwardable

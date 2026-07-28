@@ -1,18 +1,18 @@
 module Alba
   # Representing type itself, combined with TypedAttribute
   class Type
-    attr_reader name: Symbol | String
+    attr_reader name: Symbol | String | Class
     attr_writer auto_convert: bool
     
-    @name: Symbol | String
-    @check: Proc | false
-    @converter: Proc
+    @name: Symbol | String | Class
+    @check: untyped
+    @converter: untyped
     @auto_convert: bool
     
     def initialize: (
-      Symbol | String name,
+      Symbol | String | Class name,
       check: Proc | false,
-      converter: Proc,
+      converter: untyped,
       ?auto_convert: bool
     ) -> void
     

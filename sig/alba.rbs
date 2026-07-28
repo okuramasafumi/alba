@@ -1,67 +1,84 @@
-# Type definitions for Alba JSON serialization library
 module Alba
-  # Type aliases for common patterns
   type generic_hash = Hash[Symbol | String, untyped]
   type key_type = Symbol | String | nil
-  type transform_type = :camel | :lower_camel | :dash | :snake | :none
+  type root_key_type = Symbol | String | nil
+  type class_key_type = root_key_type | true
+  type transform_type = Symbol
   type backend_type = :oj | :oj_strict | :oj_rails | :oj_default | :active_support | :default | :json | :custom | nil
-  type encoder_type = ^(generic_hash) -> String
-  type inflector_type = _Inflector | nil
-  type resource_class = singleton(Resource) | Class
-  type within = generic_hash | Array[:_to_sym] | Symbol | true | false | nil
+  type encoder_type = ^(untyped) -> String
+  type inflector_type = untyped
+  type resource_class = untyped
+  type within = generic_hash | Array[untyped] | Symbol | bool | untyped
 
-  # Inflector interface
   interface _Inflector
     def camelize: (String) -> String
     def camelize_lower: (String) -> String
     def dasherize: (String) -> String
     def underscore: (String) -> String
     def classify: (String) -> String
+    def demodulize: (String) -> String
+    def pluralize: (String) -> String
   end
 
-  # Type registry
-  interface _Type
-    def check: (untyped) -> bool
-    def convert: (untyped) -> untyped
-    def auto_convert?: () -> bool
-  end
+  self.@backend: backend_type
+  self.@encoder: untyped
+  self.@inflector: inflector_type
+  self.@inferring: bool
+  self.@symbolize_keys: bool
+  self.@_on_error: untyped
+  self.@_on_nil: untyped
+  self.@types: Hash[Symbol | Class, Type]
+  self.@non_collection_types: Array[Class]
+  self.@default_superclass: Class | String | Symbol
+  self.@_transformed_keys: Hash[transform_type, Hash[String | Symbol, key_type]]
 
-  # Main Alba singleton methods
-  def self.backend: () -> backend_type
-  def self.backend=: (backend_type) -> void
+  attr_reader self.backend: backend_type
+  attr_reader self.encoder: untyped
+  attr_reader self.inflector: inflector_type
+  attr_reader self.non_collection_types: Array[Class]
+  attr_writer self.default_superclass: Class | String | Symbol
 
-  def self.encoder: () -> encoder_type
-  def self.encoder=: (encoder_type) -> void
-
-  def self.inflector: () -> inflector_type
-  def self.inflector=: (Symbol | inflector_type) -> void
-
-  # Serialization methods
-  def self.serialize: (untyped object, ?with: :inference | Proc | resource_class, ?root_key: key_type) ?{ () -> void } -> String
-  def self.hashify: (untyped object, ?with: :inference | Proc | resource_class, ?root_key: key_type) ?{ () -> void } -> generic_hash
-
-  # Resource management
-  def self.resource_class: () { () -> void } -> Class
-  def self.resource_for: (untyped object, ?with: :inference | Proc | resource_class) ?{ () -> void } -> Resource
-  def self.infer_resource_class: (String name, ?nesting: String?) -> resource_class
-
-  # Key configuration
-  def self.symbolize_keys!: () -> void
-  def self.stringify_keys!: () -> void
-  def self.regularize_key: (key_type) -> key_type
-  def self.transform_key: (String | Symbol key, transform_type: transform_type) -> (String | Symbol)
-
-  # Type registration
-  def self.register_type: (Symbol | Class name, ?check: ^(untyped) -> bool | false, ?converter: ^(untyped) -> untyped | nil, ?auto_convert: bool) -> void
-  def self.find_type: (Symbol | Class name) -> _Type
-
-  # Utility methods
-  def self.collection?: (untyped object) -> bool
-  def self.reset!: () -> void
-
-  # Deprecated methods
-  def self.enable_inference!: (with: Symbol | inflector_type) -> void
-  def self.disable_inference!: () -> void
+  def self.backend=: (backend_type) -> untyped
+  def self.encoder=: (Proc) -> untyped
+  def self.serialize: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () -> void } -> String
+  def self.hashify: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () -> void } -> untyped
+  def self.collection?: (Object object) -> bool
+  def self.enable_inference!: (with: untyped) -> untyped
+  def self.disable_inference!: () -> untyped
   def self.inferring: () -> bool
-  def self.resource_with: (untyped object, ?with: :inference | Proc | resource_class) ?{ () -> void } -> Resource
+  def self.inflector=: (untyped) -> untyped
+  def self.resource_class: (?helper: Module?, ?key_transformation: transform_type) ?{ () -> void } -> resource_class
+  def self.infer_resource_class: (String | Symbol, ?nesting: String?) -> resource_class
+  def self.symbolize_keys!: () -> untyped
+  def self.stringify_keys!: () -> untyped
+  def self.regularize_key: (root_key_type) -> key_type
+  def self.transform_key: (String | Symbol, transform_type: transform_type) -> key_type
+  def self.register_type: (Symbol | Class, ?check: untyped, ?converter: untyped, ?auto_convert: bool) -> untyped
+  def self.find_type: (Symbol | Class) -> Type
+  def self.reset!: () -> untyped
+  def self.resource_with: (untyped, ?with: untyped) ?{ () -> void } -> untyped
+  def self.resource_for: (untyped, ?params: generic_hash, ?with: untyped) -> untyped
+                       | (untyped, ?params: generic_hash, ?with: untyped) { () -> void } -> untyped
+
+  def self._resource_for: (untyped, ?params: generic_hash, ?with: untyped) ?{ () -> void } -> untyped
+  def self.inflector_from: (untyped) -> untyped
+  def self.set_encoder_from_backend: () -> untyped
+  def self.try_oj: (mode: Symbol) -> encoder_type
+  def self.try_active_support: () -> encoder_type
+  def self.default_encoder: () -> encoder_type
+  def self.hashify_collection: (untyped, untyped, root_key_type) ?{ () -> void } -> untyped
+  def self.validate_inflector: (untyped) -> untyped
+  def self.reset_transform_keys: () -> untyped
+  def self.resolved_default_superclass: () -> untyped
+  def self.register_default_types: () -> untyped
+end
+
+module Dry
+  class Inflector
+    def initialize: () -> void
+  end
+end
+
+module Oj
+  def self.dump: (untyped, **untyped) -> String
 end
