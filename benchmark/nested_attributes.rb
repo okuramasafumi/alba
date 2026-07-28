@@ -1,36 +1,32 @@
 # Benchmark script to measure what a nested attribute costs.
 #
-# Each pair of resources below serializes the same attributes, once declared directly on the resource
-# and once declared inside a nested attribute, so whatever separates the two is what nesting costs.
+# Each pair of resources below serializes exactly the same JSON, once with the nested hash built by hand in a plain
+# attribute and once with `nested_attribute`, so whatever separates the two is what the nested attribute costs.
 
 require_relative 'prep'
 
 require 'alba'
 
-# --- Attributes on the resource ---
-
-class FlatCommentResource
+class CommentResource
   include Alba::Resource
   attributes :id, :body
 end
 
-class FlatPostResource
+# --- The nested hash built by hand ---
+
+class ManualPostResource
   include Alba::Resource
-  attributes :id, :body
+  attributes :id
+  attribute(:details) { |post| {body: post.body} }
 end
 
-class FlatPostWithCommentsResource
+class ManualPostWithCommentsResource
   include Alba::Resource
-  attributes :id, :body
-  many :comments, resource: FlatCommentResource
+  attributes :id
+  attribute(:details) { |post| {body: post.body, comments: CommentResource.new(post.comments).serializable_hash} }
 end
 
-# --- The same attributes, in a nested attribute ---
-
-class NestedCommentResource
-  include Alba::Resource
-  attributes :id, :body
-end
+# --- The same JSON, through a nested attribute ---
 
 class NestedPostResource
   include Alba::Resource
@@ -47,7 +43,7 @@ class NestedPostWithCommentsResource
 
   nested_attribute :details do
     attributes :body
-    many :comments, resource: NestedCommentResource
+    many :comments, resource: CommentResource
   end
 end
 
@@ -65,15 +61,18 @@ end
 
 posts = Post.all.includes(:comments, :commenters)
 
-flat_attribute = proc { FlatPostResource.new(posts).serialize }
+manual_attribute = proc { ManualPostResource.new(posts).serialize }
 nested_attribute = proc { NestedPostResource.new(posts).serialize }
-flat_association = proc { FlatPostWithCommentsResource.new(posts).serialize }
+manual_association = proc { ManualPostWithCommentsResource.new(posts).serialize }
 nested_association = proc { NestedPostWithCommentsResource.new(posts).serialize }
 
+raise 'manual and nested must serialize the same JSON' unless manual_attribute.call == nested_attribute.call
+raise 'manual and nested must serialize the same JSON' unless manual_association.call == nested_association.call
+
 benchmark_body = lambda do |x|
-  x.report(:attribute_flat, &flat_attribute)
+  x.report(:attribute_manual, &manual_attribute)
   x.report(:attribute_nested, &nested_attribute)
-  x.report(:association_flat, &flat_association)
+  x.report(:association_manual, &manual_association)
   x.report(:association_nested, &nested_association)
 
   x.compare!
