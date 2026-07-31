@@ -40,7 +40,7 @@ jobs:
 
       # Execute Codacy Analysis CLI and generate a SARIF output with the security issues identified during the analysis
       - name: Run Codacy Analysis CLI
-        uses: codacy/codacy-analysis-cli-action@d840f886c4bd4edc059706d09c6a1586111c540b
+        uses: codacy/codacy-analysis-cli-action@562ee3e92b8e92df8b67e0a5ff8aa8e261919c08
         with:
           # Check https://github.com/codacy/codacy-analysis-cli#project-token to get your project token from your Codacy repository
           # You can also omit the token and run the tools that support default configurations
@@ -53,6 +53,20 @@ jobs:
           # Force 0 exit code to allow SARIF file generation
           # This will handover control about PR rejection to the GitHub side
           max-allowed-issues: 2147483647
+
+      # Ensure each SARIF run has a unique automationDetails.id (required by upload-sarif@v4)
+      - name: Fix SARIF multi-run categories
+        run: |
+          python3 - <<'EOF'
+          import json
+          with open('results.sarif') as f:
+              sarif = json.load(f)
+          for i, run in enumerate(sarif.get('runs', [])):
+              tool_name = run.get('tool', {}).get('driver', {}).get('name', f'tool-{i}')
+              run.setdefault('automationDetails', {})['id'] = tool_name
+          with open('results.sarif', 'w') as f:
+              json.dump(sarif, f)
+          EOF
 
       # Upload the SARIF file generated in the previous step
       - name: Upload SARIF results file
