@@ -196,6 +196,28 @@ class KeyTransformTest < Minitest::Test
     )
   end
 
+  class UserWithTransformingTraitResource
+    include Alba::Resource
+
+    attributes :id, :first_name
+
+    trait :camelized do
+      transform_keys :camel
+      attributes :last_name
+    end
+  end
+
+  def test_transform_key_inside_trait_applies_to_the_whole_output
+    assert_equal(
+      '{"Id":1,"FirstName":"Masafumi","LastName":"Okura"}',
+      UserWithTransformingTraitResource.new(@user, with_traits: :camelized).serialize
+    )
+    assert_equal(
+      '{"id":1,"first_name":"Masafumi"}',
+      UserWithTransformingTraitResource.new(@user).serialize
+    )
+  end
+
   def test_transform_key_bang_with_trait
     assert_equal(
       '{"Id":1,"FirstName":"Masafumi","LastName":"Okura"}',

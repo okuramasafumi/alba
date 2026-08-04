@@ -193,4 +193,112 @@ class TraitTest < Minitest::Test
       UserResourceWithOverride.new(@user, with_traits: [:with_greeting]).serialize
     )
   end
+
+  class UserWithMethodInTraitResource < UserResource
+    trait :with_shouted_name do
+      attributes :shouted_name
+
+      def shouted_name(user)
+        user.name.upcase
+      end
+    end
+  end
+
+  def test_method_defined_in_trait_is_available_during_serialization
+    assert_equal(
+      '{"id":1,"shouted_name":"MASAFUMI OKURA"}',
+      UserWithMethodInTraitResource.new(@user, with_traits: :with_shouted_name).serialize
+    )
+  end
+
+  class UserWithRootKeyResource < UserResource
+    root_key!
+  end
+
+  def test_trait_with_inferred_root_key
+    original_inflector = Alba.inflector
+    Alba.inflector = :default
+    assert_equal(
+      '{"user_with_root_key":{"id":1,"name":"Masafumi OKURA","email":"masafumi@example.com"}}',
+      UserWithRootKeyResource.new(@user, with_traits: :name_and_email).serialize
+    )
+  ensure
+    Alba.inflector = original_inflector
+  end
+
+  def test_trait_is_evaluated_once_however_many_objects_are_serialized
+    evaluations = 0
+    resource_class = Class.new do
+      include Alba::Resource
+
+      attributes :id
+
+      trait :counted do
+        evaluations += 1
+        attributes :name
+      end
+    end
+    users = [@user, User.new(2, 'Foo', 'foo@example.com'), User.new(3, 'Bar', 'bar@example.com')]
+
+    resource_class.new(users, with_traits: [:counted]).serialize
+
+    assert_equal 1, evaluations
+  end
+
+  def test_trait_is_not_reevaluated_when_the_caller_mutates_the_traits_array
+    evaluations = 0
+    resource_class = Class.new do
+      include Alba::Resource
+
+      attributes :id
+
+      trait :counted do
+        evaluations += 1
+        attributes :name
+      end
+    end
+    traits = [:counted]
+
+    resource_class.new(@user, with_traits: traits).serialize
+    traits << :counted
+    resource_class.new(@user, with_traits: [:counted]).serialize
+
+    assert_equal 1, evaluations
+  end
+
+  class UserResourceWithSelect
+    include Alba::Resource
+
+    attributes :id
+
+    trait :name_and_email do
+      attributes :name, :email
+    end
+
+    def select(_key, value)
+      !value.to_s.include?('@')
+    end
+  end
+
+  def test_select_defined_on_the_resource_filters_trait_attributes
+    assert_equal(
+      '{"id":1,"name":"Masafumi OKURA"}',
+      UserResourceWithSelect.new(@user, with_traits: :name_and_email).serialize
+    )
+  end
+
+  def test_traits_applied_in_a_different_order_do_not_share_their_attributes
+    assert_equal(
+      '{"id":1,"name":"MASAFUMI OKURA","greeting":"Hello, Masafumi OKURA!"}',
+      UserResourceWithOverride.new(@user, with_traits: %i[with_greeting with_uppercased_name]).serialize
+    )
+    assert_equal(
+      '{"id":1,"name":"MASAFUMI OKURA","greeting":"Hello, Masafumi OKURA!"}',
+      UserResourceWithOverride.new(@user, with_traits: %i[with_uppercased_name with_greeting]).serialize
+    )
+    assert_equal(
+      '{"id":1,"name":"Masafumi OKURA"}',
+      UserResourceWithOverride.new(@user).serialize
+    )
+  end
 end
