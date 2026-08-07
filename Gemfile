@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in alba.gemspec
 gemspec
 
-minitest_version, simplecov_version = RUBY_VERSION >= '3.2.0' ? ['~> 6.0', ~> '5.14'] : ['~> 1.0', '~> 0.22.0']
+minitest_version, simplecov_version = RUBY_VERSION >= '3.2.0' ? ['~> 6.0', '~> 5.14'] : ['~> 1.0', '~> 0.22.0']
 gem 'activesupport', require: false # For backend
 gem 'dry-inflector', require: false # For inflection
 gem 'ffaker', require: false # For testing
