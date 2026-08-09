@@ -260,7 +260,7 @@ module Alba
                 else raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
                   # :nocov:
                 end
-        value.nil? && nil_handler ? instance_exec(obj, key, attribute, &nil_handler) : value
+        nil_handler && value.nil? ? instance_exec(obj, key, attribute, &nil_handler) : value
       end
 
       def fetch_attribute_from_object_and_resource(obj, attribute)
