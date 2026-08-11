@@ -13,7 +13,7 @@ gem 'minitest', minitest_version # For test
 gem 'pbt', require: false # For property-based testing
 gem 'railties', require: false # For Rails integration testing
 gem 'rake', '~> 13.0' # For test and automation
-gem 'rubocop', '~> 1.88.0', require: false # For lint
+gem 'rubocop', '~> 1.89.0', require: false # For lint
 gem 'rubocop-gem_dev', github: 'okuramasafumi/rubocop-gem_dev', require: false # For lint
 gem 'rubocop-md', '~> 2.0', require: false # For lint
 gem 'rubocop-minitest', '~> 0.40.0', require: false # For lint
