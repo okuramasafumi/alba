@@ -287,18 +287,58 @@ class TraitTest < Minitest::Test
     )
   end
 
+  class UserResourceWithConflictingTraits
+    include Alba::Resource
+
+    attributes :id
+
+    trait :upcased_name do
+      attribute :name do |user|
+        user.name.upcase
+      end
+    end
+
+    trait :downcased_name do
+      attribute :name do |user|
+        user.name.downcase
+      end
+    end
+  end
+
   def test_traits_applied_in_a_different_order_do_not_share_their_attributes
     assert_equal(
-      '{"id":1,"name":"MASAFUMI OKURA","greeting":"Hello, Masafumi OKURA!"}',
-      UserResourceWithOverride.new(@user, with_traits: %i[with_greeting with_uppercased_name]).serialize
+      '{"id":1,"name":"masafumi okura"}',
+      UserResourceWithConflictingTraits.new(@user, with_traits: %i[upcased_name downcased_name]).serialize
     )
     assert_equal(
-      '{"id":1,"name":"MASAFUMI OKURA","greeting":"Hello, Masafumi OKURA!"}',
-      UserResourceWithOverride.new(@user, with_traits: %i[with_uppercased_name with_greeting]).serialize
+      '{"id":1,"name":"MASAFUMI OKURA"}',
+      UserResourceWithConflictingTraits.new(@user, with_traits: %i[downcased_name upcased_name]).serialize
     )
     assert_equal(
-      '{"id":1,"name":"Masafumi OKURA"}',
-      UserResourceWithOverride.new(@user).serialize
+      '{"id":1}',
+      UserResourceWithConflictingTraits.new(@user).serialize
     )
+  end
+
+  def test_redefining_a_trait_rebuilds_the_memoized_trait_class
+    resource_class = Class.new do
+      include Alba::Resource
+
+      attributes :id
+
+      trait :extra do
+        attributes :name
+      end
+    end
+
+    assert_equal '{"id":1,"name":"Masafumi OKURA"}', resource_class.new(@user, with_traits: :extra).serialize
+
+    resource_class.class_eval do
+      trait :extra do
+        attributes :email
+      end
+    end
+
+    assert_equal '{"id":1,"email":"masafumi@example.com"}', resource_class.new(@user, with_traits: :extra).serialize
   end
 end

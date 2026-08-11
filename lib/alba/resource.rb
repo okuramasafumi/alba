@@ -468,6 +468,7 @@ module Alba
         raise ArgumentError, 'No block given in trait method' unless block
 
         name = name.to_sym
+        @_classes_with_traits = nil
         @_traits[name] = block
       end
 
