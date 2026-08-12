@@ -268,7 +268,7 @@ module Alba
       end
 
       def _fetch_attribute_from_object_first(obj, attribute)
-        return obj.fetch(attribute) if obj.is_a?(Hash)
+        return fetch_attribute_from_hash(obj, attribute) if obj.is_a?(Hash)
 
         obj.__send__(attribute)
       rescue NoMethodError, KeyError
@@ -276,7 +276,7 @@ module Alba
       end
 
       def _fetch_attribute_from_resource_first(obj, attribute)
-        return obj.fetch(attribute) if obj.is_a?(Hash)
+        return fetch_attribute_from_hash(obj, attribute) if obj.is_a?(Hash)
 
         if @_resource_methods.include?(attribute)
           __send__(attribute, obj)
@@ -285,6 +285,15 @@ module Alba
         end
       rescue KeyError
         __send__(attribute, obj)
+      end
+
+      # When the key is missing, falls back to a resource method if defined, otherwise returns nil.
+      def fetch_attribute_from_hash(obj, attribute)
+        obj.fetch(attribute)
+      rescue KeyError
+        return __send__(attribute, obj) if @_resource_methods.include?(attribute)
+
+        nil
       end
 
       def nil_handler

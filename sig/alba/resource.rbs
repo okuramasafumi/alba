@@ -49,6 +49,7 @@ module Alba
       def fetch_attribute_from_object_and_resource: (untyped, Symbol) -> untyped
       def _fetch_attribute_from_object_first: (untyped, Symbol) -> untyped
       def _fetch_attribute_from_resource_first: (untyped, Symbol) -> untyped
+      def fetch_attribute_from_hash: (untyped, Symbol) -> untyped
       def nil_handler: () -> untyped
       def yield_if_within: (Symbol) { (untyped) -> untyped } -> untyped
       def check_within: (Symbol) -> untyped

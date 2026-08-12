@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Missing keys on Hash-like objects (e.g. `Elasticsearch::Model::HashWrapper`) now serialize as `null` instead of raising `NoMethodError` on the resource when no resource method is defined
+
 ## 3.11.0 2026-07-25
 
 ### Added
