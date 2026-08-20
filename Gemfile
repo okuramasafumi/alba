@@ -17,7 +17,7 @@ gem 'rubocop', '~> 1.89.0', require: false # For lint
 gem 'rubocop-gem_dev', github: 'okuramasafumi/rubocop-gem_dev', require: false # For lint
 gem 'rubocop-md', '~> 2.0', require: false # For lint
 gem 'rubocop-minitest', '~> 0.40.0', require: false # For lint
-gem 'rubocop-performance', '~> 1.26.0', require: false # For lint
+gem 'rubocop-performance', '~> 1.27.0', require: false # For lint
 gem 'rubocop-rake', '~> 0.7.1', require: false # For lint
 gem 'simplecov', simplecov_version, require: false # For test coverage
 gem 'simplecov-cobertura', require: false # For test coverage
