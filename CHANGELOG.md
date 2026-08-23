@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 4.0.0 2026-08-xx
+
+### Removed
+
+- Remove the deprecated `select` keyword argument from `Alba::Resource#initialize`
+
 ## 3.11.0 2026-07-25
 
 ### Added

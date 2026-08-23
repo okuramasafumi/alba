@@ -51,13 +51,11 @@ module Alba
       # @param within [Alba::WITHIN_DEFAULT, Hash, Array, nil, false, true]
       #   determines what associations to be serialized. If not set, it serializes all associations.
       # @param with_traits [Symbol, Array<Symbol>, nil] specified traits
-      # @param select [Method] DEPRECATED noop
-      def initialize(object, params: EMPTY_HASH, within: WITHIN_DEFAULT, with_traits: nil, select: nil)
+      def initialize(object, params: EMPTY_HASH, within: WITHIN_DEFAULT, with_traits: nil)
         @object = object
         @params = params
         @within = within
         @with_traits = with_traits
-        warn '`select` keyword for Alba::Resource is deprecated', category: :deprecated, uplevel: 1 if select
         _setup
       end
 

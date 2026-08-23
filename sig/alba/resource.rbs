@@ -17,7 +17,7 @@ module Alba
       attr_reader object: untyped
       attr_reader params: generic_hash
 
-      def initialize: (untyped, ?params: generic_hash, ?within: untyped, ?with_traits: Symbol | Array[Symbol] | nil, ?select: Method?) -> void
+      def initialize: (untyped, ?params: generic_hash, ?within: untyped, ?with_traits: Symbol | Array[Symbol] | nil) -> void
       def serialize: (?root_key: root_key_type, ?meta: generic_hash) -> String
       def to_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> String
       def as_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> untyped

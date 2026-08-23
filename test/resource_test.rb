@@ -38,6 +38,10 @@ class ResourceTest < Minitest::Test
     @foo.bars = [@bar]
   end
 
+  def test_initialize_rejects_removed_select_keyword
+    assert_raises(ArgumentError) { FooResource.new(@foo, select: method(:itself)) }
+  end
+
   def test_as_json
     assert_equal(
       {'foo' => {'id' => 1, 'bar_size' => 1, 'bars' => [{'id' => 1}]}}, # rubocop:disable Style/StringHashKeys
