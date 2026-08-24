@@ -25,21 +25,16 @@ module Alba
       alias to_h serializable_hash
 
       def hash_from_traits: (untyped) -> untyped
-      def deprecated_serializable_hash: () -> untyped
       def serialize_with: (untyped) -> String
       def hash_with_metadata: (untyped, generic_hash) -> untyped
       def _metadata: (untyped, generic_hash) -> generic_hash
       def serializable_hash_for_collection: () -> untyped
-      def deprecated_serializable_hash_for_collection: () -> untyped
       def fetch_key: () -> root_key_type
       def _key_for_collection: () -> root_key_type
       def _key: () -> root_key_type
       def resource_name: (?pluralized: bool) -> String
       def transforming_root_key?: () -> bool
-      def converter: () -> Proc
-      def collection_converter: () -> Proc
       def attributes_to_hash: (untyped, generic_hash) -> generic_hash
-      def attributes: () -> Hash[Symbol | String, attribute]
       def select: (untyped, untyped, untyped) -> bool
       def set_key_and_attribute_body_from: (untyped, untyped, attribute, generic_hash) -> untyped
       def do_select: (untyped, untyped, untyped) -> bool

@@ -23,7 +23,6 @@ module Alba
   self.@backend: backend_type
   self.@encoder: untyped
   self.@inflector: inflector_type
-  self.@inferring: bool
   self.@symbolize_keys: bool
   self.@_on_error: untyped
   self.@_on_nil: untyped
@@ -43,9 +42,6 @@ module Alba
   def self.serialize: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () -> void } -> String
   def self.hashify: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () -> void } -> untyped
   def self.collection?: (Object object) -> bool
-  def self.enable_inference!: (with: untyped) -> untyped
-  def self.disable_inference!: () -> untyped
-  def self.inferring: () -> bool
   def self.inflector=: (untyped) -> untyped
   def self.resource_class: (?helper: Module?, ?key_transformation: transform_type) ?{ () -> void } -> resource_class
   def self.infer_resource_class: (String | Symbol, ?nesting: String?) -> resource_class
@@ -56,7 +52,6 @@ module Alba
   def self.register_type: (Symbol | Class, ?check: untyped, ?converter: untyped, ?auto_convert: bool) -> untyped
   def self.find_type: (Symbol | Class) -> Type
   def self.reset!: () -> untyped
-  def self.resource_with: (untyped, ?with: untyped) ?{ () -> void } -> untyped
   def self.resource_for: (untyped, ?params: generic_hash, ?with: untyped) -> untyped
                        | (untyped, ?params: generic_hash, ?with: untyped) { () -> void } -> untyped
 
