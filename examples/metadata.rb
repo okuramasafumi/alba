@@ -6,41 +6,43 @@ rescue LoadError
   require_relative '../lib/alba'
 end
 
-class User
-  attr_reader :id, :name
+module MetadataExample
+  class User
+    attr_reader :id, :name
 
-  def initialize(id, name)
-    @id = id
-    @name = name
+    def initialize(id, name)
+      @id = id
+      @name = name
+    end
   end
-end
 
-class UserResource
-  include Alba::Resource
+  class UserResource
+    include Alba::Resource
 
-  root_key :user, :users
+    root_key :user, :users
 
-  attributes :id, :name
+    attributes :id, :name
 
-  meta do
-    {
-      count: object.respond_to?(:size) ? object.size : 1,
-      requested_by: params[:requested_by]
-    }
+    meta do
+      {
+        count: object.respond_to?(:size) ? object.size : 1,
+        requested_by: params[:requested_by]
+      }
+    end
   end
+
+  class UserResourceWithCustomMetaKey
+    include Alba::Resource
+
+    root_key :user, :users
+
+    attributes :id, :name
+
+    meta :pagination
+  end
+
+  users = [User.new(1, 'John'), User.new(2, 'Masafumi')]
+
+  puts UserResource.new(users, params: {requested_by: 'admin'}).serialize
+  puts UserResourceWithCustomMetaKey.new(users).serialize(meta: {page: 1, total_pages: 3})
 end
-
-class UserResourceWithCustomMetaKey
-  include Alba::Resource
-
-  root_key :user, :users
-
-  attributes :id, :name
-
-  meta :pagination
-end
-
-users = [User.new(1, 'John'), User.new(2, 'Masafumi')]
-
-puts UserResource.new(users, params: {requested_by: 'admin'}).serialize
-puts UserResourceWithCustomMetaKey.new(users).serialize(meta: {page: 1, total_pages: 3})

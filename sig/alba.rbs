@@ -39,11 +39,11 @@ module Alba
 
   def self.backend=: (backend_type) -> untyped
   def self.encoder=: (Proc) -> untyped
-  def self.serialize: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () -> void } -> String
-  def self.hashify: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () -> void } -> untyped
+  def self.serialize: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () [self: singleton(Resource)] -> void } -> String
+  def self.hashify: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () [self: singleton(Resource)] -> void } -> untyped
   def self.collection?: (Object object) -> bool
   def self.inflector=: (untyped) -> untyped
-  def self.resource_class: (?helper: Module?, ?key_transformation: transform_type) ?{ () -> void } -> resource_class
+  def self.resource_class: (?helper: Module?, ?key_transformation: transform_type) ?{ () [self: singleton(Resource)] -> void } -> resource_class
   def self.infer_resource_class: (String | Symbol, ?nesting: String?) -> resource_class
   def self.symbolize_keys!: () -> untyped
   def self.stringify_keys!: () -> untyped
@@ -53,9 +53,9 @@ module Alba
   def self.find_type: (Symbol | Class) -> Type
   def self.reset!: () -> untyped
   def self.resource_for: (untyped, ?params: generic_hash, ?with: untyped) -> untyped
-                       | (untyped, ?params: generic_hash, ?with: untyped) { () -> void } -> untyped
+                       | (untyped, ?params: generic_hash, ?with: untyped) { () [self: singleton(Resource)] -> void } -> untyped
 
-  def self._resource_for: (untyped, ?params: generic_hash, ?with: untyped) ?{ () -> void } -> untyped
+  def self._resource_for: (untyped, ?params: generic_hash, ?with: untyped) ?{ () [self: singleton(Resource)] -> void } -> untyped
   def self.inflector_from: (untyped) -> untyped
   def self.set_encoder_from_backend: () -> untyped
   def self.try_oj: (mode: Symbol) -> encoder_type

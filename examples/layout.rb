@@ -6,26 +6,29 @@ rescue LoadError
   require_relative '../lib/alba'
 end
 
-class Foo
-  attr_reader :id
+module LayoutExample
+  class Foo
+    attr_reader :id
 
-  def initialize(id)
-    @id = id
+    def initialize(id)
+      @id = id
+    end
   end
-end
 
-class FooResource
-  include Alba::Resource
+  class FooResource
+    include Alba::Resource
 
-  attributes :id
+    attributes :id
 
-  layout inline: proc {
-    {
-      header: params[:header],
-      body: serializable_hash
+    layout inline: proc {
+      # @type self: Alba::Layout
+      {
+        header: params[:header],
+        body: serializable_hash
+      }
     }
-  }
-end
+  end
 
-foo = Foo.new(1)
-puts FooResource.new(foo, params: {header: 'my_header'}).serialize
+  foo = Foo.new(1)
+  puts FooResource.new(foo, params: {header: 'my_header'}).serialize
+end

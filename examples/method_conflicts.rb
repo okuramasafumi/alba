@@ -6,37 +6,39 @@ rescue LoadError
   require_relative '../lib/alba'
 end
 
-class Report
-  attr_reader :format
+module MethodConflictsExample
+  class Report
+    attr_reader :format
 
-  def initialize(format)
-    @format = format
+    def initialize(format)
+      @format = format
+    end
   end
-end
 
-class ResourceMethodFirstReportResource
-  include Alba::Resource
+  class ResourceMethodFirstReportResource
+    include Alba::Resource
 
-  attributes :format
+    attributes :format
 
-  def format(_report)
-    'resource-format'
+    def format(_report)
+      'resource-format'
+    end
   end
-end
 
-class ObjectMethodFirstReportResource
-  include Alba::Resource
+  class ObjectMethodFirstReportResource
+    include Alba::Resource
 
-  prefer_object_method!
+    prefer_object_method!
 
-  attributes :format
+    attributes :format
 
-  def format(_report)
-    'resource-format'
+    def format(_report)
+      'resource-format'
+    end
   end
+
+  report = Report.new('pdf')
+
+  puts ResourceMethodFirstReportResource.new(report).serialize
+  puts ObjectMethodFirstReportResource.new(report).serialize
 end
-
-report = Report.new('pdf')
-
-puts ResourceMethodFirstReportResource.new(report).serialize
-puts ObjectMethodFirstReportResource.new(report).serialize

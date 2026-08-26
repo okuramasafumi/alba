@@ -6,36 +6,42 @@ rescue LoadError
   require_relative '../lib/alba'
 end
 
-class Post
-  attr_reader :title
+module ConditionalAttributesAndAssociationsExample
+  class Post
+    attr_reader :title
 
-  def initialize(title)
-    @title = title
+    def initialize(title)
+      @title = title
+    end
   end
-end
 
-class User
-  attr_reader :id, :name, :email, :posts
+  class User
+    attr_reader :id, :name, :email, :posts
 
-  def initialize(id, name, email, posts = [])
-    @id = id
-    @name = name
-    @email = email
-    @posts = posts
+    def initialize(id, name, email, posts = [])
+      @id = id
+      @name = name
+      @email = email
+      @posts = posts
+    end
   end
-end
 
-class UserResource
-  include Alba::Resource
+  class UserResource
+    include Alba::Resource
 
-  attributes :id, :name, :email, if: ->(_user, value) { !value.nil? }
+    attributes :id, :name, :email, if: ->(_user, value) { !value.nil? }
 
-  many :posts, if: ->(_user) { params[:include_posts] } do
-    attributes :title
+    many :posts,
+         if: lambda { |_user|
+           # @type self: UserResource
+           params[:include_posts]
+         } do
+      attributes :title
+    end
   end
+
+  user = User.new(1, 'Ada', nil, [Post.new('Hello'), Post.new('World')])
+
+  puts UserResource.new(user, params: {include_posts: true}).serialize
+  puts UserResource.new(user, params: {include_posts: false}).serialize
 end
-
-user = User.new(1, 'Ada', nil, [Post.new('Hello'), Post.new('World')])
-
-puts UserResource.new(user, params: {include_posts: true}).serialize
-puts UserResource.new(user, params: {include_posts: false}).serialize

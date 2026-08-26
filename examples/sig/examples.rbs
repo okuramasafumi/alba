@@ -1,0 +1,485 @@
+use Alba::Resource::InstanceMethods as ResourceInstanceMethods
+use Alba::Resource::ClassMethods as ResourceClassMethods
+
+# circular_associations_control.rb
+module CircularAssociationsControlExample
+  class Author
+    attr_accessor name: untyped
+    attr_accessor books: untyped
+
+    def initialize: (untyped name, ?untyped books) -> void
+  end
+
+  class Book
+    attr_accessor title: untyped
+    attr_accessor authors: untyped
+
+    def initialize: (untyped title, ?untyped authors) -> void
+  end
+
+  class AuthorResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+
+  class BookResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# collection_key.rb
+module CollectionKeyExample
+  class User
+    attr_reader id: untyped
+    attr_reader name: untyped
+
+    def initialize: (untyped id, untyped name) -> void
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# conditional_attributes_and_associations.rb
+module ConditionalAttributesAndAssociationsExample
+  class Post
+    attr_reader title: untyped
+
+    def initialize: (untyped title) -> void
+  end
+
+  class User
+    attr_reader id: untyped
+    attr_reader name: untyped
+    attr_reader email: untyped
+    attr_reader posts: untyped
+
+    def initialize: (untyped id, untyped name, untyped email, ?untyped posts) -> void
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# custom_association_source.rb
+module CustomAssociationSourceExample
+  class Article
+    attr_reader title: untyped
+    attr_reader status: untyped
+
+    def initialize: (untyped title, untyped status) -> void
+  end
+
+  class User
+    @metadata: untyped
+
+    attr_reader id: untyped
+    attr_reader name: untyped
+    attr_reader articles: untyped
+
+    def initialize: (untyped id, untyped name, untyped articles) -> void
+    def custom_profile: () -> Hash[Symbol, String]
+    def articles_by_status: (untyped status) -> untyped
+  end
+
+  class MetadataResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+
+  class ArticleResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# custom_types.rb
+module CustomTypesExample
+  class Event
+    attr_reader id: untyped
+    attr_reader name: untyped
+    attr_reader created_at: untyped
+    attr_reader starts_on: untyped
+
+    def initialize: (untyped id, untyped name, untyped created_at, untyped starts_on) -> void
+  end
+
+  class EventResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# error_handling.rb
+module ErrorHandlingExample
+  class User
+    attr_reader id: untyped
+    attr_reader name: untyped
+
+    def initialize: (untyped id, untyped name) -> void
+    def email: () -> untyped
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# helpers_for_inline_associations.rb
+module HelpersForInlineAssociationsExample
+  class Book
+    attr_reader id: untyped
+    attr_reader title: untyped
+
+    def initialize: (untyped id, untyped title) -> void
+  end
+
+  class Library
+    attr_reader id: untyped
+    attr_reader name: untyped
+    attr_reader books: untyped
+
+    def initialize: (untyped id, untyped name, untyped books) -> void
+  end
+
+  class ApplicationResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+
+    def with_id: () -> untyped
+    def with_title: () -> untyped
+    def self.with_id: () -> untyped
+    def self.with_title: () -> untyped
+  end
+
+  class LibraryResource < ApplicationResource
+  end
+end
+
+# inline_definition.rb
+module InlineDefinitionExample
+  class Article
+    attr_reader title: untyped
+    attr_reader body: untyped
+
+    def initialize: (untyped title, untyped body) -> void
+  end
+
+  class User
+    attr_reader id: untyped
+    attr_reader articles: untyped
+
+    def initialize: (untyped id, untyped articles) -> void
+  end
+end
+
+# key_transformation.rb
+module KeyTransformationExample
+  module ExampleInflector
+    def self?.camelize: (untyped str) -> untyped
+
+    def self?.camelize_lower: (untyped str) -> untyped
+
+    def self?.dasherize: (untyped str) -> untyped
+
+    def self?.classify: (untyped str) -> untyped
+
+    def self?.demodulize: (untyped str) -> untyped
+
+    def self?.underscore: (untyped str) -> untyped
+
+    def self?.pluralize: (untyped str) -> String
+  end
+
+  class User
+    attr_reader id: untyped
+    attr_reader first_name: untyped
+    attr_reader last_name: untyped
+
+    def initialize: (untyped id, untyped first_name, untyped last_name) -> void
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# layout.rb
+module LayoutExample
+  class Foo
+    attr_reader id: untyped
+
+    def initialize: (untyped id) -> void
+  end
+
+  class FooResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# metadata.rb
+module MetadataExample
+  class User
+    attr_reader id: untyped
+    attr_reader name: untyped
+
+    def initialize: (untyped id, untyped name) -> void
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+
+  class UserResourceWithCustomMetaKey
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# metadata_and_pagination.rb
+module MetadataAndPaginationExample
+  class User
+    attr_reader id: untyped
+    attr_reader name: untyped
+
+    def initialize: (untyped id, untyped name) -> void
+  end
+
+  class PaginatedUsers
+    attr_reader items: untyped
+    attr_reader page: untyped
+    attr_reader per_page: untyped
+    attr_reader total: untyped
+
+    def initialize: (untyped items, page: untyped, per_page: untyped, total: untyped) -> void
+    def total_pages: () -> untyped
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+
+  class PaginatedUsersResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# method_conflicts.rb
+module MethodConflictsExample
+  class Report
+    attr_reader format: untyped
+
+    def initialize: (untyped format) -> void
+  end
+
+  class ResourceMethodFirstReportResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+
+    def format: (untyped report) -> String
+  end
+
+  class ObjectMethodFirstReportResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+
+    def format: (untyped report) -> String
+  end
+end
+
+# nested_attributes.rb
+module NestedAttributesExample
+  class User
+    attr_reader id: untyped
+    attr_reader city: untyped
+    attr_reader zipcode: untyped
+    attr_reader card_brand: untyped
+    attr_reader last4: untyped
+
+    def initialize: (untyped id, untyped city, untyped zipcode, untyped card_brand, untyped last4) -> void
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# nil_handling.rb
+module NilHandlingExample
+  class User
+    attr_reader id: untyped
+    attr_reader name: untyped
+    attr_reader age: untyped
+
+    def initialize: (untyped id, ?untyped name, ?untyped age) -> void
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# no_runtime_dependencies.rb
+module NoRuntimeDependenciesExample
+  class User
+    attr_reader id: untyped
+    attr_reader name: untyped
+
+    def initialize: (untyped id, untyped name) -> void
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# polymorphic_associations.rb
+module PolymorphicAssociationsExample
+  class FolderNode
+    attr_reader name: untyped
+    attr_reader children: untyped
+
+    def initialize: (untyped name, ?untyped children) -> void
+  end
+
+  class FileNode
+    attr_reader name: untyped
+    attr_reader size: untyped
+
+    def initialize: (untyped name, untyped size) -> void
+  end
+
+  class FileNodeResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+
+  class FolderNodeResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# root_key_and_association_inference.rb
+module RootKeyAndAssociationInferenceExample
+  module ExampleInflector
+    def self?.camelize: (untyped str) -> untyped
+
+    def self?.camelize_lower: (untyped str) -> untyped
+
+    def self?.dasherize: (untyped str) -> untyped
+
+    def self?.classify: (untyped str) -> untyped
+
+    def self?.demodulize: (untyped str) -> untyped
+
+    def self?.underscore: (untyped str) -> untyped
+
+    def self?.pluralize: (untyped str) -> String
+  end
+
+  class Article
+    attr_reader title: untyped
+
+    def initialize: (untyped title) -> void
+  end
+
+  class User
+    attr_reader id: untyped
+    attr_reader articles: untyped
+
+    def initialize: (untyped id, ?untyped articles) -> void
+  end
+
+  class ArticleResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# selectable_backend.rb
+module SelectableBackendExample
+  class User
+    attr_reader id: untyped
+    attr_reader name: untyped
+
+    def initialize: (untyped id, untyped name) -> void
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# traits.rb
+module TraitsExample
+  class Profile
+    attr_reader display_name: untyped
+    attr_reader status: untyped
+
+    def initialize: (untyped display_name, untyped status) -> void
+  end
+
+  class User
+    attr_reader id: untyped
+    attr_reader name: untyped
+    attr_reader email: untyped
+    attr_reader profile: untyped
+
+    def initialize: (untyped id, untyped name, untyped email, untyped profile) -> void
+  end
+
+  class ProfileResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
+
+# types.rb
+module TypesExample
+  class User
+    attr_reader id: untyped
+    attr_reader name: untyped
+    attr_reader age: untyped
+    attr_reader bio: untyped
+    attr_reader admin: untyped
+    attr_reader created_at: Time
+
+    def initialize: (untyped id, untyped name, untyped age, ?String bio, ?bool admin) -> void
+  end
+
+  class UserResource
+    include ResourceInstanceMethods
+    extend ResourceClassMethods
+  end
+end
