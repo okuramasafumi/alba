@@ -6,11 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## 4.0.0 2026-08-xx
+## 4.0.0 2026-08-28
+
+### Changed
+
+- Call #nil? on attribute values only when a nil handler is set [#546](https://github.com/okuramasafumi/alba/pull/546)
 
 ### Removed
 
-- Remove the deprecated `select` keyword argument from `Alba::Resource#initialize`
+- Remove the deprecated inference methods `Alba.enable_inference!`, `Alba.disable_inference!`, and `Alba.inferring`; use `Alba.inflector` and `Alba.inflector=` instead
+- Remove the deprecated `Alba.resource_with`; use `Alba.resource_for` instead
+- Remove deprecated support for overriding `Alba::Resource#attributes`; override `Alba::Resource#select` to filter attributes instead
+- Remove the deprecated `converter` and `collection_converter` serialization hooks
+- Remove the deprecated `select` keyword argument from `Alba::Resource#initialize`; the `Alba::Resource#select` filtering method remains available
 
 ## 3.11.0 2026-07-25
 
@@ -19,10 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rails: `serialize` and `render_serialized_json` now takes `params` [#509](https://github.com/okuramasafumi/alba/pull/509)
 - Add `Alba.non_collection_types` for declaring Enumerable classes that should not be treated as collections [#532](https://github.com/okuramasafumi/alba/pull/532)
 - Add default superclass configuration [#547](https://github.com/okuramasafumi/alba/pull/547)
-
-### Changed
-
-- Skip calling `#nil?` on attribute values when no nil handler (`on_nil`) is set, so lazy-loading proxies such as batch-loader keep their batching
 
 ### Fixed
 
