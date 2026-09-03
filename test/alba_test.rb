@@ -373,7 +373,7 @@ class AlbaTest < Minitest::Test
     end
   end
 
-  # rubocop:disable Style/StringHashKeys
+  # rubocop:disable-next Style/StringHashKeys
   def test_hashify_collection_with_different_types
     foo1 = Foo.new(1, 'foo1')
     foo2 = Foo.new(2, 'foo2')
@@ -406,7 +406,6 @@ class AlbaTest < Minitest::Test
       assert_raises(Alba::Error) { Alba.hashify([foo1, bar1, foo2, bar2]) }
     end
   end
-  # rubocop:enable Style/StringHashKeys
 
   def test_serialize_collection_with_block
     foo1 = Foo.new(1, 'foo1')
