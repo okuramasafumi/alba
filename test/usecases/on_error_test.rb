@@ -14,11 +14,10 @@ class OnErrorTest < Minitest::Test
       @updated_at = Time.now
     end
 
-    # rubocop:disable Style/RedundantException
+    # rubocop:disable-next Style/RedundantException
     def email
       raise RuntimeError, 'Error!'
     end
-    # rubocop:enable Style/RedundantException
   end
 
   class UserResource
