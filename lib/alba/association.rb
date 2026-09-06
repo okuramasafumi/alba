@@ -13,7 +13,7 @@ module Alba
     attr_reader :name
 
     # @param name [Symbol, String] name of the method to fetch association
-    # @param condition [Proc, nil] a proc filtering data
+    # @param modifier [Proc, nil] a Proc to modify the association
     # @param resource [Class<Alba::Resource>, Proc, String, Symbol, nil]
     #   a resource class for the association, a proc returning a resource class or a name of the resource
     # @param source [Proc, nil] a proc to specify the source of the association
@@ -25,7 +25,7 @@ module Alba
     # @param block [Block] used to define resource when resource arg is absent
     def initialize(
       name:,
-      condition: nil,
+      modifier: nil,
       resource: nil,
       source: nil,
       with_traits: nil,
@@ -36,7 +36,7 @@ module Alba
       &block
     )
       @name = name
-      @condition = condition
+      @modifier = modifier
       @resource = resource
       @source = source
       @with_traits = with_traits
@@ -82,7 +82,7 @@ module Alba
           else
             target.is_a?(Hash) ? target.fetch(@name) : target.__send__(@name)
           end
-      o = @condition.call(o, params, target) if @condition
+      o = @modifier.call(o, params, target) if @modifier
       o
     end
 
