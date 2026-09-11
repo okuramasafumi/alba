@@ -4,7 +4,7 @@ module Alba
     # Class methods
     self.@const_cache: Hash[Symbol | String, Class]
 
-    @condition: untyped
+    @modifier: untyped
     @resource: untyped
     @source: Proc?
     @with_traits: Symbol | Array[Symbol] | nil
@@ -17,7 +17,7 @@ module Alba
 
     def initialize: (
       name: Symbol | String,
-      ?condition: Proc?,
+      ?modifier: Proc?,
       ?resource: (Class | Proc | String | Symbol)?,
       ?source: Proc?,
       ?with_traits: (Symbol | Array[Symbol])?,
