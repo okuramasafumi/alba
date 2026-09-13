@@ -5,10 +5,11 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in alba.gemspec
 gemspec
 
-minitest_version, simplecov_version = RUBY_VERSION >= '3.2.0' ? ['~> 6.0', '~> 1.0'] : ['~> 5.14', '~> 0.22.0']
+minitest_version, simplecov_version, json_version = RUBY_VERSION >= '3.2.0' ? ['~> 6.0', '~> 1.0', '~> 3.0'] : ['~> 5.14', '~> 0.22.0', '~> 2.0']
 gem 'activesupport', require: false # For backend
 gem 'dry-inflector', require: false # For inflection
 gem 'ffaker', require: false # For testing
+gem 'json', json_version, require: false # Specified here so that version 2 is used for Ruby 3.1
 gem 'minitest', minitest_version # For test
 gem 'pbt', require: false # For property-based testing
 gem 'railties', require: false # For Rails integration testing
