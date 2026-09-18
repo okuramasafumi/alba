@@ -26,8 +26,8 @@ gem 'yard', require: false # For documentation
 
 # Type checking gems (not supported on JRuby)
 group :type do
-  gem 'rbs', '~> 3.0', require: false # For type signatures
-  gem 'steep', '~> 1.10.0', require: false # For type checking
+  gem 'rbs', '~> 4.0', require: false # For type signatures
+  gem 'steep', '~> 2.1', require: false # For type checking
 end
 
 platforms :ruby do
