@@ -24,10 +24,12 @@ gem 'simplecov', simplecov_version, require: false # For test coverage
 gem 'simplecov-cobertura', require: false # For test coverage
 gem 'yard', require: false # For documentation
 
-# Type checking gems (not supported on JRuby)
-group :type do
-  gem 'rbs', '~> 4.0', require: false # For type signatures
-  gem 'steep', '~> 2.1', require: false # For type checking
+# Bundler resolves excluded groups too; Steep 2.1 requires Ruby 3.3 or newer.
+if RUBY_VERSION >= '3.3.0'
+  group :type do
+    gem 'rbs', '~> 4.0', require: false # For type signatures
+    gem 'steep', '~> 2.1', require: false # For type checking
+  end
 end
 
 platforms :ruby do
