@@ -39,7 +39,7 @@ module Alba
 
     def object_from: (untyped target, generic_hash params) -> untyped
     def constantize: (Class | Symbol | String resource) -> Class
-    def assign_resource: (String? nesting, Alba::transform_type key_transformation, untyped block, Module? helper) -> void
+    def resource_from: (String? nesting, Alba::transform_type key_transformation, untyped block, Module? helper) -> Alba::resource_class
     def to_h_with_each_resource: (Enumerable[untyped] object, within within, generic_hash params) -> Array[generic_hash]
     def to_h_with_constantize_resource: (untyped object, within within, generic_hash params) -> generic_hash
   end
