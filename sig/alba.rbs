@@ -5,7 +5,7 @@ module Alba
   type class_key_type = root_key_type | true
   type transform_type = Symbol
   type backend_type = :oj | :oj_strict | :oj_rails | :oj_default | :active_support | :default | :json | :custom | nil
-  type encoder_type = ^(untyped) -> String
+  type encoder_type = ^(untyped) [self: top] -> String
   type inflector_type = untyped
   type resource_class = untyped
   type within = generic_hash | Array[untyped] | Symbol | bool | untyped
@@ -21,7 +21,7 @@ module Alba
   end
 
   self.@backend: backend_type
-  self.@encoder: untyped
+  self.@encoder: encoder_type
   self.@inflector: inflector_type
   self.@symbolize_keys: bool
   self.@_on_error: untyped
@@ -32,13 +32,13 @@ module Alba
   self.@_transformed_keys: Hash[transform_type, Hash[String | Symbol, key_type]]
 
   attr_reader self.backend: backend_type
-  attr_reader self.encoder: untyped
+  attr_reader self.encoder: encoder_type
   attr_reader self.inflector: inflector_type
   attr_reader self.non_collection_types: Array[Class]
   attr_writer self.default_superclass: Class | String | Symbol
 
-  def self.backend=: (backend_type) -> untyped
-  def self.encoder=: (Proc) -> untyped
+  def self.backend=: (backend_type) -> void
+  def self.encoder=: (encoder_type) -> void
   def self.serialize: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () [self: singleton(Resource)] -> void } -> String
   def self.hashify: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () [self: singleton(Resource)] -> void } -> untyped
   def self.collection?: (Object object) -> bool
@@ -57,7 +57,7 @@ module Alba
 
   def self._resource_for: (untyped, ?params: generic_hash, ?with: untyped) ?{ () [self: singleton(Resource)] -> void } -> untyped
   def self.inflector_from: (untyped) -> untyped
-  def self.set_encoder_from_backend: () -> untyped
+  def self.set_encoder_from_backend: () -> encoder_type
   def self.try_oj: (mode: Symbol) -> encoder_type
   def self.try_active_support: () -> encoder_type
   def self.default_encoder: () -> encoder_type
