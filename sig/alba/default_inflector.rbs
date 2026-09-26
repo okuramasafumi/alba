@@ -6,7 +6,7 @@ module Alba
     def self.camelize_lower: (String key) -> String
     def self.dasherize: (String key) -> String
     def self.underscore: (String key) -> String
-    def self.classify: (String key) -> String
+    def self.classify: (String | Symbol key) -> String
     def self.demodulize: (String key) -> String
     def self.pluralize: (String key) -> String
   end

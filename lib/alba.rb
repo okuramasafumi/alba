@@ -120,7 +120,7 @@ module Alba
       klass
     end
 
-    # @param name [String] a String Alba infers resource name with
+    # @param name [String, Symbol] a name Alba infers resource name with
     # @param nesting [String, nil] namespace Alba tries to find resource class in
     # @return [Class<Alba::Resource>] resource class
     def infer_resource_class(name, nesting: nil)

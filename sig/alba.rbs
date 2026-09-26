@@ -6,7 +6,7 @@ module Alba
   type transform_type = Symbol
   type backend_type = :oj | :oj_strict | :oj_rails | :oj_default | :active_support | :default | :json | :custom | nil
   type encoder_type = ^(untyped) [self: top] -> String
-  type inflector_type = untyped
+  type inflector_type = _Inflector?
   type resource_class = untyped
   type within = generic_hash | Array[untyped] | Symbol | bool | untyped
 
@@ -15,9 +15,11 @@ module Alba
     def camelize_lower: (String) -> String
     def dasherize: (String) -> String
     def underscore: (String) -> String
-    def classify: (String) -> String
+    def classify: (String | Symbol) -> String
     def demodulize: (String) -> String
     def pluralize: (String) -> String
+    def inspect: () -> String
+    def respond_to?: (Symbol) -> bool
   end
 
   self.@backend: backend_type
@@ -42,7 +44,7 @@ module Alba
   def self.serialize: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () [self: singleton(Resource)] -> void } -> String
   def self.hashify: (?untyped object, ?with: untyped, ?root_key: root_key_type) ?{ () [self: singleton(Resource)] -> void } -> untyped
   def self.collection?: (Object object) -> bool
-  def self.inflector=: (untyped) -> untyped
+  def self.inflector=: (:default | :active_support | :dry | inflector_type) -> inflector_type
   def self.resource_class: (?helper: Module?, ?key_transformation: transform_type) ?{ () [self: singleton(Resource)] -> void } -> resource_class
   def self.infer_resource_class: (String | Symbol, ?nesting: String?) -> resource_class
   def self.symbolize_keys!: () -> untyped
@@ -56,22 +58,16 @@ module Alba
                        | (untyped, ?params: generic_hash, ?with: untyped) { () [self: singleton(Resource)] -> void } -> untyped
 
   def self._resource_for: (untyped, ?params: generic_hash, ?with: untyped) ?{ () [self: singleton(Resource)] -> void } -> untyped
-  def self.inflector_from: (untyped) -> untyped
+  def self.inflector_from: (:default | :active_support | :dry | _Inflector | nil) -> inflector_type
   def self.set_encoder_from_backend: () -> encoder_type
   def self.try_oj: (mode: Symbol) -> encoder_type
   def self.try_active_support: () -> encoder_type
   def self.default_encoder: () -> encoder_type
   def self.hashify_collection: (untyped, untyped, root_key_type) ?{ () -> void } -> untyped
-  def self.validate_inflector: (untyped) -> untyped
+  def self.validate_inflector: (_Inflector) -> _Inflector
   def self.reset_transform_keys: () -> untyped
   def self.resolved_default_superclass: () -> untyped
   def self.register_default_types: () -> untyped
-end
-
-module Dry
-  class Inflector
-    def initialize: () -> void
-  end
 end
 
 module Oj

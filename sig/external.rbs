@@ -15,7 +15,7 @@ module ActiveSupport
     def self.camelize: (String, ?bool) -> String
     def self.dasherize: (String) -> String
     def self.underscore: (String) -> String
-    def self.classify: (String) -> String
+    def self.classify: (String | Symbol) -> String
     def self.demodulize: (String) -> String
     def self.pluralize: (String) -> String
   end
@@ -44,4 +44,12 @@ end
 # after narrowing an arbitrary object with `is_a?(Enumerable)`.
 module Enumerable[unchecked out Elem]
   def is_a?: (Module) -> bool
+end
+
+module Dry
+  class Inflector
+    include Alba::_Inflector
+
+    def initialize: () -> void
+  end
 end
