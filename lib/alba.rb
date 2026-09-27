@@ -124,7 +124,7 @@ module Alba
     # @param nesting [String, nil] namespace Alba tries to find resource class in
     # @return [Class<Alba::Resource>] resource class
     def infer_resource_class(name, nesting: nil)
-      raise Alba::Error, 'Inference is disabled so Alba cannot infer resource name. Set inflector before use.' unless Alba.inflector
+      raise Alba::Error, 'Inference is disabled so Alba cannot infer resource name. Set inflector before use.' unless inflector
 
       const_parent = nesting.nil? ? Object : Object.const_get(nesting)
       begin
