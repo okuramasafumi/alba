@@ -117,7 +117,7 @@ module Alba
       klass.helper(helper) if helper
       klass.transform_keys(key_transformation)
       klass.class_eval(&block) if block
-      klass
+      klass # : Class & Alba::resource_class
     end
 
     # @param name [String, Symbol] a name Alba infers resource name with

@@ -7,8 +7,14 @@ module Alba
   type backend_type = :oj | :oj_strict | :oj_rails | :oj_default | :active_support | :default | :json | :custom | nil
   type encoder_type = ^(untyped) [self: top] -> String
   type inflector_type = _Inflector?
-  type resource_class = untyped
+  type resource_class = _ResourceClass
   type within = generic_hash | Array[untyped] | Symbol | bool | untyped
+
+  interface _ResourceClass
+    include Resource::_ClassMethods
+
+    def new: (untyped object, ?params: generic_hash, ?within: untyped, ?with_traits: Symbol | Array[Symbol] | nil) -> Resource::_InstanceMethods
+  end
 
   interface _Inflector
     def camelize: (String) -> String

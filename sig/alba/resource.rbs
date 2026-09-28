@@ -9,21 +9,56 @@ module Alba
 
     def self.included: (Class) -> untyped
 
+    interface _InstanceMethods
+      def object: () -> untyped
+      def params: () -> generic_hash
+      def serialize: (?root_key: root_key_type, ?meta: generic_hash) -> String
+      def to_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> String
+      def as_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> untyped
+      def serializable_hash: () -> untyped
+      alias to_h serializable_hash
+    end
+
+    interface _ClassMethods
+      def method_added: (Symbol) -> untyped
+      def inherited: (Class) -> untyped
+      def attributes: (*(Symbol | String), ?if: instance_proc | Symbol | nil, **untyped) -> untyped
+      def assign_attributes: (Array[Symbol | String], instance_proc | Symbol | nil) -> untyped
+      def assign_attributes_with_types: (Hash[Symbol | String, untyped], instance_proc | Symbol | nil) ?{ (untyped) [self: InstanceMethods] -> untyped } -> untyped
+      def attribute: (?Symbol | String | nil, ?if: instance_proc | Symbol | nil, **untyped) ?{ (untyped) [self: InstanceMethods] -> untyped } -> untyped
+      def association: (Symbol | String, ?instance_proc?, ?resource: untyped, ?serializer: untyped, ?source: Proc?, ?key: key_type, ?with_traits: Symbol | Array[Symbol] | nil, ?params: generic_hash, **untyped) ?{ () [self: singleton(Resource)] -> void } -> untyped
+      alias one association
+      alias many association
+      alias has_one association
+      alias has_many association
+      def nesting: () -> String?
+      def nested_attribute: (Symbol | String, **untyped) ?{ () [self: singleton(Resource)] -> void } -> untyped
+      alias nested nested_attribute
+      def trait: (Symbol | String) ?{ () [self: singleton(Resource)] -> void } -> untyped
+      def root_key: (Symbol | String, ?Symbol | String | nil) -> untyped
+      def root_key_for_collection: (Symbol | String) -> untyped
+      def root_key!: () -> untyped
+      def meta: (?Symbol) ?{ () [self: InstanceMethods] -> generic_hash } -> untyped
+      def layout: (?file: String?, ?inline: Proc?) -> untyped
+      def transform_keys: (Symbol | String, ?root: bool, ?cascade: bool) -> untyped
+      def transform_keys!: (Symbol | String) -> untyped
+      def collection_key: (Symbol | String) -> untyped
+      def on_error: (?Symbol?) ?{ (*untyped) [self: InstanceMethods] -> untyped } -> untyped
+      def validated_error_handler: (untyped) -> Symbol
+      def on_nil: () ?{ (*untyped) [self: InstanceMethods] -> untyped } -> untyped
+      def helper: (?Module) ?{ (*untyped) [self: singleton(Resource)] -> untyped } -> untyped
+      def prefer_resource_method!: () -> untyped
+      def prefer_object_method!: () -> untyped
+    end
+
     module InstanceMethods
       @object: untyped
       @params: generic_hash
       @within: untyped
       @with_traits: Symbol | Array[Symbol] | nil
 
-      attr_reader object: untyped
-      attr_reader params: generic_hash
-
       def initialize: (untyped, ?params: generic_hash, ?within: untyped, ?with_traits: Symbol | Array[Symbol] | nil) -> void
-      def serialize: (?root_key: root_key_type, ?meta: generic_hash) -> String
-      def to_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> String
-      def as_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> untyped
-      def serializable_hash: () -> untyped
-      alias to_h serializable_hash
+      include _InstanceMethods
 
       def hash_from_traits: (untyped) -> untyped
       def serialize_with: (untyped) -> String
@@ -103,35 +138,7 @@ module Alba
       def new: (*untyped, **untyped) -> untyped
       def _resource_methods: () -> Array[Symbol]
 
-      def method_added: (Symbol) -> untyped
-      def inherited: (Class) -> untyped
-      def attributes: (*(Symbol | String), ?if: instance_proc | Symbol | nil, **untyped) -> untyped
-      def assign_attributes: (Array[Symbol | String], instance_proc | Symbol | nil) -> untyped
-      def assign_attributes_with_types: (Hash[Symbol | String, untyped], instance_proc | Symbol | nil) ?{ (untyped) [self: InstanceMethods] -> untyped } -> untyped
-      def attribute: (?Symbol | String | nil, ?if: instance_proc | Symbol | nil, **untyped) ?{ (untyped) [self: InstanceMethods] -> untyped } -> untyped
-      def association: (Symbol | String, ?instance_proc?, ?resource: untyped, ?serializer: untyped, ?source: Proc?, ?key: key_type, ?with_traits: Symbol | Array[Symbol] | nil, ?params: generic_hash, **untyped) ?{ () [self: singleton(Resource)] -> void } -> untyped
-      alias one association
-      alias many association
-      alias has_one association
-      alias has_many association
-      def nesting: () -> String?
-      def nested_attribute: (Symbol | String, **untyped) ?{ () [self: singleton(Resource)] -> void } -> untyped
-      alias nested nested_attribute
-      def trait: (Symbol | String) ?{ () [self: singleton(Resource)] -> void } -> untyped
-      def root_key: (Symbol | String, ?Symbol | String | nil) -> untyped
-      def root_key_for_collection: (Symbol | String) -> untyped
-      def root_key!: () -> untyped
-      def meta: (?Symbol) ?{ () [self: InstanceMethods] -> generic_hash } -> untyped
-      def layout: (?file: String?, ?inline: Proc?) -> untyped
-      def transform_keys: (Symbol | String, ?root: bool, ?cascade: bool) -> untyped
-      def transform_keys!: (Symbol | String) -> untyped
-      def collection_key: (Symbol | String) -> untyped
-      def on_error: (?Symbol?) ?{ (*untyped) [self: InstanceMethods] -> untyped } -> untyped
-      def validated_error_handler: (untyped) -> Symbol
-      def on_nil: () ?{ (*untyped) [self: InstanceMethods] -> untyped } -> untyped
-      def helper: (?Module) ?{ (*untyped) [self: singleton(Resource)] -> untyped } -> untyped
-      def prefer_resource_method!: () -> untyped
-      def prefer_object_method!: () -> untyped
+      include _ClassMethods
     end
 
     include InstanceMethods
