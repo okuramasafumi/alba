@@ -546,7 +546,7 @@ module Alba
       end
 
       # Set error handler
-      # If this is set it's used as a error handler overriding global one
+      # Defaults to raising errors when no handler is set.
       #
       # @param handler [Symbol] `:raise`, `:ignore` or `:nullify`
       # @param block [Block]

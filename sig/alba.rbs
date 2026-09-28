@@ -32,8 +32,6 @@ module Alba
   self.@encoder: encoder_type
   self.@inflector: inflector_type
   self.@symbolize_keys: bool
-  self.@_on_error: untyped
-  self.@_on_nil: untyped
   self.@types: Hash[Symbol | Class, Type]
   self.@non_collection_types: Array[Class]
   self.@default_superclass: Class | String | Symbol

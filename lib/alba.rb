@@ -203,8 +203,6 @@ module Alba
     def reset!
       @encoder = default_encoder
       @symbolize_keys = false
-      @_on_error = :raise
-      @_on_nil = nil
       @types = {}
       @non_collection_types = [Struct, Range, Hash]
       @default_superclass = ::Object
