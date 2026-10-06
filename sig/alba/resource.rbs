@@ -1,6 +1,6 @@
 module Alba
   module Resource
-    type attribute = untyped
+    type attribute = String | Symbol | ^(untyped) [self: ::Alba::Resource::InstanceMethods] -> untyped | ConditionalAttribute | NestedAttribute | TypedAttribute | Association
     type instance_proc = ^(*untyped) [self: InstanceMethods] -> untyped
 
     INTERNAL_VARIABLES: Hash[Symbol, untyped]
