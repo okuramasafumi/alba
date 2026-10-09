@@ -21,6 +21,10 @@ Gem::Specification.new do |spec|
   }
 
   spec.files         = `git ls-files -- lib/*`.split("\n")
+  # Ship the signatures so RBS tools load them. `sig/external.rbs` stubs Rails and ActiveSupport APIs for
+  # Alba's own type check and would clash with an application's real signatures for them, and
+  # `sig/alba/railtie.rbs` needs `Rails::Railtie`, so neither is packaged.
+  spec.files         += `git ls-files -- sig/*`.split("\n") - %w[sig/external.rbs sig/alba/railtie.rbs]
   spec.files         += %w[README.md LICENSE.txt CHANGELOG.md]
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
