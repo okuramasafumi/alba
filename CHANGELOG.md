@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Ship the RBS signatures in the gem so applications can load them [#575](https://github.com/okuramasafumi/alba/pull/575)
+
 ## 4.0.0 2026-08-28
 
 ### Changed
