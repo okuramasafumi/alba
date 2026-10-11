@@ -10,7 +10,7 @@ module Alba
   type resource_class = _ResourceClass
   type with_type = :inference | Class | ^(untyped) -> resource_class
   type within = generic_hash | Array[Symbol | String] | Symbol | bool | nil | Object
-  type serializable_hash_type = generic_hash | Array[generic_hash] | Hash[key_type, generic_hash] | Hash[root_key_type, Array[generic_hash]]
+  type serializable_hash_type = generic_hash | Array[generic_hash] | Hash[root_key_type, generic_hash] | Hash[root_key_type, Array[generic_hash]]
 
   interface _ResourceClass
     include Resource::_ClassMethods

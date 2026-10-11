@@ -65,7 +65,7 @@ module Alba
       def serialize_with: (untyped) -> String
       def hash_with_metadata: (generic_hash, generic_hash) -> generic_hash
       def _metadata: (Proc?, generic_hash) -> generic_hash
-      def serializable_hash_for_collection: () -> (Array[generic_hash] | Hash[root_key_type, Array[generic_hash]])
+      def serializable_hash_for_collection: () -> (Array[generic_hash] | Hash[root_key_type, generic_hash])
       def fetch_key: () -> root_key_type
       def _key_for_collection: () -> root_key_type
       def _key: () -> root_key_type
