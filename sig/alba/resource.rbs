@@ -7,48 +7,49 @@ module Alba
     WITHIN_DEFAULT: Object
     EMPTY_HASH: generic_hash
 
-    def self.included: (Class) -> untyped
+    def self.included: (Class) -> void
 
     interface _InstanceMethods
+      def nil?: () -> bool
       def object: () -> untyped
       def params: () -> generic_hash
       def serialize: (?root_key: root_key_type, ?meta: generic_hash) -> String
       def to_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> String
-      def as_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> untyped
-      def serializable_hash: () -> untyped
+      def as_json: (?generic_hash, ?root_key: root_key_type, ?meta: generic_hash) -> serializable_hash_type
+      def serializable_hash: () -> serializable_hash_type
       alias to_h serializable_hash
     end
 
     interface _ClassMethods
-      def method_added: (Symbol) -> untyped
-      def inherited: (Class) -> untyped
-      def attributes: (*(Symbol | String), ?if: instance_proc | Symbol | nil, **untyped) -> untyped
-      def assign_attributes: (Array[Symbol | String], instance_proc | Symbol | nil) -> untyped
-      def assign_attributes_with_types: (Hash[Symbol | String, untyped], instance_proc | Symbol | nil) ?{ (untyped) [self: InstanceMethods] -> untyped } -> untyped
-      def attribute: (?Symbol | String | nil, ?if: instance_proc | Symbol | nil, **untyped) ?{ (untyped) [self: InstanceMethods] -> untyped } -> untyped
-      def association: (Symbol | String, ?instance_proc?, ?resource: untyped, ?serializer: untyped, ?source: Proc?, ?key: key_type, ?with_traits: Symbol | Array[Symbol] | nil, ?params: generic_hash, **untyped) ?{ () [self: singleton(Resource)] -> void } -> untyped
+      def method_added: (Symbol) -> void
+      def inherited: (Class) -> void
+      def attributes: (*(Symbol | String), ?if: instance_proc | Symbol | nil, **untyped) -> void
+      def assign_attributes: (Array[Symbol | String], instance_proc | Symbol | nil) -> void
+      def assign_attributes_with_types: (Hash[Symbol | String, untyped], instance_proc | Symbol | nil) ?{ (untyped) [self: InstanceMethods] -> untyped } -> void
+      def attribute: (?Symbol | String | nil, ?if: instance_proc | Symbol | nil, **untyped) ?{ (untyped) [self: InstanceMethods] -> untyped } -> void
+      def association: (Symbol | String, ?instance_proc?, ?resource: (Class | Proc | String | Symbol)?, ?serializer: (Class | Proc | String | Symbol)?, ?source: Proc?, ?key: key_type, ?with_traits: Symbol | Array[Symbol] | nil, ?params: generic_hash, **untyped) ?{ () [self: singleton(Resource)] -> void } -> (Alba::Association | Alba::ConditionalAttribute)
       alias one association
       alias many association
       alias has_one association
       alias has_many association
       def nesting: () -> String?
-      def nested_attribute: (Symbol | String, **untyped) ?{ () [self: singleton(Resource)] -> void } -> untyped
+      def nested_attribute: (Symbol | String, **untyped) ?{ () [self: singleton(Resource)] -> void } -> (Alba::ConditionalAttribute | Alba::NestedAttribute)
       alias nested nested_attribute
-      def trait: (Symbol | String) ?{ () [self: singleton(Resource)] -> void } -> untyped
-      def root_key: (Symbol | String, ?Symbol | String | nil) -> untyped
-      def root_key_for_collection: (Symbol | String) -> untyped
-      def root_key!: () -> untyped
-      def meta: (?Symbol) ?{ () [self: InstanceMethods] -> generic_hash } -> untyped
-      def layout: (?file: String?, ?inline: Proc?) -> untyped
-      def transform_keys: (Symbol | String, ?root: bool, ?cascade: bool) -> untyped
+      def trait: (Symbol | String) ?{ () [self: singleton(Resource)] -> void } -> Proc
+      def root_key: (Symbol | String, ?Symbol | String | nil) -> Symbol?
+      def root_key_for_collection: (Symbol | String) -> Symbol
+      def root_key!: () -> class_key_type
+      def meta: (?Symbol?) ?{ () [self: InstanceMethods] -> generic_hash } -> [Symbol?, Proc?]
+      def layout: (?file: String?, ?inline: Proc?) -> Alba::Layout
+      def transform_keys: (Symbol | String, ?root: bool, ?cascade: bool) -> bool
       def transform_keys!: (Symbol | String) -> untyped
-      def collection_key: (Symbol | String) -> untyped
-      def on_error: (?Symbol?) ?{ (*untyped) [self: InstanceMethods] -> untyped } -> untyped
-      def validated_error_handler: (untyped) -> Symbol
-      def on_nil: () ?{ (*untyped) [self: InstanceMethods] -> untyped } -> untyped
-      def helper: (?Module) ?{ (*untyped) [self: singleton(Resource)] -> untyped } -> untyped
-      def prefer_resource_method!: () -> untyped
-      def prefer_object_method!: () -> untyped
+      def collection_key: (Symbol | String) -> Symbol
+      def on_error: (?( :raise | :ignore | :nullify | nil) handler) ?{ (*untyped) [self: InstanceMethods] -> untyped } -> (Proc | :raise | :ignore | :nullify)?
+      def validated_error_handler: ((:raise | :ignore | :nullify | nil) handler) -> (:raise | :ignore | :nullify)?
+      def on_nil: () ?{ (*untyped) [self: InstanceMethods] -> untyped } -> Proc?
+      def helper: (?Module) ?{ (*untyped) [self: singleton(Resource)] -> untyped } -> Module
+      def prefer_resource_method!: () -> Symbol
+      def prefer_object_method!: () -> Symbol
     end
 
     module InstanceMethods
@@ -57,32 +58,32 @@ module Alba
       @within: untyped
       @with_traits: Symbol | Array[Symbol] | nil
 
-      def initialize: (untyped, ?params: generic_hash, ?within: untyped, ?with_traits: Symbol | Array[Symbol] | nil) -> void
+      def initialize: (untyped, ?params: generic_hash, ?within: within, ?with_traits: Symbol | Array[Symbol] | nil) -> void
       include _InstanceMethods
 
-      def hash_from_traits: (untyped) -> untyped
+      def hash_from_traits: (untyped) -> generic_hash
       def serialize_with: (untyped) -> String
-      def hash_with_metadata: (untyped, generic_hash) -> untyped
-      def _metadata: (untyped, generic_hash) -> generic_hash
-      def serializable_hash_for_collection: () -> untyped
+      def hash_with_metadata: (generic_hash, generic_hash) -> generic_hash
+      def _metadata: (Proc?, generic_hash) -> generic_hash
+      def serializable_hash_for_collection: () -> (Array[generic_hash] | Hash[root_key_type, Array[generic_hash]])
       def fetch_key: () -> root_key_type
       def _key_for_collection: () -> root_key_type
       def _key: () -> root_key_type
       def resource_name: (?pluralized: bool) -> String
       def transforming_root_key?: () -> bool
       def attributes_to_hash: (untyped, generic_hash) -> generic_hash
-      def select: (untyped, untyped, untyped) -> bool
-      def set_key_and_attribute_body_from: (untyped, untyped, attribute, generic_hash) -> untyped
-      def do_select: (untyped, untyped, untyped) -> bool
-      def handle_error: (StandardError, untyped, Symbol | String, attribute, generic_hash) -> untyped
-      def transform_key: (untyped) -> untyped
-      def fetch_attribute: (untyped, untyped, attribute) -> untyped
+      def select: (key_type, untyped, attribute) -> bool
+      def set_key_and_attribute_body_from: (untyped, untyped, attribute, generic_hash) -> void
+      def do_select: (key_type, untyped, attribute) -> bool
+      def handle_error: (StandardError, untyped, Symbol | String, attribute, generic_hash) -> void
+      def transform_key: (Symbol | String | nil) -> untyped
+      def fetch_attribute: (untyped, key_type, attribute) -> untyped
       def fetch_attribute_from_object_and_resource: (untyped, Symbol) -> untyped
       def _fetch_attribute_from_object_first: (untyped, Symbol) -> untyped
       def _fetch_attribute_from_resource_first: (untyped, Symbol) -> untyped
-      def nil_handler: () -> untyped
-      def yield_if_within: (Symbol) { (untyped) -> untyped } -> untyped
-      def check_within: (Symbol) -> untyped
+      def nil_handler: () -> Proc?
+      def yield_if_within: (Symbol) { (within) -> untyped } -> untyped
+      def check_within: (Symbol) -> within
       def _setup: () -> void
 
       # These methods are available on the eventual resource instance. Declaring
@@ -97,15 +98,15 @@ module Alba
 
     interface _ClassContext
       def alias_method: (Symbol, Symbol) -> Symbol
-      def private: (*Symbol) -> untyped
+      def private: (*Symbol) -> void
       def instance_method: (Symbol) -> UnboundMethod
-      def include: (*Module) -> untyped
-      def extend: (*Module) -> untyped
+      def include: (*Module) -> self
+      def extend: (*Module) -> self
       def class_eval: [A] () { () [self: untyped] -> A } -> A
       def module_eval: [A] () { () [self: untyped] -> A } -> A
-      def name: () -> untyped
+      def name: () -> String
       def dup: () -> untyped
-      def new: (*untyped, **untyped) -> untyped
+      def new: (*untyped, **untyped) -> Resource::_InstanceMethods
       def _resource_methods: () -> Array[Symbol]
     end
 
@@ -113,12 +114,12 @@ module Alba
       @_attributes: Hash[Symbol | String, attribute]
       @_key: class_key_type
       @_key_for_collection: class_key_type
-      @_meta: untyped
+      @_meta: [Symbol?, Proc?]?
       @_transform_type: transform_type
       @_transforming_root_key: bool
       @_key_transformation_cascade: bool
-      @_on_error: untyped
-      @_on_nil: untyped
+      @_on_error: (Proc | :raise | :ignore | :nullify)?
+      @_on_nil: Proc?
       @_layout: Layout?
       @_collection_key: key_type
       @_helper: Module?
@@ -127,15 +128,15 @@ module Alba
       @_traits: Hash[Symbol, Proc]
 
       def alias_method: (Symbol, Symbol) -> Symbol
-      def private: (*Symbol) -> untyped
+      def private: (*Symbol) -> void
       def instance_method: (Symbol) -> UnboundMethod
-      def include: (*Module) -> untyped
-      def extend: (*Module) -> untyped
+      def include: (*Module) -> self
+      def extend: (*Module) -> self
       def class_eval: [A] () { () [self: untyped] -> A } -> A
       def module_eval: [A] () { () [self: untyped] -> A } -> A
-      def name: () -> untyped
+      def name: () -> String
       def dup: () -> untyped
-      def new: (*untyped, **untyped) -> untyped
+      def new: (*untyped, **untyped) -> Resource::_InstanceMethods
       def _resource_methods: () -> Array[Symbol]
 
       include _ClassMethods

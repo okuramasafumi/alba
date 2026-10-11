@@ -11,14 +11,14 @@ module Alba
     ) -> void
 
     def with_passing_condition: (
-      resource: untyped,
+      resource: Alba::Resource::InstanceMethods,
       ?object: untyped
     ) { (Alba::Resource::attribute) -> untyped } -> untyped
 
     private
 
-    def condition_passes?: (untyped resource, untyped object) -> bool
+    def condition_passes?: (Alba::Resource::InstanceMethods resource, untyped object) -> bool
     def with_two_arity_proc_condition?: () -> bool
-    def second_object: (untyped object, untyped resource) -> untyped
+    def second_object: (untyped object, Alba::Resource::InstanceMethods resource) -> untyped
   end
 end
