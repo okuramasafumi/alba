@@ -24,7 +24,6 @@ target :lib do
     # eventual Class context.
     diagnostics[D::Ruby::FallbackAny] = :information
     diagnostics[D::Ruby::UnannotatedEmptyCollection] = :information
-    diagnostics[D::Ruby::UnexpectedSuper] = :information
     diagnostics[D::Ruby::UnexpectedPositionalArgument] = :information
     diagnostics[D::Ruby::UnexpectedKeywordArgument] = :information
   end
