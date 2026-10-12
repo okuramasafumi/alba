@@ -13,12 +13,12 @@ module Alba
     def self.def_delegators: (Symbol, *Symbol) -> void
 
     def initialize: (
-      file: untyped,
-      inline: untyped
+      file: String?,
+      inline: Proc?
     ) -> void
 
     def serialize: (
-      resource: untyped,
+      resource: Alba::Resource::_InstanceMethods,
       serialized_json: String,
       binding: Binding
     ) -> String
@@ -27,7 +27,7 @@ module Alba
 
     attr_reader serialized_json: String
 
-    def check_and_return: (untyped obj, String message, Class klass) -> untyped
+    def check_and_return: (Object obj, String message, Class klass) -> Object
     def serialize_within_string_layout: (Binding bnd) -> String
     def serialize_within_inline_layout: () -> String
     def encode: (generic_hash hash) -> String

@@ -12,12 +12,12 @@ module Alba
     def initialize: (
       Symbol | String | Class name,
       check: Proc | false,
-      converter: untyped,
+      converter: Proc?,
       ?auto_convert: bool
     ) -> void
     
-    def check: (untyped value) -> bool
-    def convert: (untyped obj) -> untyped
+    def check: (Object value) -> bool
+    def convert: (Object obj) -> untyped
     def auto_convert_with: (Proc converter) -> void
   end
 end
