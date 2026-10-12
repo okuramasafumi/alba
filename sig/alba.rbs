@@ -16,6 +16,7 @@ module Alba
     include Resource::_ClassMethods
 
     def new: (Object? object, ?params: generic_hash, ?within: within, ?with_traits: Symbol | Array[Symbol] | nil) -> Resource::_InstanceMethods
+    def class_eval: () { () [self: singleton(Resource)] -> void } -> void
   end
 
   interface _Inflector
@@ -57,19 +58,19 @@ module Alba
   def self.stringify_keys!: () -> bool
   def self.regularize_key: (root_key_type) -> key_type
   def self.transform_key: (String | Symbol, transform_type: transform_type) -> key_type
-  def self.register_type: (Symbol | Class, ?check: (Proc | false), ?converter: Proc?, ?auto_convert: bool) -> Alba::Type
+  def self.register_type: (Symbol | Class, ?check: Alba::Type::check, ?converter: Alba::Type::converter, ?auto_convert: bool) -> void
   def self.find_type: (Symbol | Class) -> Type
   def self.reset!: () -> void
-  def self.resource_for: (untyped object, ?params: generic_hash, ?with: with_type) -> Resource::_InstanceMethods
-                       | (untyped object, ?params: generic_hash, ?with: with_type) { () [self: singleton(Resource)] -> void } -> Resource::_InstanceMethods
+  def self.resource_for: (untyped, ?params: generic_hash, ?with: with_type) -> Resource::_InstanceMethods
+                       | (untyped, ?params: generic_hash, ?with: with_type) ?{ () [self: singleton(Resource)] -> void } -> untyped
 
-  def self._resource_for: (untyped object, ?params: generic_hash, ?with: with_type) ?{ () [self: singleton(Resource)] -> void } -> Resource::_InstanceMethods
+  def self._resource_for: (untyped, ?params: generic_hash, ?with: with_type) ?{ () [self: singleton(Resource)] -> void } -> Resource::_InstanceMethods
   def self.inflector_from: (:default | :active_support | :dry | _Inflector | nil) -> inflector_type
   def self.set_encoder_from_backend: () -> encoder_type
   def self.try_oj: (mode: Symbol) -> encoder_type
   def self.try_active_support: () -> encoder_type
   def self.default_encoder: () -> encoder_type
-  def self.hashify_collection: (Enumerable[untyped], with_type, root_key_type) ?{ () -> void } -> (Array[serializable_hash_type] | Hash[root_key_type, Array[serializable_hash_type]])
+  def self.hashify_collection: (Enumerable[untyped], with_type, root_key_type) ?{ () [self: singleton(Resource)] -> void } -> (Array[serializable_hash_type] | Hash[root_key_type, Array[serializable_hash_type]])
   def self.validate_inflector: (_Inflector) -> _Inflector
   def self.reset_transform_keys: () -> Hash[transform_type, Hash[String | Symbol, key_type]]
   def self.resolved_default_superclass: () -> untyped

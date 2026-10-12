@@ -10,7 +10,7 @@ module Alba
     def initialize: (
       klass: untyped,
       ?key_transformation: Alba::transform_type
-    ) { () -> void } -> void
+    ) { () [self: singleton(Alba::Resource)] -> void } -> void
 
     def value: (
       object: untyped,

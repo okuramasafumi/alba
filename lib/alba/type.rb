@@ -32,7 +32,7 @@ module Alba
     #
     # @param obj [Object] object to convert
     def convert(obj)
-      @auto_convert ? @converter.call(obj) : raise(TypeError)
+      @auto_convert && @converter ? @converter.call(obj) : raise(TypeError) # steep:ignore
     end
 
     # Enable auto convert with given converter

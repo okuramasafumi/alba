@@ -112,12 +112,12 @@ module Alba
     # @param block [Block] resource body
     # @return [Class<Alba::Resource>] resource class
     def resource_class(helper: nil, key_transformation: :none, &block)
-      klass = Class.new(resolved_default_superclass)
+      klass = Class.new(resolved_default_superclass) # : Class & Alba::resource_class
       klass.include(Alba::Resource)
       klass.helper(helper) if helper
       klass.transform_keys(key_transformation)
       klass.class_eval(&block) if block
-      klass # : Class & Alba::resource_class
+      klass
     end
 
     # @param name [String, Symbol] a name Alba infers resource name with
@@ -324,7 +324,7 @@ module Alba
 
     def register_default_types # rubocop:disable Metrics/AbcSize
       [String, :String].each do |t|
-        register_type(t, check: ->(obj) { obj.is_a?(String) }, converter: lambda(&:to_s))
+        register_type(t, check: ->(obj) { obj.is_a?(String) }, converter: lambda(&:to_s)) # steep:ignore
       end
       [Integer, :Integer].each do |t|
         register_type(t, check: ->(obj) { obj.is_a?(Integer) }, converter: ->(obj) { Integer(obj) })

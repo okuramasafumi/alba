@@ -1,23 +1,26 @@
 module Alba
   # Representing type itself, combined with TypedAttribute
   class Type
+    type converter = nil | ^(untyped) [self: Type] -> untyped
+    type check = bool | ^(untyped) [self: Type] -> bool
+
     attr_reader name: Symbol | String | Class
     attr_writer auto_convert: bool
-    
+
     @name: Symbol | String | Class
     @check: untyped
-    @converter: untyped
+    @converter: converter
     @auto_convert: bool
-    
+
     def initialize: (
       Symbol | String | Class name,
-      check: Proc | false,
-      converter: Proc?,
+      check: check,
+      converter: converter,
       ?auto_convert: bool
     ) -> void
-    
+
     def check: (Object value) -> bool
     def convert: (Object obj) -> untyped
-    def auto_convert_with: (Proc converter) -> void
+    def auto_convert_with: (converter converter) -> void
   end
 end

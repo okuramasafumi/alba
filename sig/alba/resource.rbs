@@ -2,6 +2,7 @@ module Alba
   module Resource
     type attribute = String | Symbol | ^(untyped) [self: ::Alba::Resource::InstanceMethods] -> untyped | ConditionalAttribute | NestedAttribute | TypedAttribute | Association
     type instance_proc = ^(*untyped) [self: InstanceMethods] -> untyped
+    type metadata_proc = ^() [self: InstanceMethods] -> generic_hash
 
     INTERNAL_VARIABLES: Hash[Symbol, untyped]
     WITHIN_DEFAULT: Object
@@ -39,15 +40,15 @@ module Alba
       def root_key: (Symbol | String, ?Symbol | String | nil) -> Symbol?
       def root_key_for_collection: (Symbol | String) -> Symbol
       def root_key!: () -> class_key_type
-      def meta: (?Symbol?) ?{ () [self: InstanceMethods] -> generic_hash } -> [Symbol?, Proc?]
+      def meta: (?Symbol?) ?{ () [self: InstanceMethods] -> generic_hash } -> [Symbol?, metadata_proc?]
       def layout: (?file: String?, ?inline: Proc?) -> Alba::Layout
       def transform_keys: (Symbol | String, ?root: bool, ?cascade: bool) -> bool
       def transform_keys!: (Symbol | String) -> untyped
       def collection_key: (Symbol | String) -> Symbol
       def on_error: (?( :raise | :ignore | :nullify | nil) handler) ?{ (*untyped) [self: InstanceMethods] -> untyped } -> (Proc | :raise | :ignore | :nullify)?
       def validated_error_handler: ((:raise | :ignore | :nullify | nil) handler) -> (:raise | :ignore | :nullify)?
-      def on_nil: () ?{ (*untyped) [self: InstanceMethods] -> untyped } -> Proc?
-      def helper: (?Module) ?{ (*untyped) [self: singleton(Resource)] -> untyped } -> Module
+      def on_nil: () ?{ (*untyped) [self: InstanceMethods] -> untyped } -> instance_proc?
+      def helper: (?Module) ?{ (Module) [self: Module] -> untyped } -> Module
       def prefer_resource_method!: () -> Symbol
       def prefer_object_method!: () -> Symbol
     end
@@ -64,7 +65,7 @@ module Alba
       def hash_from_traits: (untyped) -> generic_hash
       def serialize_with: (untyped) -> String
       def hash_with_metadata: (generic_hash, generic_hash) -> generic_hash
-      def _metadata: (Proc?, generic_hash) -> generic_hash
+      def _metadata: (metadata_proc?, generic_hash) -> generic_hash
       def serializable_hash_for_collection: () -> (Array[generic_hash] | Hash[root_key_type, generic_hash])
       def fetch_key: () -> root_key_type
       def _key_for_collection: () -> root_key_type
@@ -81,7 +82,7 @@ module Alba
       def fetch_attribute_from_object_and_resource: (untyped, Symbol) -> untyped
       def _fetch_attribute_from_object_first: (untyped, Symbol) -> untyped
       def _fetch_attribute_from_resource_first: (untyped, Symbol) -> untyped
-      def nil_handler: () -> Proc?
+      def nil_handler: () -> instance_proc?
       def yield_if_within: (Symbol) { (within) -> untyped } -> untyped
       def check_within: (Symbol) -> within
       def _setup: () -> void
@@ -90,7 +91,8 @@ module Alba
       # them here models the module's inclusion context for Steep.
       def class: () -> Class
       def instance_eval: [A] () { () [self: self] -> A } -> A
-      def instance_exec: [A] (*untyped) { (*untyped) [self: self] -> A } -> A
+      def instance_exec: [A] (untyped) { (untyped) [self: self] -> A } -> A
+                       | [A] (*untyped) { (*untyped) [self: self] -> A } -> A
       def __send__: (Symbol, *untyped) -> untyped
       def binding: () -> Binding
       def encode: (untyped) -> String
@@ -114,12 +116,12 @@ module Alba
       @_attributes: Hash[Symbol | String, attribute]
       @_key: class_key_type
       @_key_for_collection: class_key_type
-      @_meta: [Symbol?, Proc?]?
+      @_meta: [Symbol?, metadata_proc?]?
       @_transform_type: transform_type
       @_transforming_root_key: bool
       @_key_transformation_cascade: bool
       @_on_error: (Proc | :raise | :ignore | :nullify)?
-      @_on_nil: Proc?
+      @_on_nil: instance_proc?
       @_layout: Layout?
       @_collection_key: key_type
       @_helper: Module?
