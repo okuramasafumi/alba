@@ -106,7 +106,7 @@ module Alba
       def extend: (*Module) -> self
       def class_eval: [A] () { () [self: untyped] -> A } -> A
       def module_eval: [A] () { () [self: untyped] -> A } -> A
-      def name: () -> String
+      def name: () -> String?
       def dup: () -> untyped
       def new: (*untyped, **untyped) -> Resource::_InstanceMethods
       def _resource_methods: () -> Array[Symbol]
@@ -136,7 +136,7 @@ module Alba
       def extend: (*Module) -> self
       def class_eval: [A] () { () [self: untyped] -> A } -> A
       def module_eval: [A] () { () [self: untyped] -> A } -> A
-      def name: () -> String
+      def name: () -> String?
       def dup: () -> untyped
       def new: (*untyped, **untyped) -> Resource::_InstanceMethods
       def _resource_methods: () -> Array[Symbol]

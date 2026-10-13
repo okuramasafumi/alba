@@ -418,11 +418,10 @@ module Alba
       alias has_many association
 
       def nesting
-        if name.nil?
-          nil
-        else
-          name.rpartition('::').first.then { |n| n.empty? ? nil : n }
-        end
+        class_name = name
+        return if class_name.nil?
+
+        class_name.rpartition('::').first.then { |n| n.empty? ? nil : n }
       end
       private :nesting
 
