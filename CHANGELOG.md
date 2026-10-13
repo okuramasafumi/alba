@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Raise `Alba::Error` instead of `NoMethodError` when `root_key!` or `root_key_for_collection!` is used on an anonymous resource class
+- Raise `Alba::Error` instead of `NoMethodError` when `root_key!` is used on an anonymous resource class
 
 ## 4.0.0 2026-08-28
 
