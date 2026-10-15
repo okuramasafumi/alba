@@ -182,6 +182,8 @@ module Alba
         raise Alba::Error, 'You must set inflector when setting root key as true.' unless inflector
 
         class_name = self.class.name
+        raise Alba::Error, 'An anonymous resource class has no name to derive a root key from. Set the key explicitly.' unless class_name
+
         suffix = class_name.end_with?('Resource') ? 'Resource' : 'Serializer'
         name = inflector.demodulize(class_name).delete_suffix(suffix)
         underscore_name = inflector.underscore(name)
