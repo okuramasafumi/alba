@@ -1,0 +1,26 @@
+#!/bin/sh
+set -eu
+
+cd "$(dirname "$0")/../benchmark"
+
+target=${1-collection}
+if [ "$#" -gt 0 ]; then
+  shift
+fi
+
+case "$target" in
+  ''|*[!a-zA-Z0-9_-]*)
+    printf 'Invalid benchmark name: %s\nUse a script name without the .rb extension, such as collection.\n' "$target" >&2
+    exit 1
+    ;;
+esac
+
+if [ ! -f "./$target.rb" ]; then
+  printf 'Unknown benchmark: %s (benchmark/%s.rb does not exist)\n' "$target" "$target" >&2
+  exit 1
+fi
+
+export BUNDLE_GEMFILE="$PWD/Gemfile"
+
+bundle check || bundle install
+exec bundle exec ruby "./$target.rb" "$@"
