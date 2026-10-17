@@ -6,13 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 4.0.1 2026-10-17
+
 ### Added
 
 - Ship the RBS signatures in the gem so applications can load them [#575](https://github.com/okuramasafumi/alba/pull/575)
 
+### Changed
+
+- Improve RBS signatures for resource classes, serialization results, callbacks, inflectors, and custom types [#576](https://github.com/okuramasafumi/alba/pull/576)
+- Correct RBS signatures to allow anonymous resource classes to have no name [#579](https://github.com/okuramasafumi/alba/pull/579)
+- Rename the `Alba::Association.new` keyword argument `condition:` to `modifier:` to clarify its purpose
+
 ### Fixed
 
-- Raise `Alba::Error` instead of `NoMethodError` when `root_key!` is used on an anonymous resource class
+- Raise `TypeError` instead of `NoMethodError` when automatic type conversion is enabled without a converter
+- Raise `Alba::Error` instead of `NoMethodError` when `root_key!` is used on an anonymous resource class [#580](https://github.com/okuramasafumi/alba/pull/580)
 
 ## 4.0.0 2026-08-28
 
