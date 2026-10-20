@@ -9,3 +9,5 @@
 
 Gemfile.lock
 /gemfiles/*.lock
+
+/.gem_rbs_collection/

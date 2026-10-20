@@ -1,0 +1,28 @@
+---
+path: ".gem_rbs_collection"
+gems:
+- name: fileutils
+  version: '0'
+  source:
+    type: stdlib
+- name: minitest
+  version: '5.25'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: 979bfa4404f6f623023e36ce83cc3091581a715d
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
+- name: prism
+  version: 1.9.0
+  source:
+    type: rubygems
+- name: rake
+  version: '13.0'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: 979bfa4404f6f623023e36ce83cc3091581a715d
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
+gemfile_lock_path: Gemfile.lock

@@ -57,4 +57,5 @@ jobs:
         bundler-cache: true
     - name: Run type check
       run: |
+        bundle exec rbs collection install
         bundle exec rake typecheck
