@@ -44,16 +44,12 @@ jobs:
 
   typecheck:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        ruby: [3.4]
     steps:
     - uses: actions/checkout@v7.0.1
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: ${{ matrix.ruby }}
+        ruby-version: '4.0'
         bundler-cache: true
     - name: Run type check
       run: |
