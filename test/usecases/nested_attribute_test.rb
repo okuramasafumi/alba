@@ -201,4 +201,37 @@ class NestedAttributeTest < Minitest::Test
       Bar6Resource.new(Bar.new('foo')).serialize
     )
   end
+
+  def test_nested_attribute_block_is_evaluated_once_however_many_objects_are_serialized
+    evaluations = 0
+    resource_class = Class.new do
+      include Alba::Resource
+
+      nested_attribute :na do
+        evaluations += 1
+        attributes :some_value
+      end
+    end
+    bars = [Bar.new('foo'), Bar.new('bar'), Bar.new('baz')]
+
+    assert_equal(
+      '[{"na":{"some_value":"foo"}},{"na":{"some_value":"bar"}},{"na":{"some_value":"baz"}}]',
+      resource_class.new(bars).serialize
+    )
+    assert_equal 1, evaluations
+  end
+
+  def test_nested_attribute_block_is_reevaluated_when_key_transformation_changes
+    resource_class = Class.new do
+      include Alba::Resource
+
+      nested_attribute :na do
+        attributes :some_value
+      end
+    end
+    bar = Bar.new('foo')
+
+    assert_equal '{"na":{"some_value":"foo"}}', resource_class.new(bar).serialize
+    assert_equal '{"Na":{"SomeValue":"foo"}}', resource_class.transform_keys!(:camel).new(bar).serialize
+  end
 end

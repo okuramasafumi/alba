@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Memoize nested attribute classes [#552](https://github.com/okuramasafumi/alba/pull/552)
+  - Thank you, @marekls
+
 ## 4.0.1 2026-10-17
 
 ### Added
