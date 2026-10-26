@@ -4,21 +4,38 @@ This directory contains a few different benchmark scripts.
 
 ## How to run
 
-```
-bundle install
+From the project root, run `bin/benchmark`. It checks the benchmark bundle and
+installs missing dependencies before running the selected script (`collection.rb`
+by default). Your shell stays in the project root; the launcher changes directory
+only in its own process.
 
+```sh
 # with `Oj.optimize_rails` and without YJIT
-NO_YJIT=1 bundle exec ruby collection.rb
+NO_YJIT=1 bin/benchmark
 
 # without `Oj.optimize_rails` and without YJIT
-NO_YJIT=1 NO_OJ_OPTIMIZE_RAILS=1 bundle exec ruby collection.rb
+NO_YJIT=1 NO_OJ_OPTIMIZE_RAILS=1 bin/benchmark
 
 # with `Oj.optimize_rails` and YJIT
-bundle exec ruby collection.rb
+bin/benchmark
 
 # without `Oj.optimize_rails` and with YJIT
-NO_OJ_OPTIMIZE_RAILS=1 bundle exec ruby collection.rb
+NO_OJ_OPTIMIZE_RAILS=1 bin/benchmark
 ```
+
+To select another script, pass its name without the `.rb` extension:
+
+```sh
+bin/benchmark collection
+bin/benchmark single_resource
+```
+
+Adding `benchmark/new_case.rb` makes it available as `bin/benchmark new_case`.
+Any arguments after the script name are forwarded to that script. Invalid names
+and missing scripts fail before dependency installation.
+
+You can still run individual scripts from this directory with `bundle install`
+and `bundle exec ruby collection.rb` (or `single_resource.rb`).
 
 ## Result
 

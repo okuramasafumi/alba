@@ -51,13 +51,11 @@ module Alba
       # @param within [Alba::WITHIN_DEFAULT, Hash, Array, nil, false, true]
       #   determines what associations to be serialized. If not set, it serializes all associations.
       # @param with_traits [Symbol, Array<Symbol>, nil] specified traits
-      # @param select [Method] DEPRECATED noop
-      def initialize(object, params: EMPTY_HASH, within: WITHIN_DEFAULT, with_traits: nil, select: nil)
+      def initialize(object, params: EMPTY_HASH, within: WITHIN_DEFAULT, with_traits: nil)
         @object = object
         @params = params
         @within = within
         @with_traits = with_traits
-        warn '`select` keyword for Alba::Resource is deprecated', category: :deprecated, uplevel: 1 if select
         _setup
       end
 
@@ -127,10 +125,6 @@ module Alba
         end
       end
 
-      def deprecated_serializable_hash
-        Alba.collection?(@object) ? serializable_hash_for_collection : converter.call(@object)
-      end
-
       def serialize_with(hash)
         serialized_json = encode(hash)
         return serialized_json unless @_layout
@@ -167,18 +161,6 @@ module Alba
         end
       end
 
-      def deprecated_serializable_hash_for_collection
-        if @_collection_key
-          @object.to_h do |item|
-            k = item.public_send(@_collection_key)
-            key = Alba.regularize_key(k)
-            [key, converter.call(item)]
-          end
-        else
-          @object.each_with_object([], &collection_converter)
-        end
-      end
-
       # @return [String]
       def fetch_key
         k = Alba.collection?(@object) ? _key_for_collection : _key
@@ -200,6 +182,8 @@ module Alba
         raise Alba::Error, 'You must set inflector when setting root key as true.' unless inflector
 
         class_name = self.class.name
+        raise Alba::Error, 'An anonymous resource class has no name to derive a root key from. Set the key explicitly.' unless class_name
+
         suffix = class_name.end_with?('Resource') ? 'Resource' : 'Serializer'
         name = inflector.demodulize(class_name).delete_suffix(suffix)
         underscore_name = inflector.underscore(name)
@@ -210,23 +194,8 @@ module Alba
         @_transforming_root_key
       end
 
-      def converter
-        lambda do |obj|
-          attributes_to_hash(obj, {})
-        end
-      end
-
-      def collection_converter
-        lambda do |obj, a|
-          a << {}
-          h = a.last
-          attributes_to_hash(obj, h)
-          a
-        end
-      end
-
       def attributes_to_hash(obj, hash)
-        attributes.each do |key, attribute|
+        @_attributes.each do |key, attribute|
           set_key_and_attribute_body_from(obj, key, attribute, hash)
         rescue ::Alba::Error, FrozenError, TypeError
           raise
@@ -234,14 +203,6 @@ module Alba
           handle_error(e, obj, key, attribute, hash)
         end
         @with_traits.nil? ? hash : hash.merge!(hash_from_traits(obj))
-      end
-
-      # This is default behavior for getting attributes for serialization
-      # Override this method to filter certain attributes
-      #
-      # @deprecated in favor of `select`
-      def attributes
-        @_attributes
       end
 
       # Default implementation for selecting attributes
@@ -299,7 +260,7 @@ module Alba
                 else raise ::Alba::Error, "Unsupported type of attribute: #{attribute.class}"
                   # :nocov:
                 end
-        value.nil? && nil_handler ? instance_exec(obj, key, attribute, &nil_handler) : value
+        nil_handler && value.nil? ? instance_exec(obj, key, attribute, &nil_handler) : value # steep:ignore
       end
 
       def fetch_attribute_from_object_and_resource(obj, attribute)
@@ -353,16 +314,8 @@ module Alba
       attr_reader(*INTERNAL_VARIABLES.keys)
 
       # This `method_added` is used for defining "resource methods"
-      def method_added(method_name) # rubocop:disable Metrics/MethodLength
+      def method_added(method_name)
         case method_name
-        when :collection_converter, :converter
-          warn "Defining ##{method_name} methods is deprecated", category: :deprecated, uplevel: 1
-          alias_method :serializable_hash_for_collection, :deprecated_serializable_hash_for_collection
-          private(:serializable_hash_for_collection)
-          alias_method :serializable_hash, :deprecated_serializable_hash
-          alias_method :to_h, :deprecated_serializable_hash
-        when :attributes
-          warn 'Overriding `attributes` is deprecated, use `select` instead.', category: :deprecated, uplevel: 1
         when :select
           @_select_arity = instance_method(:select).arity
         when :_setup # noop
@@ -437,7 +390,7 @@ module Alba
       # Set association
       #
       # @param name [String, Symbol] name of the association, used as key when `key` param doesn't exist
-      # @param condition [Proc, nil] a Proc to modify the association
+      # @param modifier [Proc, nil] a Proc to modify the association
       # @param resource [Class<Alba::Resource>, String, Proc, nil] representing resource for this association
       # @param serializer [Class<Alba::Resource>, String, Proc, nil] alias for `resource`
       # @param source [Proc, nil] a Proc to customize the association source
@@ -451,11 +404,11 @@ module Alba
       # @param block [Block]
       # @return [void]
       # @see Alba::Association#initialize
-      def association(name, condition = nil, resource: nil, serializer: nil, source: nil, key: nil, with_traits: nil, params: EMPTY_HASH, **options, &block)
+      def association(name, modifier = nil, resource: nil, serializer: nil, source: nil, key: nil, with_traits: nil, params: EMPTY_HASH, **options, &block)
         resource ||= serializer
         transformation = @_key_transformation_cascade ? @_transform_type : :none
         assoc = Association.new(
-          name: name, condition: condition, resource: resource, source: source, with_traits: with_traits,
+          name: name, modifier: modifier, resource: resource, source: source, with_traits: with_traits,
           params: params, nesting: nesting, key_transformation: transformation, helper: @_helper,
           &block
         )
@@ -467,11 +420,10 @@ module Alba
       alias has_many association
 
       def nesting
-        if name.nil?
-          nil
-        else
-          name.rpartition('::').first.then { |n| n.empty? ? nil : n }
-        end
+        class_name = name
+        return if class_name.nil?
+
+        class_name.rpartition('::').first.then { |n| n.empty? ? nil : n }
       end
       private :nesting
 
@@ -595,7 +547,7 @@ module Alba
       end
 
       # Set error handler
-      # If this is set it's used as a error handler overriding global one
+      # Defaults to raising errors when no handler is set.
       #
       # @param handler [Symbol] `:raise`, `:ignore` or `:nullify`
       # @param block [Block]

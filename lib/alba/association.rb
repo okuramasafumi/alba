@@ -13,7 +13,7 @@ module Alba
     attr_reader :name
 
     # @param name [Symbol, String] name of the method to fetch association
-    # @param condition [Proc, nil] a proc filtering data
+    # @param modifier [Proc, nil] a Proc to modify the association
     # @param resource [Class<Alba::Resource>, Proc, String, Symbol, nil]
     #   a resource class for the association, a proc returning a resource class or a name of the resource
     # @param source [Proc, nil] a proc to specify the source of the association
@@ -25,7 +25,7 @@ module Alba
     # @param block [Block] used to define resource when resource arg is absent
     def initialize(
       name:,
-      condition: nil,
+      modifier: nil,
       resource: nil,
       source: nil,
       with_traits: nil,
@@ -36,14 +36,11 @@ module Alba
       &block
     )
       @name = name
-      @condition = condition
-      @resource = resource
+      @modifier = modifier
+      @resource = resource || resource_from(nesting, key_transformation, block, helper)
       @source = source
       @with_traits = with_traits
       @params = params
-      return if @resource
-
-      assign_resource(nesting, key_transformation, block, helper)
     end
 
     # This is the same API in `NestedAttribute`
@@ -82,7 +79,7 @@ module Alba
           else
             target.is_a?(Hash) ? target.fetch(@name) : target.__send__(@name)
           end
-      o = @condition.call(o, params, target) if @condition
+      o = @modifier.call(o, params, target) if @modifier
       o
     end
 
@@ -99,14 +96,14 @@ module Alba
       end
     end
 
-    def assign_resource(nesting, key_transformation, block, helper)
-      @resource = if block
-                    Alba.resource_class(helper: helper, key_transformation: key_transformation, &block)
-                  elsif Alba.inflector
-                    Alba.infer_resource_class(@name, nesting: nesting)
-                  else
-                    raise ArgumentError, 'When Alba.inflector is nil, either resource or block is required'
-                  end
+    def resource_from(nesting, key_transformation, block, helper)
+      if block
+        Alba.resource_class(helper: helper, key_transformation: key_transformation, &block)
+      elsif Alba.inflector
+        Alba.infer_resource_class(@name, nesting: nesting)
+      else
+        raise ArgumentError, 'When Alba.inflector is nil, either resource or block is required'
+      end
     end
 
     def to_h_with_each_resource(object, within, params)

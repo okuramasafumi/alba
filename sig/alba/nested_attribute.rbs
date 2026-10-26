@@ -9,7 +9,7 @@ module Alba
     def initialize: (
       klass: untyped,
       ?key_transformation: Alba::transform_type
-    ) { () -> void } -> void
+    ) { () [self: singleton(Alba::Resource)] -> void } -> void
 
     def key_transformation=: (Symbol | String) -> (Symbol | String)
 

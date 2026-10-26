@@ -152,4 +152,51 @@ class NilHandlerTest < Minitest::Test
       UserResource2.new(@user3).serialize
     )
   end
+
+  # Lazy-loading proxies (e.g. batch-loader) implement `nil?` with a side effect
+  # that forces the load, so it must be called only when a nil handler is set.
+  class ValueTrackingNilCheck
+    attr_reader :nil_checked
+
+    def initialize
+      @nil_checked = false
+    end
+
+    def nil?
+      @nil_checked = true
+      super
+    end
+  end
+
+  class Item
+    attr_reader :value
+
+    def initialize(value)
+      @value = value
+    end
+  end
+
+  class ItemResource
+    include Alba::Resource
+
+    attributes :value
+  end
+
+  class ItemResourceWithNilHandler < ItemResource
+    on_nil { '' }
+  end
+
+  def test_without_nil_handler_it_does_not_call_nil_predicate_on_attribute_values
+    value = ValueTrackingNilCheck.new
+    ItemResource.new(Item.new(value)).serializable_hash
+
+    refute value.nil_checked
+  end
+
+  def test_with_nil_handler_it_calls_nil_predicate_on_attribute_values
+    value = ValueTrackingNilCheck.new
+    ItemResourceWithNilHandler.new(Item.new(value)).serializable_hash
+
+    assert value.nil_checked
+  end
 end

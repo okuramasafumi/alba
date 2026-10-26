@@ -97,34 +97,6 @@ module Alba
       object.is_a?(Enumerable) && @non_collection_types.none? { |type| object.is_a?(type) }
     end
 
-    # Enable inference for key and resource name
-    #
-    # @param with [Symbol, Class, Module] inflector
-    #   When it's a Symbol, it sets inflector with given name
-    #   When it's a Class or a Module, it sets given object to inflector
-    # @deprecated Use {.inflector=} instead
-    def enable_inference!(with:)
-      Alba::Deprecation.warn('Alba.enable_inference! is deprecated. Use `Alba.inflector=` instead.')
-      @inflector = inflector_from(with)
-      @inferring = true
-    end
-
-    # Disable inference for key and resource name
-    #
-    # @deprecated Use {.inflector=} instead
-    def disable_inference!
-      Alba::Deprecation.warn('Alba.disable_inference! is deprecated. Use `Alba.inflector = nil` instead.')
-      @inferring = false
-      @inflector = nil
-    end
-
-    # @deprecated Use {.inflector} instead
-    # @return [Boolean] whether inference is enabled or not
-    def inferring
-      Alba::Deprecation.warn('Alba.inferring is deprecated. Use `Alba.inflector` instead.')
-      @inferring
-    end
-
     # Set an inflector
     #
     # @param inflector [Symbol, Class, Module] inflector
@@ -140,7 +112,7 @@ module Alba
     # @param block [Block] resource body
     # @return [Class<Alba::Resource>] resource class
     def resource_class(helper: nil, key_transformation: :none, &block)
-      klass = Class.new(resolved_default_superclass)
+      klass = Class.new(resolved_default_superclass) # : Class & Alba::resource_class
       klass.include(Alba::Resource)
       klass.helper(helper) if helper
       klass.transform_keys(key_transformation)
@@ -148,11 +120,11 @@ module Alba
       klass
     end
 
-    # @param name [String] a String Alba infers resource name with
+    # @param name [String, Symbol] a name Alba infers resource name with
     # @param nesting [String, nil] namespace Alba tries to find resource class in
     # @return [Class<Alba::Resource>] resource class
     def infer_resource_class(name, nesting: nil)
-      raise Alba::Error, 'Inference is disabled so Alba cannot infer resource name. Set inflector before use.' unless Alba.inflector
+      raise Alba::Error, 'Inference is disabled so Alba cannot infer resource name. Set inflector before use.' unless inflector
 
       const_parent = nesting.nil? ? Object : Object.const_get(nesting)
       begin
@@ -231,19 +203,11 @@ module Alba
     def reset!
       @encoder = default_encoder
       @symbolize_keys = false
-      @_on_error = :raise
-      @_on_nil = nil
       @types = {}
       @non_collection_types = [Struct, Range, Hash]
       @default_superclass = ::Object
       reset_transform_keys
       register_default_types
-    end
-
-    # @deprecated Use resource_for instead
-    def resource_with(object, with: :inference, &block)
-      Kernel.warn('Alba.resource_with is deprecated. Use `Alba.resource_for` instead.')
-      _resource_for(object, with: with, &block)
     end
 
     # Get a resource object from arguments
@@ -360,7 +324,7 @@ module Alba
 
     def register_default_types # rubocop:disable Metrics/AbcSize
       [String, :String].each do |t|
-        register_type(t, check: ->(obj) { obj.is_a?(String) }, converter: lambda(&:to_s))
+        register_type(t, check: ->(obj) { obj.is_a?(String) }, converter: lambda(&:to_s)) # steep:ignore
       end
       [Integer, :Integer].each do |t|
         register_type(t, check: ->(obj) { obj.is_a?(Integer) }, converter: ->(obj) { Integer(obj) })

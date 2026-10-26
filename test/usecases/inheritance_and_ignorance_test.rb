@@ -20,8 +20,8 @@ class InheritanceAndIgnoranceTest < Minitest::Test
   end
 
   class RestrictedFooResource < GenericFooResource
-    def attributes
-      super.select { |key, _| key.to_sym == :name }
+    def select(key, _value, *)
+      key.to_sym == :name
     end
   end
 

@@ -11,7 +11,7 @@ module Alba
       name: Symbol | String,
       type: Symbol | Class,
       converter: untyped
-    ) ?{ (untyped) -> untyped } -> void
+    ) ?{ (untyped) [self: Alba::Resource::InstanceMethods] -> untyped } -> void
     
     def value: (?object: untyped) { (Symbol | String) -> untyped } -> untyped
     

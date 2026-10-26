@@ -242,7 +242,7 @@ class CircularAssociationTest < Minitest::Test
     end
   end
 
-  # rubocop:disable Style/StringHashKeys
+  # rubocop:disable-next Style/StringHashKeys
   def test_within_for_nested_attributes
     company = Company.new.tap do |c|
       c.id = 42
@@ -317,5 +317,4 @@ class CircularAssociationTest < Minitest::Test
       CompanyResource.new(company, within: {users: :company}).to_h
     )
   end
-  # rubocop:enable Style/StringHashKeys
 end

@@ -38,6 +38,10 @@ class ResourceTest < Minitest::Test
     @foo.bars = [@bar]
   end
 
+  def test_initialize_rejects_removed_select_keyword
+    assert_raises(ArgumentError) { FooResource.new(@foo, select: method(:itself)) }
+  end
+
   def test_as_json
     assert_equal(
       {'foo' => {'id' => 1, 'bar_size' => 1, 'bars' => [{'id' => 1}]}}, # rubocop:disable Style/StringHashKeys
@@ -127,55 +131,5 @@ class ResourceTest < Minitest::Test
       '{"foo":{"id":1,"bar_size":1,"bars":[{"id":1}]}}',
       FooSerializer.new(@foo).to_json
     )
-  end
-
-  class DeprecatedConverterResource
-    include Alba::Resource
-
-    attributes :id
-
-    private
-
-    def converter
-      ->(o) { o }
-    end
-  end
-
-  def test_deprecated_converter
-    assert_equal @foo, DeprecatedConverterResource.new(@foo).as_json
-  end
-
-  class DeprecatedConverterCollectionResource
-    include Alba::Resource
-
-    attributes :id
-
-    private
-
-    def collection_converter
-      lambda do |obj, a|
-        a << obj
-      end
-    end
-  end
-
-  def test_deprecated_collection_converter
-    assert_equal [@foo], DeprecatedConverterCollectionResource.new([@foo]).as_json
-  end
-
-  def test_deprecated_attributes
-    assert_output('', /Overriding `attributes` is deprecated, use `select` instead./) do
-      Class.new do
-        include Alba::Resource
-
-        attributes :id
-
-        private
-
-        def attributes # rubocop:disable Lint/UselessMethodDefinition
-          super
-        end
-      end
-    end
   end
 end

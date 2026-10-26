@@ -5,27 +5,31 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in alba.gemspec
 gemspec
 
+minitest_version, simplecov_version, json_version = RUBY_VERSION >= '3.2.0' ? ['~> 6.0', '~> 1.0', '~> 3.0'] : ['~> 5.14', '~> 0.22.0', '~> 2.0']
 gem 'activesupport', require: false # For backend
 gem 'dry-inflector', require: false # For inflection
 gem 'ffaker', require: false # For testing
-gem 'minitest', '~> 5.14' # For test
+gem 'json', json_version, require: false # Specified here so that version 2 is used for Ruby 3.1
+gem 'minitest', minitest_version # For test
 gem 'pbt', require: false # For property-based testing
 gem 'railties', require: false # For Rails integration testing
 gem 'rake', '~> 13.0' # For test and automation
-gem 'rubocop', '~> 1.88.0', require: false # For lint
+gem 'rubocop', '~> 1.92.0', require: false # For lint
 gem 'rubocop-gem_dev', github: 'okuramasafumi/rubocop-gem_dev', require: false # For lint
 gem 'rubocop-md', '~> 2.0', require: false # For lint
-gem 'rubocop-minitest', '~> 0.39.1', require: false # For lint
-gem 'rubocop-performance', '~> 1.26.0', require: false # For lint
+gem 'rubocop-minitest', '~> 0.41.0', require: false # For lint
+gem 'rubocop-performance', '~> 1.27.0', require: false # For lint
 gem 'rubocop-rake', '~> 0.7.1', require: false # For lint
-gem 'simplecov', '~> 0.22.0', require: false # For test coverage
+gem 'simplecov', simplecov_version, require: false # For test coverage
 gem 'simplecov-cobertura', require: false # For test coverage
 gem 'yard', require: false # For documentation
 
-# Type checking gems (not supported on JRuby)
-group :type do
-  gem 'rbs', '~> 3.0', require: false # For type signatures
-  gem 'steep', '~> 1.10.0', require: false # For type checking
+# Bundler resolves excluded groups too; Steep 2.1 requires Ruby 3.3 or newer.
+if RUBY_VERSION >= '3.3.0'
+  group :type do
+    gem 'rbs', '~> 4.0', require: false # For type signatures
+    gem 'steep', '~> 2.1', require: false # For type checking
+  end
 end
 
 platforms :ruby do
