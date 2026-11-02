@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 4.0.2 2026-11-02
+
+### Fixed
+
+- Remove rbs from the dependencies in sig/manifest.yaml [#587](https://github.com/okuramasafumi/alba/pull/587)
+
 ## 4.0.1 2026-10-17
 
 ### Added
