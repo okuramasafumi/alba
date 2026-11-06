@@ -129,7 +129,7 @@ module Alba
         serialized_json = encode(hash)
         return serialized_json unless @_layout
 
-        @_layout.serialize(resource: self, serialized_json: serialized_json, binding: binding)
+        @_layout.dup.serialize(resource: self, serialized_json: serialized_json, binding: binding)
       end
 
       def hash_with_metadata(hash, meta)
