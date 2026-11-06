@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 4.0.3 2026-11-07
+
+### Fixed
+
+- Multithread bug on inline layout [No PR](https://github.com/okuramasafumi/alba/commit/d20ed9efbf2f99827c12b8a07308e2f5aea6ab6d)
+
 ## 4.0.2 2026-11-02
 
 ### Fixed
