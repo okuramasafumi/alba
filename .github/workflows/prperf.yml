@@ -1,0 +1,23 @@
+name: prperf
+on:
+  push:
+    branches: main
+  pull_request: # compared against the base
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # checkout
+      id-token: write # OIDC upload (no secrets)
+      checks: write # write the Check Run (public repos)
+      pull-requests: write # sticky comment (public repos)
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ruby
+          bundler-cache: true
+      - run: gem install rperf
+      - uses: rperf-dev/prperf-action@v1
+        with:
+          run: bin/rperf

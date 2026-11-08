@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+cd "$(dirname "$0")/../benchmark"
+
+export BUNDLE_GEMFILE="$PWD/Gemfile"
+
+bundle check || bundle install
+rperf exec bundle exec ruby rperf.rb "$@"
