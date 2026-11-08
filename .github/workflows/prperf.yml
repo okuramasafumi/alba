@@ -18,6 +18,9 @@ jobs:
           ruby-version: ruby
           bundler-cache: true
       - run: gem install rperf
+      - run: bundle install --gemfile benchmark/Gemfile
       - uses: rperf-dev/prperf-action@v1
+        env:
+          BUNDLE_GEMFILE: benchmark/Gemfile
         with:
           run: bundle exec ruby benchmark/rperf.rb
