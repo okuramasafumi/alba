@@ -13,6 +13,14 @@ gems:
     revision: 979bfa4404f6f623023e36ce83cc3091581a715d
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
+- name: pp
+  version: '0'
+  source:
+    type: stdlib
+- name: prettyprint
+  version: '0'
+  source:
+    type: stdlib
 - name: prism
   version: 1.9.0
   source:

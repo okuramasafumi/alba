@@ -17,3 +17,6 @@ path: .gem_rbs_collection
 #   # If you want to avoid installing rbs files for gems, you can specify them here.
 #   - name: GEM_NAME
 #     ignore: true
+
+gems:
+  - name: pp
