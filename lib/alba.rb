@@ -173,7 +173,9 @@ module Alba
       else
         # Convert directly to strings once the key mode is fixed.
         def self.regularize_key(key)
-          key&.to_s
+          return if key.nil?
+
+          key.is_a?(Symbol) ? key.name : key.to_s
         end
       end
 
