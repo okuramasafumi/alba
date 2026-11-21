@@ -158,6 +158,29 @@ module Alba
       key.is_a?(Symbol) ? key.name : key.to_s
     end
 
+    # Freeze configuration and specialize key conversion for the configured key mode.
+    # Referenced values, including the inflector, are also frozen, except the default superclass and transformed-key cache.
+    #
+    # @return [Module] self
+    def freeze! # rubocop:disable Metrics/MethodLength
+      return self if frozen?
+
+      if @symbolize_keys
+        # Convert directly to symbols once the key mode is fixed.
+        def self.regularize_key(key)
+          key&.to_sym
+        end
+      else
+        # Convert directly to strings once the key mode is fixed.
+        def self.regularize_key(key)
+          key&.to_s
+        end
+      end
+
+      (instance_variables - %i[@default_superclass @_transformed_keys @inflector]).each { |name| instance_variable_get(name).freeze }
+      freeze
+    end
+
     # Transform a key with given transform_type
     #
     # @param key [String] a target key
@@ -200,6 +223,8 @@ module Alba
 
     # Reset config variables
     # Useful for test cleanup
+    #
+    # @raise [FrozenError] if configuration has been frozen with {.freeze!}
     def reset!
       @encoder = default_encoder
       @symbolize_keys = false
