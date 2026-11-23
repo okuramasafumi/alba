@@ -1,7 +1,8 @@
 name: prperf
 on:
   push:
-    branches: main
+    branches:
+      - "main"
   pull_request: # compared against the base
 jobs:
   bench:
