@@ -72,7 +72,7 @@ class PbtSerializeTest < Minitest::Test
   end
 
   def root_key_arbitrary
-    Pbt.one_of(nil, :record, 'record')
+    Pbt.constant_from(nil, :record, 'record')
   end
 
   def record_case_arbitrary
