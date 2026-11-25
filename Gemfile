@@ -11,7 +11,7 @@ gem 'dry-inflector', require: false # For inflection
 gem 'ffaker', require: false # For testing
 gem 'json', json_version, require: false # Specified here so that version 2 is used for Ruby 3.1
 gem 'minitest', minitest_version # For test
-gem 'pbt', '~> 0.7.0', require: false # For property-based testing
+gem 'pbt', '~> 0.8.0', require: false # For property-based testing
 gem 'railties', require: false # For Rails integration testing
 gem 'rake', '~> 13.0' # For test and automation
 gem 'rubocop', '~> 1.92.0', require: false # For lint
