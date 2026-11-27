@@ -25,7 +25,7 @@ class PbtTypeValidationTest < Minitest::Test
   end
 
   def test_typed_attributes_convert_values_when_auto_conversion_is_enabled
-    Pbt.assert(worker: :none) do
+    Pbt.assert do
       Pbt.property(convertible_record_arbitrary) do |data|
         record = converting_record_from(data)
 
@@ -42,7 +42,7 @@ class PbtTypeValidationTest < Minitest::Test
   end
 
   def test_typed_attributes_preserve_valid_strict_values
-    Pbt.assert(worker: :none) do
+    Pbt.assert do
       Pbt.property(strict_record_arbitrary) do |data|
         record = strict_record_from(data)
 
@@ -60,7 +60,7 @@ class PbtTypeValidationTest < Minitest::Test
   end
 
   def test_typed_attributes_raise_for_invalid_strict_values
-    Pbt.assert(worker: :none) do
+    Pbt.assert do
       Pbt.property(invalid_strict_record_arbitrary) do |data|
         record = strict_record_from(data)
 
@@ -73,9 +73,9 @@ class PbtTypeValidationTest < Minitest::Test
 
   def converting_record_from(data)
     Record.new(
-      id: string_or_integer_from(data.fetch(:id)),
+      id: data.fetch(:id),
       age: data.fetch(:age).to_s,
-      admin: boolean_like_from(data.fetch(:admin))
+      admin: data.fetch(:admin)
     )
   end
 
@@ -109,39 +109,24 @@ class PbtTypeValidationTest < Minitest::Test
     Pbt.fixed_hash(
       id: Pbt.integer(min: -100, max: 100),
       age: Pbt.ascii_string,
-      bio: Pbt.constant(nil),
+      bio: Pbt.nil,
       admin: Pbt.integer(min: -100, max: 100)
     )
   end
 
   def string_or_integer_arbitrary
-    Pbt.fixed_hash(
-      type: Pbt.choose(0..1),
-      string: Pbt.ascii_string,
-      integer: Pbt.integer(min: -100, max: 100)
+    Pbt.one_of(
+      Pbt.ascii_string,
+      Pbt.integer(min: -100, max: 100)
     )
-  end
-
-  def string_or_integer_from(data)
-    data.fetch(:type).zero? ? data.fetch(:string) : data.fetch(:integer)
   end
 
   def boolean_like_arbitrary
-    Pbt.fixed_hash(
-      type: Pbt.choose(0..3),
-      boolean: Pbt.boolean,
-      integer: Pbt.integer(min: -100, max: 100),
-      string: Pbt.ascii_string
+    Pbt.one_of(
+      Pbt.boolean,
+      Pbt.integer(min: -100, max: 100),
+      Pbt.ascii_string,
+      Pbt.nil
     )
-  end
-
-  def boolean_like_from(data)
-    case data.fetch(:type)
-    when 0 then data.fetch(:boolean)
-    when 1 then data.fetch(:integer)
-    when 2 then data.fetch(:string)
-    when 3 then nil
-    else raise ArgumentError, "unknown boolean-like type: #{data.fetch(:type)}"
-    end
   end
 end

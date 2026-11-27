@@ -20,7 +20,7 @@ class PbtConditionalAttributesTest < Minitest::Test
   end
 
   def test_conditional_attributes_output_expected_json_shape
-    Pbt.assert(worker: :none) do
+    Pbt.assert do
       Pbt.property(record_case_arbitrary) do |data|
         record = record_from(data.fetch(:record))
         params = {include_name: data.fetch(:include_name)}
@@ -34,7 +34,7 @@ class PbtConditionalAttributesTest < Minitest::Test
   end
 
   def test_conditional_attributes_output_expected_json_shape_for_collection
-    Pbt.assert(worker: :none) do
+    Pbt.assert do
       Pbt.property(collection_case_arbitrary) do |data|
         records = data.fetch(:records).map { |record_data| record_from(record_data) }
         params = {include_name: data.fetch(:include_name)}
