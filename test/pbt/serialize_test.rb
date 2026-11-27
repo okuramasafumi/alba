@@ -14,7 +14,7 @@ class PbtSerializeTest < Minitest::Test
   end
 
   def test_serialize_outputs_expected_json_shape_for_single_object
-    Pbt.assert(worker: :none) do
+    Pbt.assert do
       Pbt.property(record_case_arbitrary) do |data|
         record = record_from(data.fetch(:record))
         root_key = data.fetch(:root_key)
@@ -28,7 +28,7 @@ class PbtSerializeTest < Minitest::Test
   end
 
   def test_serialize_outputs_expected_json_shape_for_collection
-    Pbt.assert(worker: :none) do
+    Pbt.assert do
       Pbt.property(collection_case_arbitrary) do |data|
         collection = data.fetch(:records).map { |record_data| record_from(record_data) }
         root_key = data.fetch(:root_key)
@@ -72,7 +72,7 @@ class PbtSerializeTest < Minitest::Test
   end
 
   def root_key_arbitrary
-    Pbt.one_of(nil, :record, 'record')
+    Pbt.constant_from(nil, :record, 'record')
   end
 
   def record_case_arbitrary

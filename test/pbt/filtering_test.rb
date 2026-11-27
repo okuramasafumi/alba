@@ -36,7 +36,7 @@ class PbtFilteringTest < Minitest::Test
   end
 
   def test_select_filters_nil_values_for_single_object
-    Pbt.assert(worker: :none) do
+    Pbt.assert do
       Pbt.property(record_arbitrary) do |data|
         record = record_from(data)
 
@@ -49,7 +49,7 @@ class PbtFilteringTest < Minitest::Test
   end
 
   def test_select_filters_nil_values_for_collection
-    Pbt.assert(worker: :none) do
+    Pbt.assert do
       Pbt.property(Pbt.array(record_arbitrary, max: 10, empty: true)) do |records_data|
         records = records_data.map { |data| record_from(data) }
 
@@ -62,7 +62,7 @@ class PbtFilteringTest < Minitest::Test
   end
 
   def test_select_receives_attribute_object_for_nested_attributes_and_traits
-    Pbt.assert(worker: :none) do
+    Pbt.assert do
       Pbt.property(record_arbitrary) do |data|
         record = record_from(data)
 
@@ -90,10 +90,10 @@ class PbtFilteringTest < Minitest::Test
 
   def record_from(data)
     Record.new(
-      id: value_from(data.fetch(:id)),
-      name: value_from(data.fetch(:name)),
-      email: value_from(data.fetch(:email)),
-      tag: value_from(data.fetch(:tag))
+      id: data.fetch(:id),
+      name: data.fetch(:name),
+      email: data.fetch(:email),
+      tag: data.fetch(:tag)
     )
   end
 
@@ -107,20 +107,10 @@ class PbtFilteringTest < Minitest::Test
   end
 
   def nilable_integer_arbitrary
-    Pbt.fixed_hash(
-      value: Pbt.integer(min: -100, max: 100),
-      nil: Pbt.boolean
-    )
+    Pbt.one_of(Pbt.integer(min: -100, max: 100), Pbt.nil)
   end
 
   def nilable_string_arbitrary
-    Pbt.fixed_hash(
-      value: Pbt.ascii_string,
-      nil: Pbt.boolean
-    )
-  end
-
-  def value_from(data)
-    data.fetch(:nil) ? nil : data.fetch(:value)
+    Pbt.one_of(Pbt.ascii_string, Pbt.nil)
   end
 end
