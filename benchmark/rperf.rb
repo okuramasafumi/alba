@@ -3,6 +3,8 @@ require 'alba'
 
 Alba.inflector = :active_support
 
+Alba.freeze!
+
 class AlbaCommentResource
   include ::Alba::Resource
   attributes :id, :body

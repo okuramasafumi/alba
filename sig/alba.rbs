@@ -57,6 +57,7 @@ module Alba
   def self.symbolize_keys!: () -> bool
   def self.stringify_keys!: () -> bool
   def self.regularize_key: (root_key_type) -> key_type
+  def self.freeze!: () -> singleton(Alba)
   def self.transform_key: (String | Symbol, transform_type: transform_type) -> key_type
   def self.register_type: (Symbol | Class, ?check: Alba::Type::check, ?converter: Alba::Type::converter, ?auto_convert: bool) -> void
   def self.find_type: (Symbol | Class) -> Type
